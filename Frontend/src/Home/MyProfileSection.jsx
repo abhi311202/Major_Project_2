@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
-
+import { useTranslation } from "react-i18next";
 const MyProfileSection = () => {
+  const { t, i18n } = useTranslation();
+    
+  const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng);
+  };
   const [profileData, setProfileData] = useState({});
 
   const storedObjectString = localStorage.getItem("Admin");
@@ -35,7 +40,7 @@ const MyProfileSection = () => {
     {/* Profile image with hover scale */}
     <img
       src={profileData.profile}
-      alt="Profile"
+      alt={t("Profile")}
       className="w-40 h-40 rounded-full object-cover bg-center transition-transform duration-300 group-hover:scale-105"
     />
   </div>
@@ -53,19 +58,19 @@ const MyProfileSection = () => {
           <div className="text-xl font-bold text-black">
             {profileData.created_at?.split("T")[0]}
           </div>
-          <div className="text-sm text-black mt-1">Registration Date</div>
+          <div className="text-sm text-black mt-1">{t("Registration Date")}e</div>
         </div>
         <div
           className={`bg-white p-4 rounded-xl shadow text-center ${gradientHover}`}
         >
           <div className="text-xl font-bold text-black">15</div>
-          <div className="text-sm text-black mt-1">Doc Uploaded</div>
+          <div className="text-sm text-black mt-1">{t("Doc Uploaded")}</div>
         </div>
         <div
           className={`bg-white p-4 rounded-xl shadow text-center ${gradientHover}`}
         >
           <div className="text-xl font-bold text-black">5</div>
-          <div className="text-sm text-black mt-1">Rating</div>
+          <div className="text-sm text-black mt-1">{t("Rating")}</div>
         </div>
       </div>
 
@@ -85,7 +90,7 @@ const MyProfileSection = () => {
             key={index}
             className="bg-white p-4 rounded-xl shadow border border-gray-200 hover:bg-gradient-to-r from-pink-400 via-yellow-300 to-purple-400 transition"
           >
-            <p className="text-gray-500 mb-1">{label}</p>
+            <p className="text-gray-500 mb-1">{t(label)}</p>
             <p className="font-semibold text-gray-800 dark:text-white">
               {value}
             </p>
@@ -101,7 +106,7 @@ const MyProfileSection = () => {
               key={i}
               className="bg-black text-white font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-300 hover:bg-gradient-to-r hover:from-green-400 hover:via-blue-500 hover:to-purple-600"
             >
-              {btn}
+              {t(btn)}
             </button>
           )
         )}

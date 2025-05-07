@@ -5,12 +5,19 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const AdminSignUp = () => {
   const [profilePic, setProfilePic] = useState(null);
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [preview, setPreview] = useState(null);
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [showOTPModal, setShowOTPModal] = useState(false);
+  const [enteredOTP, setEnteredOTP] = useState("");
+  const [serverOTP, setServerOTP] = useState("");
+  const [pendingData, setPendingData] = useState(null);
+
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -19,6 +26,16 @@ const AdminSignUp = () => {
       setProfilePic(file);
     }
   };
+
+    const { t, i18n } = useTranslation();
+  
+    const changeLanguage = (lng) => {
+      i18n.changeLanguage(lng);
+    };
+  
+    const handleClick = () => {
+      navigate("/AdminSignUp");
+    };
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,6 +46,50 @@ const AdminSignUp = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const handleInitialSubmit = async (data) => {
+  try {
+    // Send only email to backend to trigger OTP send
+    const response = await axios.post("http://localhost:4001/send-otp", {
+      email: data.email,
+    });
+
+    if (response.data.otp) {
+      setServerOTP(response.data.otp); // Only for demo, remove this on production
+      setShowOTPModal(true);
+      setPendingData(data); // Save data to submit after OTP verified
+      toast.success("OTP sent to your email");
+    } else {
+      toast.error("Failed to send OTP");
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("Error sending OTP");
+  }
+};
+
+const handleOTPVerify = async () => {
+  try {
+    const response = await axios.post("http://localhost:4001/Admin/verify-otp", {
+      email: emailForVerification,
+      otp: enteredOTP,
+    });
+
+    if (response.data.verified) {
+      // ✅ OTP verified – proceed to registration
+      await onSubmit(formDataCache);
+      setShowOTPModal(false); // Close the modal
+      toast.success("OTP Verified! Registration complete.");
+    } else {
+      // ❌ OTP is incorrect
+      toast.error("OTP not verified. Please try again.");
+    }
+  } catch (error) {
+    console.error("OTP verification failed", error);
+    toast.error("An error occurred while verifying OTP.");
+  }
+};
+
+
 
   const onSubmit = async (data) => {
     try {
@@ -78,8 +139,9 @@ const AdminSignUp = () => {
   return (
     <Wrapper>
       <Navbar />
-      <form className="form" onSubmit={handleSubmit(onSubmit)}>
-        <h2 className="title">Admin Registration</h2>
+      <form className="form" onSubmit={handleSubmit(handleInitialSubmit)}>
+
+        <h2 className="title">{t("ar")}</h2>
 
         <div className="form-control w-full max-w-xs items-center gap-4 ">
           <label htmlFor="profile-upload" className="cursor-pointer">
@@ -92,7 +154,7 @@ const AdminSignUp = () => {
                 />
               ) : (
                 <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
-                  Upload Profile
+                {t("up")}
                 </div>
               )}
             </div>
@@ -108,43 +170,43 @@ const AdminSignUp = () => {
 
         <div className="form-grid">
           <div className="form-group">
-            <label>Name</label>
+            <label>{t("name")}</label>
             <div className="input-wrapper">
               <input
                 type="text"
-                placeholder="Enter your Name"
+                placeholder={t("name")}
                 {...register("name", { required: true })}
               />
               {errors.name && (
                 <span className="p-2 text-sm text-red-500">
-                  This field is required
+                  {t("required")}
                 </span>
               )}
             </div>
           </div>
 
           <div className="form-group">
-            <label>User Name</label>
+            <label>{t("un")}</label>
             <div className="input-wrapper">
               <input
                 type="text"
-                placeholder="Enter your user name"
+                placeholder={t("eyun")}
                 {...register("username", { required: true })}
               />
               {errors.username && (
                 <span className="p-2 text-sm text-red-500">
-                  This field is required
+                  {t("required")}
                 </span>
               )}
             </div>
           </div>
 
           <div className="form-group">
-            <label>Email</label>
+            <label>{t("email")}</label>
             <div className="input-wrapper">
               <input
                 type="email"
-                placeholder="Enter your Email"
+                placeholder={t("email")}
                 {...register("email", {
                   required: "Email is required",
                   pattern: {
@@ -162,31 +224,33 @@ const AdminSignUp = () => {
                 </span>
               )}
             </div>
+      
+
           </div>
 
           <div className="form-group">
-            <label>Gender</label>
+            <label>{t("g")}</label>
             <div className="input-wrapper">
               <select {...register("gender", { required: true })}>
-                <option value="">Select Gender</option>
+                <option value="">{t("sg")}</option>
                 <option>Male</option>
                 <option>Female</option>
                 <option>Other</option>
               </select>
               {errors.gender && (
                 <span className="p-2 text-sm text-red-500">
-                  This field is required
+                  {t("required")}
                 </span>
               )}
             </div>
           </div>
 
           <div className="form-group">
-            <label>Organization</label>
+            <label>{t("o")}</label>
             <div className="input-wrapper">
               <input
                 type="text"
-                placeholder="Enter your Organization"
+                placeholder={t("eyo")}
                 {...register("organisation", { required: true })}
               />
               {errors.organisation && (
@@ -198,27 +262,27 @@ const AdminSignUp = () => {
           </div>
 
           <div className="form-group">
-            <label>Phone</label>
+            <label>{t("pn")}</label>
             <div className="input-wrapper">
               <input
                 type="phone"
-                placeholder="Enter your Phone Number"
+                placeholder={t("eypn")}
                 {...register("phone", { required: true })}
               />
               {errors.phone && (
                 <span className="p-2 text-sm text-red-500">
-                  This field is required
+                  {t("required")}
                 </span>
               )}
             </div>
           </div>
 
           <div className="form-group">
-            <label>Password</label>
+            <label>{t("p")}</label>
             <div className="input-wrapper relative">
               <input
                 type={passwordVisible ? "text" : "password"}
-                placeholder="Enter your Password"
+                placeholder={t("eyp")}
                 {...register("password", { required: true })}
               />
               <span
@@ -229,21 +293,21 @@ const AdminSignUp = () => {
               </span>
               {errors.password && (
                 <span className="p-2 text-sm text-red-500">
-                  This field is required
+                 {t("required")}
                 </span>
               )}
             </div>
           </div>
 
           <div className="form-group">
-            <label>Profession</label>
+            <label>{t("profession")}</label>
             <div className="input-wrapper">
               <select
                 {...register("profession", { required: true })}
                 className="select select-bordered select-md w-full"
               >
                 <option disabled selected>
-                  Select Profession
+                {t("selectProfession")}
                 </option>
                 <option value="Lawyer">Lawyer</option>
                 <option value="Judge">Judge</option>
@@ -252,18 +316,18 @@ const AdminSignUp = () => {
               </select>
               {errors.profession && (
                 <span className="p-2 text-sm text-red-500">
-                  This field is required
+                  {t("required")}
                 </span>
               )}
             </div>
           </div>
 
           <div className="form-group">
-            <label>Aadhar Number</label>
+            <label>{t("aadhaar")}</label>
             <div className="input-wrapper">
               <input
                 type="number"
-                placeholder="Enter your Aadhar Number"
+                placeholder={t("aadhaar")}
                 maxLength={12}
                 {...register("aadhaar", {
                   required: true,
@@ -279,12 +343,12 @@ const AdminSignUp = () => {
           </div>
 
           <div className="form-group">
-            <label>Date of Birth</label>
+            <label>{t("dob")}</label>
             <div className="input-wrapper">
               <input type="date" {...register("dob", { required: true })} />
               {errors.dob && (
                 <span className="p-2 text-sm text-red-500">
-                  This field is required
+                  {t("required")}
                 </span>
               )}
             </div>
@@ -293,11 +357,32 @@ const AdminSignUp = () => {
           <div className="form-group ml-64">
             <label style={{ visibility: "hidden" }}>Submit</label>
             <button type="submit" className="submit-btn">
-              Register
+            {t("r")}
             </button>
           </div>
         </div>
       </form>
+{showOTPModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white p-6 rounded-md shadow-lg w-96">
+      <h2 className="text-xl font-bold mb-4">Enter OTP</h2>
+      <input
+        type="text"
+        value={enteredOTP}
+        onChange={(e) => setEnteredOTP(e.target.value)}
+        className="w-full p-2 border rounded mb-4"
+        placeholder="Enter OTP"
+      />
+      <button
+        onClick={handleOTPVerify}
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+      >
+        Verify
+      </button>
+    </div>
+  </div>
+)}
+
     </Wrapper>
   );
 };

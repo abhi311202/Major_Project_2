@@ -10,6 +10,7 @@ import SuperAdminHome from "./Home/SuperAdminHome";
 
 import SuperAdminLogin from "./components/SuperAdminLogin";
 import { Toaster } from "react-hot-toast";
+
 const App = () => {
   const user = JSON.parse(localStorage.getItem("Users"));
   return (

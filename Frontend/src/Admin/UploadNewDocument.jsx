@@ -6,6 +6,8 @@ import pdfToText from "react-pdftotext"; // Import react-pdftotext
 import mammoth from "mammoth";
 import { FiUpload, FiLoader } from "react-icons/fi";
 import { toast } from "react-hot-toast";
+import { S3Client } from "@aws-sdk/client-s3";
+import { Upload } from "@aws-sdk/lib-storage";
 
 
 
@@ -66,7 +68,7 @@ function UploadNewDocument() {
   const [fileKey, setFileKey] = useState("");
   const [hashHex, setHashHex] = useState('');
   const [profileData, setProfileData] = useState({});
-
+  const [fileName, setFileName] = useState("");
 
 
 
@@ -397,41 +399,70 @@ function UploadNewDocument() {
     };
   };
 
-  let fileK, url, fileName;
-const Helper = async (title) => {
+
+
+const s3 = new S3Client({
+  region: "ap-south-1",
+  credentials: {
+    accessKeyId: "AKIARWPFIIDC7HN6OB5J",
+    secretAccessKey: "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",
+  },
+});
+
+const uploadToS3 = async (file) => {
   try {
-    if (file) {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("file", file);
-      console.log(title, file);
+    const timestamp = Date.now();
+    const fileKey = `uploads/${timestamp}-${file.name}`;
+    const target = {
+      Bucket: "legalai-bucket",
+      Key: fileKey,
+      Body: file,
+      ContentType: file.type,
+    };
 
-      // Send file to the backend and get the response
-      const result = await axios.post(
-        "http://localhost:4001/upload-pdf",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+    const upload = new Upload({
+      client: s3,
+      params: target,
+    });
 
-      // Set the PDF URL and File Key from the response
-      setPdfUrl(result.data.pdf);
-      setFileKey(result.data.filekey);
-      
-      // Save the fileKey and url for later use
-      fileK = result.data.filekey;
-      url = result.data.pdf;
+    upload.on("httpUploadProgress", (progress) => {
+      console.log("Upload Progress:", progress);
+    });
 
-      // Get the filename from the backend response, fallback to an empty string if not present
-      fileName = result.data.filename || ''; // This ensures fileName is either the response filename or an empty string
-      console.log("Upload success:", result.data.pdf, fileName);
+    const result = await upload.done();
+    console.log("Upload Success", result);
 
-      return true;
-    }
-  } catch (error) {
-    console.error("Upload error:", error);
-    return false;
+    // ✅ Fix: Get region properly
+    const region = await s3.config.region();
+    const pdfUrl = `https://${target.Bucket}.s3.${region}.amazonaws.com/${fileKey}`;
+    const fileName = file.name;
+    setPdfUrl(pdfUrl);
+    // ✅ Console outputs
+    console.log("PDF URL:", pdfUrl);
+    console.log("File Key:", fileKey);
+    console.log("File Name:", fileName);
+    
+    setFileKey(fileKey);
+    setFileName(fileName);
+
+    return {
+      pdfUrl,
+      fileKey,
+      fileName,
+    };
+
+  } catch (err) {
+    console.error("Upload failed:", err);
+    return null;
   }
 };
+
+console.log("hiiii"+fileName);
+console.log("hellll"+fileKey);
+console.log("hllllooo"+PdfUrl);
+const filen= fileName;
+const filek= fileKey;
+const pdfu= PdfUrl;
 
 
 
@@ -458,7 +489,8 @@ const Helper = async (title) => {
     console.log("IN ON SUBMIT");
     // console.log(data,"abhi");
 
-    const success = await Helper(data.title);
+    const success = await uploadToS3(file);
+    console.log(success);
     if (!success) {
       alert("Error: Pdf upload in S3 failed!!");
       return;
@@ -488,53 +520,6 @@ const Helper = async (title) => {
       return toast.error("Invalid case type!");
     }
 
-    // const documentInfo = {
-    //   //MongoDB
-    //   title: data.title,
-    //   serialnum: data.serialnum,
-    //   content: data.content,
-    //   summary: data.summary,
-    //   Class: oth ? "Other" : c,
-    //   ClassificationReason: data.classificationReason,
-    //   adminid: myObject.id,
-    //   uploadDate: new Date().toLocaleDateString("en-US", {
-    //     year: "numeric",
-    //     month: "long",
-    //     day: "numeric",
-    //   }),
-
-    //   // key entity
-    //   caseno: data.caseno,
-    //   casetype: data.casetype,
-    //   casestatus: data.casestatus,
-    //   filingdate: data.filingdate,
-    //   judgmentdate: data.judgmentdate,
-    //   courtname: data.courtname,
-    //   courtno: data.courtno,
-    //   bench: data.bench,
-    //   petitioner: data.petitioner,
-    //   respondent: data.respondent,
-    //   advofpetitioner: data.advofpetitioner,
-    //   advofrespondent: data.advofrespondent,
-    //   prevcasecitation: data.prevcasecitation,
-    //   penaltydetail: data.penaltydetail,
-    //   headnote: data.headnote,
-
-    //   // metadata
-    //   judgementauthor: data.judgementauthor,
-    //   judgementtype: data.judgementtype,
-    //   langofjudgement: data.langofjudgement,
-    //   dateofhearing: data.dateofhearing,
-    //   dateoforderpro: data.dateoforderpro,
-    //   benchcomposition: data.benchcomposition,
-    //   referredacts: data.referredacts,
-
-    //   //file
-    //   pdfUrl: PdfUrl ? PdfUrl : url,
-    //   filekey: fileKey ? fileKey : fileK,
-    //   filename: fileName ? fileName : file ? file.name : "" ,
-    //   hashHex:hashHex,
-    // };
     
 
     const documentInfo = {
@@ -586,30 +571,25 @@ const Helper = async (title) => {
     Doc:{
 
       //file
-      S3_url: PdfUrl ? PdfUrl : url,
-      S3_file_key: fileKey ? fileKey : fileK,
-      S3_File_name: fileName ? fileName : file ? file.name : "" ,
-      Document_Hash:hashHex,
-     Access_id: 1233,
+      S3_url: success.pdfUrl,
+      S3_file_key: success.fileKey,
+      S3_File_name: success.fileName || file?.name || "",
+      Document_Hash: hashHex,
+      Access_id: 1233,
 
     },
     };
     
 
-    // const documentInfo = {
-    //   title: data.title,
-    //   serialnum: data.serialnum,
-    //   content: data.content,
-    //   summary: data.summary,
-    //   Class: data.Class,
-    //   ClassificationReason: data.ClassificationReason,
-    //   adminid: myObject.id,
-    //   uploadDate: new Date().toLocaleDateString("en-US", {
-    //     year: "numeric",
-    //     month: "long",
-    //     day: "numeric",
-    //   }),
-    // };
+    
+
+console.log("hiiii new "+fileName);
+console.log("hellll new "+fileKey);
+console.log("hllllooo new "+PdfUrl)
+
+
+
+
 
     console.log(documentInfo, "abhi1");
     await axios
@@ -770,6 +750,9 @@ const Helper = async (title) => {
       console.log('SHA-256 Hash:', hashHexValue);
 
       setHashHex(hashHexValue);
+
+    
+      setLoading(false);
   
       // 2. Read file content as text
       const reader = new FileReader();
@@ -796,7 +779,7 @@ const Helper = async (title) => {
   
   
 
-  return (
+return (
 <div className="flex min-h-screen max-h-max overflow-hidden ">
   <div className="flex flex-col items-center justify-start w-full p-4">
     

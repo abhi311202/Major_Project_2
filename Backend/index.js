@@ -67,13 +67,6 @@ app.post("/upload-pdf", upload.single("file"), async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-
-
-
-
-
-
 app.use("/User", userRoutes);
 app.use("/Admin", adminRoutes);
 app.use("/SuperAdmin", superAdminRoutes);

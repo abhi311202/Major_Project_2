@@ -7,11 +7,18 @@ import axios from "axios";
 import { useAuth } from "../context/AuthProvider";
 import { toast } from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
+import { useTranslation } from "react-i18next";
 const UserLogin = () => {
+
+  
   const [authUser, setAuthUser] = useAuth();
   const navigate = useNavigate();
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
 
   const handleClick = () => {
     navigate("/AdminSignUp");
@@ -51,38 +58,37 @@ const UserLogin = () => {
     <Wrapper>
       <Navbar />
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
-        <h2 className="title">Admin Login</h2>
+        <h2 className="title">{t("al")}</h2>
 
         <div className="form-group">
-          <label>User Name</label>
+        <label>{t("username")}</label>
           <div className="input-wrapper">
             <svg height={20} width={20} viewBox="0 0 32 32" fill="currentColor">
               <path d="..." />
             </svg>
             <input
-              type="text"
-              placeholder="Enter your Email"
-              {...register("username", { required: true })}
-            />
+            type="text"
+            placeholder={t("usernamePlaceholder")}
+            {...register("username", { required: true })}
+          />
           </div>
         </div>
         {errors.username && (
-          <span className="p-2 text-sm text-red-500">
-            This field is required
-          </span>
+          <span className="p-2 text-sm text-red-500">{t("required")}</span>
         )}
 
         <div className="form-group">
-          <label>Password</label>
+        <label>{t("password")}</label>
           <div className="input-wrapper">
             <svg height={20} width={20} viewBox="0 0 32 32" fill="currentColor">
               <path d="..." />
             </svg>
             <input
               type={passwordVisible ? "text" : "password"}
-              placeholder="Enter your Password"
+              placeholder={t("passwordPlaceholder")}
               {...register("password_hash", { required: true })}
             />
+
             <span
               className="eye-icon"
               onClick={() => setPasswordVisible(!passwordVisible)}
@@ -92,19 +98,17 @@ const UserLogin = () => {
           </div>
         </div>
         {errors.password_hash && (
-          <span className="p-2 text-sm text-red-500">
-            This field is required
-          </span>
-        )}
+  <span className="p-2 text-sm text-red-500">{t("required")}</span>
+)}
 
         <button type="submit" className="submit-btn">
-          Log In
+          {t("login2")}
         </button>
 
-        <p className="text-center">
-          Don't have an account?{" "}
+         <p className="text-center">
+          {t("noAccount")}{" "}
           <span className="link" onClick={handleClick}>
-            Sign Up
+            {t("signup")}
           </span>
         </p>
 
@@ -116,7 +120,7 @@ const UserLogin = () => {
             alt="Google icon"
             height="18"
           />
-          Continue with Google
+          {t("google")}
         </button>
       </form>
     </Wrapper>

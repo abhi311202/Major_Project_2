@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Globe, Moon, Sun, ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useTranslation } from "react-i18next";
 
 import {
   DropdownMenu,
@@ -27,6 +28,12 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setSticky(window.scrollY > 0);
@@ -39,27 +46,27 @@ const Navbar = () => {
     <>
       <li>
         <a href="/" className="text-xs">
-          Home
+        {t("home")}
         </a>
       </li>
       <li>
         <a href="/search" className="text-xs">
-          Search
+        {t("search")}
         </a>
       </li>
       <li>
         <a href="/services" className="text-xs">
-          Services
+        {t("service")}
         </a>
       </li>
       <li>
         <a href="/team" className="text-xs">
-          Team
+        {t("team")}
         </a>
       </li>
       <li>
         <a href="/about" className="text-xs">
-          About
+        {t("about")}
         </a>
       </li>
     </>
@@ -124,9 +131,9 @@ const Navbar = () => {
                 <ChevronDown size={20} />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem>English</DropdownMenuItem>
-                <DropdownMenuItem>Hindi</DropdownMenuItem>
-                <DropdownMenuItem>Bengali</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage("en")}>English</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage("hi")}>Hindi</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage("bn")}>Bengali</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -156,14 +163,14 @@ const Navbar = () => {
             {authUser || authAdmin ? (
               <div className="flex items-center gap-2">
                 <Button onClick={() => navigate("/AdminHome")} size="sm">
-                  Dashboard
+                {t("db")}
                 </Button>
                 <Logout />
               </div>
             ) : authAdmin2 ? (
               <div className="flex items-center gap-2">
                 <Button onClick={() => navigate("/SuperAdminHome")} size="sm">
-                  Dashboard
+                {t("db")}
                 </Button>
                 <SuperAdminLogout />
               </div>
@@ -174,22 +181,22 @@ const Navbar = () => {
                   size="sm"
                   className="text-xs px-3 py-1.5"
                 >
-                  User Login
+                 {t("userLogin")}
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button size="sm" className="text-xs px-3 py-1.5">
-                      Login
+                    {t("login")}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem onClick={() => navigate("/AdminLogin")}>
-                      Admin Login
+                     {t("al")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => navigate("/SuperAdminLogin")}
                     >
-                      Super Admin
+                     {t("sl")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

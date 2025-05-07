@@ -1,0 +1,148 @@
+{
+    "home": "Home",
+    "search": "Search",
+    "service": "Services",
+    "team": "Team",
+    "about": "About",
+    "userLogin": "User Login",
+    "login": "Login",
+    "dashboard": "Dashboard",
+    "welcomelegalai":"Transform legal workflows with AI-driven solutions that automate the summarization and classification of legal documents, enhancingaccuracy and efficiency.",
+    "wt":"Welcome to",
+    "es":"Explore Services",
+    "hs":"Hello, Search your Documents with powerful RAG",
+    "hsd":"The Document Search feature combines semantic and full-text search to help users find the most relevant legal documents,even if they don’t use exact keywords. It applies filters,removes weak documents, and gives fast, accurate results using AI — making legal research simple and effective.",
+    "yg": "Your Gateway",
+    "ds":"Document Search",
+    "dsd":"Easily access and search your legal, academic, or project documents in one click.",
+    "sd":"Search Documents",
+    "services": {
+    "summarization": {
+      "title": "Summarization",
+      "heading": "Summarize your Documents.",
+      "description": "Automatically generate concise summaries of long legal documents."
+    },
+    "classification": {
+      "title": "Classification",
+      "heading": "Classify your Documents.",
+      "description": "Automatically assign categories to legal texts using AI."
+    },
+    "search": {
+      "title": "Search",
+      "heading": "Advance Document Search.",
+      "description": "Use smart filters and semantic search to find documents faster."
+    },
+    "entity": {
+      "title": "Entity Extraction",
+      "heading": "Extract Entities of Documents.",
+      "description": "Identify names, places, and organizations from legal texts."
+    },
+    "metadata": {
+      "title": "Metadata Extraction",
+      "heading": "Extract Metadata of Documents.",
+      "description": "Extract document metadata like date, author, case type."
+    },
+    "textvoice": {
+      "title": "Text to Voice Support",
+      "heading": "Text to Voice of Documents.",
+      "description": "Convert legal text to speech for better accessibility."
+    },
+    "langsupport": {
+      "title": "Language Support",
+      "heading": "Language Translation.",
+      "description": "Translate legal content across multiple languages."
+    }
+  },
+  "learnMore": "Learn More",
+  "of": "Our Features",
+  "teamSection": {
+    "heading": "Meet Our Team",
+    "members": {
+      "abhishek": {
+        "title": "Abhishek Kumar Rai",
+        "role": "Department of IT - NEHU"
+      },
+      "abhi": {
+        "title": "Abhi Suresh Nitnaware",
+        "role": "Department of IT - NEHU"
+      },
+      "sanskar": {
+        "title": "Sanskar Kashyap",
+        "role": "Department of IT - NEHU"
+      },
+      "ujjwal": {
+        "title": "Ujjwal Kumar",
+        "role": "Department of IT - NEHU"
+      },
+      "lapyn": {
+        "title": "Lapyntngenlang Kharkrang",
+        "role": "Department of IT - NEHU"
+      }
+    }
+  },
+  "readMore": {
+    "title": "Legal AI Development Process",
+    "shortDescription": "In the legal sector, handling large volumes of documents is a routine but essential task. Legal practitioners, researchers, and even clients frequently deal with extensive paperwork that demands careful review and analysis. However, this manual process is time-consuming, prone to errors, and can lead to inefficiencies within the legal workflow. Our solution aims to address these challenges through the power of Artificial Intelligence and Machine Learning.",
+    "fullDescription": "Our AI-based service specializes in summarizing and classifying legal documents to streamline legal processes. By leveraging advanced machine learning (ML) techniques, we have developed tools that assist legal professionals in managing information overload, improving accuracy, and enhancing workflow efficiency.",
+    "button": "Read More"
+  },
+  "al":"Admin Login",
+  "sl":"SuperAdmin Login",
+  "cwus":"Connect with us:",
+  "username": "User Name",
+  "usernamePlaceholder": "Enter your Email",
+  "password": "Password",
+  "passwordPlaceholder": "Enter your Password",
+  "login2": "Log In",
+  "noAccount": "Don't have an account?",
+  "signup": "Sign Up",
+  "google": "Continue with Google",
+  "required": "This field is required",
+  "ar": "Admin Registration",
+  "name": "Name",
+  "email": "Email",
+  "confirmPassword": "Confirm Password",
+  "passwordMismatch": "Passwords do not match",
+  "aadhaar": "Aadhar Number",
+  "profession": "Profession",
+  "selectProfession": "Select Profession",
+  "government": "Government",
+  "private": "Private",
+  "profilePhoto": "Profile Photo",
+  "register": "Register",
+  "alreadyHaveAccount": "Already have an account?",
+  "up": "Upload Profile",
+  "un":"User Name",
+  "eyun":"Enter your user name",
+  "g": "Gender",
+  "sg": "Select Gender",
+  "o": "Organisation",
+  "eyo": "Enter Organisation",
+  "pn": "Phone Number",
+  "eypn": "Enter Phone Number",
+  "dob": "Date of Birth",
+  "r": "Register",
+  "sal":"Super Admin Login",
+  "logout":"Logout",
+  "db":"Dashboard",
+  "uploadNew": "Upload New Document",
+  "uploadedDoc": "Uploaded Document",
+  "hide": "Hide",
+  "Email": "Email",
+  "Username": "Username",
+  "Gender": "Gender",
+  "DOB": "Date of Birth",
+  "Aadhaar ID": "Aadhaar ID",
+  "Profession": "Profession",
+  "Organization": "Organization",
+  "Phone": "Phone",
+  "Registration Date": "Registration Date",
+  "Doc Uploaded": "Documents Uploaded",
+  "Rating": "Rating",
+  "Change Password": "Change Password",
+  "Edit Profile": "Edit Profile",
+  "Request For SuperAdmin": "Request For SuperAdmin",
+  "Profile": "Profile"
+
+  }
+  

@@ -14,8 +14,14 @@ import {
   FiUsers,
 } from "react-icons/fi";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export const AdminBody = () => {
+  const { t, i18n } = useTranslation();
+    
+  const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng);
+  };
   
   const [selected, setSelected] = useState("Dashboard");
 
@@ -45,6 +51,7 @@ export const AdminBody = () => {
 
 const Sidebar = ({ selected, setSelected }) => {
   const [open, setOpen] = useState(true);
+  const { t } = useTranslation(); 
   
 
   useEffect(() => {
@@ -68,6 +75,7 @@ const Sidebar = ({ selected, setSelected }) => {
           selected={selected}
           setSelected={setSelected}
           open={open}
+          label={t("db")}
         />
         <Option
           Icon={FiUpload }
@@ -76,6 +84,7 @@ const Sidebar = ({ selected, setSelected }) => {
           setSelected={setSelected}
           open={open}
           notifs={3}
+          label={t("uploadNew")}
         />
 
         <Option
@@ -85,6 +94,7 @@ const Sidebar = ({ selected, setSelected }) => {
           setSelected={setSelected}
           open={open}
           notifs={3}
+          label={t("uploadedDoc")}
         />
         
       </div>
@@ -94,7 +104,7 @@ const Sidebar = ({ selected, setSelected }) => {
   );
 };
 
-const Option = ({ Icon, title, selected, setSelected, open, notifs }) => {
+const Option = ({ Icon, title, label, selected, setSelected, open, notifs }) => {
   return (
     <motion.button
       layout
@@ -119,7 +129,7 @@ const Option = ({ Icon, title, selected, setSelected, open, notifs }) => {
           transition={{ delay: 0.125 }}
           className="text-xs font-medium"
         >
-          {title}
+        {label}
         </motion.span>
       )}
 

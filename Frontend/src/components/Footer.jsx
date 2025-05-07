@@ -7,13 +7,20 @@ import {
   FaLinkedinIn,
   FaGithub,
 } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+
+  const { t, i18n } = useTranslation();
+ 
+   const changeLanguage = (lng) => {
+     i18n.changeLanguage(lng);
+   };
   return (
     <footer className="bg-gradient-to-r from-pink-400 via green-400 to-yellow-400 text-white">
       {/* Social Icons */}
       <div className="flex flex-col md:flex-row items-center justify-between px-6 py-6 border-b border-gray-700">
-        <h3 className="text-lg font-semibold mb-4 md:mb-0">Connect with us:</h3>
+        <h3 className="text-lg font-semibold mb-4 md:mb-0"> {t("cwus")}</h3>
         <div className="flex gap-4">
           {[
             FaFacebookF,

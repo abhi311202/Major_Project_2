@@ -2,8 +2,13 @@ import React from "react";
 import { useAuth2 } from "../context/AuthProvider2";
 import toast from "react-hot-toast";
 import { replace, useLocation, useNavigate } from "react-router-dom";
-
+import { useTranslation } from "react-i18next";
 function SuperAdminLogout() {
+    const { t, i18n } = useTranslation();
+  
+    const changeLanguage = (lng) => {
+      i18n.changeLanguage(lng);
+    };
   const [authAdmin2, setAuthAdmin2] = useAuth2();
   const handleLogout = () => {
     try {
@@ -30,7 +35,7 @@ function SuperAdminLogout() {
         className="bg-black border border-black-700 text-white text-xs sm:text-sm px-2 py-1 sm:px-2 sm:py-[5px] rounded-md hover:bg-black-600 duration-300 cursor-pointer"
         onClick={handleLogout}
       >
-        Logout
+     {t("logout")}
       </button>
     </div>
   );
