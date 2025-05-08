@@ -7,6 +7,7 @@ import {
   verifyOtpController,
 } from "../Controllers/emailAuthController.js";
 import { welcomeEmailController } from "../Controllers/welcomeEmailController.js";
+import { sendPhoneOtpController, verifyPhoneOtpController } from "../Controllers/phoneAuthController.js";
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -19,6 +20,8 @@ router.post("/upload-pdf", upload.single("file"), uploadS3PdfController);
 router.delete("/delete-pdf", deleteS3PdfController);
 router.post("/send-otp", sendOtpController);
 router.post("/verify-otp", verifyOtpController);
+router.post("/send-phone-otp", sendPhoneOtpController);
+router.post("/verify-phone-otp", verifyPhoneOtpController);
 router.post("/send-welcome-email", welcomeEmailController);
 
 export default router;

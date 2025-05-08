@@ -4,10 +4,10 @@ import cors from "cors";
 import userRoutes from "./Modules/User/Routes/userRoutes.js";
 import adminRoutes from "./Modules/Admin/Routes/adminRoutes.js";
 import superAdminRoutes from "./Modules/SuperAdmin/Routes/superAdminRoutes.js";
+import documentRoutes from "./Modules/Document/Routes/documentRoutes.js";
 import servicesRoutes from "./Services/Routes/servicesRoutes.js";
 import cookieParser from "cookie-parser";
 import connectMongo from "./config/mongoClient.js";
-
 
 const app = express();
 app.use(cors());
@@ -26,7 +26,8 @@ app.get("/", (req, res) => {
 app.use("/User", userRoutes);
 app.use("/Admin", adminRoutes);
 app.use("/SuperAdmin", superAdminRoutes);
-app.use("/Services",servicesRoutes);
+app.use("/Services", servicesRoutes);
+app.use("/Document", documentRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on ${port}`);
