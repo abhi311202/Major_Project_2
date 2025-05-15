@@ -16,3 +16,16 @@ export const softDeleteSuperAdminRequest = async (requestId) => {
   }
   return rows[0];
 };
+
+export const getAdminInfo = async (id) => {
+  try {
+    const query = `SELECT email, username FROM admin WHERE id = $1;`;
+    const result = await client.query(query, [id]);
+    if (result.rowCount === 0) {
+      throw new Error("Admin not found");
+    }
+    return result.rows[0];
+  } catch (error) {
+    throw error;
+  }
+};

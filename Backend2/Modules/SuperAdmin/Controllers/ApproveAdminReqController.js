@@ -2,6 +2,7 @@ import { getPendingReqByID } from "../Models/getPendingReqByIDModel.js";
 import { Approve_Pending_Req } from "../Models/ApprovePendingReqModel.js";
 import { Delete_Pending_Req_By_ID } from "../Models/DeletePendingReqByIDModel.js";
 import { Delete_From_Admin_Table_By_ID } from "../Models/DeleteFromAdminTableByIDModel.js";
+import client from "../../../config/sqlDB.js";
 
 export const Approve_Req = async (req, res) => {
     try {
@@ -32,7 +33,6 @@ export const Approve_Req = async (req, res) => {
           } else {
             return res.status(200).json({
               message: "Request Approved Seccessfully",
-              // approved_admin_mail : pendingReq.email,
             });
           }
         }
