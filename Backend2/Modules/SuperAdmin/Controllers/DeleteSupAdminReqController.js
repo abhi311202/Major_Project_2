@@ -1,4 +1,7 @@
-import { softDeleteSuperAdminRequest } from "../Models/DeleteSupAdminReqModel.js";
+import {
+  softDeleteSuperAdminRequest,
+  getAdminInfo,
+} from "../Models/DeleteSupAdminReqModel.js";
 
 export const deleteSuperAdminRequest = async (req, res) => {
   const { id } = req.body;
@@ -7,7 +10,13 @@ export const deleteSuperAdminRequest = async (req, res) => {
   }
   try {
     const deleted = await softDeleteSuperAdminRequest(id);
-    res.json({ message: "Request deleted successfully", request: deleted });
+    const adminInfo = await getAdminInfo(deleted.admin_id);
+    res.status(200).json({
+      message: "Request deleted successfully",
+      request: deleted,
+      email: adminInfo.email,
+      username: adminInfo.username,
+    });
   } catch (error) {
     res.status(404).json({ error: error.message });
   }

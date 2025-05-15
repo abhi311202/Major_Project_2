@@ -37,7 +37,7 @@ export const Approve_Pending_Req = async (SuperAdmin_id, pendingReq) => {
       FALSE,
       CURRENT_TIMESTAMP,
       CURRENT_TIMESTAMP,
-      '3000-12-31 00:00:00',
+      NULL,
       $12 
   ) RETURNING id;`;
 
