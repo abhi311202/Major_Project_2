@@ -592,27 +592,27 @@ console.log("hllllooo new "+PdfUrl)
 
 
     console.log(documentInfo, "abhi1");
-    await axios
-      .post("http://localhost:4001/Admin/UploadDocument", documentInfo)
-      .then((res) => {
-        // console.log(res.data);
-        if (res.data) {
-          // console.log(res.data);
-          // Remove "Please wait..." toast
-          toast.success(res.data.message);
-          handleResetButton();
-          handleResetButton();
-          // **Force re-render of file input field**
-          document.getElementById("fileUploaded").value = "";
-        }
-      })
-      .catch((err) => {
-        if (err.response) {
-          console.log(err);
-          console.log("Error from backend: " + err.response.data.message);
-          toast.error("Error: " + err.response.data.message);
-        }
-      });
+    // await axios
+    //   .post("http://localhost:4001/Admin/UploadDocument", documentInfo)
+    //   .then((res) => {
+    //     // console.log(res.data);
+    //     if (res.data) {
+    //       // console.log(res.data);
+    //       // Remove "Please wait..." toast
+    //       toast.success(res.data.message);
+    //       handleResetButton();
+    //       handleResetButton();
+    //       // **Force re-render of file input field**
+    //       document.getElementById("fileUploaded").value = "";
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     if (err.response) {
+    //       console.log(err);
+    //       console.log("Error from backend: " + err.response.data.message);
+    //       toast.error("Error: " + err.response.data.message);
+    //     }
+    //   });
   };
 
   const handleResetButton = () => {
@@ -787,7 +787,7 @@ return (
     <div className="w-full ml-[950px]">
   <label
     htmlFor="file-upload"
-    className={`inline-block cursor-pointer text-white text-base font-semibold py-3 px-6 rounded-md transition-all duration-300
+    className={`inline-block cursor-pointer text-white text-base font-semibold py-3 px-6 rounded-md transition-all duration-300 dark:bg-white dark:text-black
       ${isInScope ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-700'}`}
   >
     Browse File
@@ -801,7 +801,7 @@ return (
     className="hidden"
   />
   {selectedFileName && (
-    <p className="mt-2 text-sm text-gray-700">{selectedFileName}</p>
+    <p className="mt-2 text-sm text-gray-700 dark:text-white">{selectedFileName}</p>
   )}
 </div>
 
@@ -834,7 +834,7 @@ return (
             </label>
             <input
               type="text"
-              className="w-full p-2 rounded-md border border-gray-300 dark:bg-black dark:border-gray-600"
+              className="w-full p-2 rounded-md border border-gray-300 dark:bg-black dark:border-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               placeholder="Enter document title"
               {...register("title", { required: true })}
             />
@@ -850,7 +850,7 @@ return (
             </label>
             <input
               type="text"
-              className="w-full p-2 rounded-md border border-gray-300 dark:bg-black dark:border-gray-600"
+              className="w-full p-2 rounded-md border border-gray-300 dark:bg-black dark:border-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               placeholder="Enter serial number"
               {...register("serialnum", { required: true })}
             />
@@ -866,7 +866,7 @@ return (
             
 
             <button
-              className={`w-full sm:w-auto bg-black text-white font-medium px-6 py-2 rounded-md ${
+              className={`w-full sm:w-auto bg-black text-white font-medium px-6 py-2 rounded-md dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white ${
                 file ? "hover:bg-gray-700" : "opacity-50 cursor-not-allowed"
               }`}
               onClick={() => {
@@ -1110,7 +1110,7 @@ return (
 <div className="mt-6 flex flex-wrap gap-4">
   <button
     onClick={handleShowResult}
-    className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-blue-500 dark:hover:bg-blue-600"
+    className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
   >
     Show Result
   </button>
@@ -1247,7 +1247,7 @@ return (
 <div className="mt-6 flex flex-wrap gap-4">
   <button
     onClick={handleShowResult}
-    className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-blue-500 dark:hover:bg-blue-600"
+    className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
   >
     Show Result
   </button>
@@ -1276,7 +1276,7 @@ return (
                 {...(loading1
                   ? {}
                   : register("classification", { required: true }))}
-                className={`w-full p-4 border rounded-lg resize-none text-gray-700 dark:bg-black dark:border-gray-600 dark:text-white ${
+                className={`w-full p-4 border rounded-lg resize-none text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white ${
                   classError || classificationError
                     ? "border-red-500"
                     : "border-gray-300"
@@ -1323,7 +1323,7 @@ return (
                   setValue("ClassificationReason", e.target.value);
                 }}
                 {...(loading1 ? {} : register("classificationReason", { required: true }))}
-                className={`w-full p-3 border rounded-md resize-none dark:bg-black dark:border-gray-600 dark:text-white ${
+                className={`w-full p-3 border rounded-md resize-none dark:bg-black dark:border-gray-600 dark:text-white dark:bg-gray-800 dark:border-gray-700 dark:text-white ${
                   classificationError ? "border-red-500" : ""
                 }`}
               />
@@ -1350,7 +1350,7 @@ return (
           <div className="mt-6 flex flex-wrap gap-4">
   <button
     onClick={handleShowResult}
-    className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-blue-500 dark:hover:bg-blue-600"
+    className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
   >
     Show Result
   </button>
@@ -1379,7 +1379,7 @@ return (
                   setValue("summary", e.target.value);
                 }}
                 {...(loading ? {} : register("summary", { required: true }))}
-                className={`w-full p-3 border rounded-md resize-none dark:bg-black dark:border-gray-600 dark:text-white ${
+                className={`w-full p-3 border rounded-md resize-none dark:bg-black dark:border-gray-600 dark:text-white dark:bg-gray-800 dark:border-gray-700 dark:text-white${
                   summarizationError ? "border-red-500" : ""
                 }`}
               />
@@ -1405,7 +1405,7 @@ return (
           <div className="mt-6 flex flex-wrap gap-4">
   <button
     onClick={handleShowResult}
-    className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-blue-500 dark:hover:bg-blue-600"
+    className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
   >
     Show Result
   </button>
@@ -1434,7 +1434,7 @@ return (
                 setValue("content", e.target.value);
               }}
               {...register("content", { required: true })}
-              className="w-full p-3 border rounded-md resize-none dark:bg-black dark:border-gray-600 dark:text-white"
+              className="w-full p-3 border rounded-md resize-none dark:bg-black dark:border-gray-600 dark:text-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
             />
             {errors.content && (
               <span className="text-sm text-red-500">This field is required</span>
@@ -1444,14 +1444,14 @@ return (
           {/* Submit + Reset */}
           <div className="flex justify-between">
             <button
-              className="w-1/4 mr-2 bg-black text-white py-2 rounded-md"
+              className="w-1/4 mr-2 bg-black text-white py-2 rounded-md dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
               onClick={handleSubmit(onSubmit)}
               disabled={loading || loading1}
             >
               {loading || loading1 ? "Processing..." : "Submit"}
             </button>
             <button
-              className="w-1/4 ml-2 bg-black text-white py-2 rounded-md"
+              className="w-1/4 ml-2 bg-black text-white py-2 rounded-md dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
               type="reset"
               onClick={handleResetButton}
               disabled={loading || loading1}

@@ -32,6 +32,7 @@ export const Approve_Req = async (req, res) => {
           } else {
             return res.status(200).json({
               message: "Request Approved Seccessfully",
+              // approved_admin_mail : pendingReq.email,
             });
           }
         }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Navbar from "../components/Navbar";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -16,8 +16,22 @@ const AdminSignUp = () => {
   const [enteredOTP, setEnteredOTP] = useState("");
   const [serverOTP, setServerOTP] = useState("");
   const [pendingData, setPendingData] = useState(null);
+  const [emailForVerification, setEmailForVerification] = useState("");
+  const [formDataCache, setFormDataCache] = useState(null);
+  const [phoneForVerification, setPhoneForVerification] = useState("");
+  const [enteredPhoneOTP, setEnteredPhoneOTP] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [phoneVerified, setPhoneVerified] = useState(false);
 
-
+  
+  useEffect(() => {
+    if (emailVerified && phoneVerified) {
+      onSubmit(formDataCache);
+      setShowOTPModal(false);
+      toast.success("Both OTPs Verified!");
+    }
+  }, [emailVerified, phoneVerified]);
+  
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -46,48 +60,132 @@ const AdminSignUp = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const handleInitialSubmit = async (data) => {
-  try {
-    // Send only email to backend to trigger OTP send
-    const response = await axios.post("http://localhost:4001/send-otp", {
-      email: data.email,
-    });
 
-    if (response.data.otp) {
-      setServerOTP(response.data.otp); // Only for demo, remove this on production
-      setShowOTPModal(true);
-      setPendingData(data); // Save data to submit after OTP verified
-      toast.success("OTP sent to your email");
+
+
+  const handleResendEmailOTP = async () => {
+    try {
+      const response = await sendEmailOTP(emailForVerification);
+      if (response.data.message === "OTP sent to email") {
+        toast.success("OTP sent to email again");
+      } else {
+        toast.error("Failed to resend email OTP");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error resending email OTP");
+    }
+  };
+
+  // Trigger Phone OTP resend
+  const handleResendPhoneOTP = async () => {
+    try {
+      const response = await sendPhoneOTP(phoneForVerification);
+      if (response.data.message === "OTP sent to phone") {
+        toast.success("OTP sent to phone again");
+      } else {
+        toast.error("Failed to resend phone OTP");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error resending phone OTP");
+    }
+  };
+
+  // Verify Email OTP
+const handleEmailOTPVerify = async () => {
+  try {
+    const response = await verifyEmailOTP(emailForVerification, enteredOTP);
+    if (response.data.message === "Email verified successfully") {
+      setEmailVerified(true);
+      toast.success("Email OTP Verified");
+
+      if (phoneVerified) {
+        await onSubmit(formDataCache); // Auto-submit if phone already verified
+        setShowOTPModal(false);
+        toast.success("Both OTPs Verified! Submitted");
+      }
     } else {
-      toast.error("Failed to send OTP");
+      toast.error("Email OTP verification failed");
     }
   } catch (error) {
     console.error(error);
-    toast.error("Error sending OTP");
+    toast.error("Error verifying Email OTP");
   }
 };
 
-const handleOTPVerify = async () => {
+// Verify Phone OTP
+const handlePhoneOTPVerify = async () => {
   try {
-    const response = await axios.post("http://localhost:4001/Admin/verify-otp", {
-      email: emailForVerification,
-      otp: enteredOTP,
-    });
+    const response = await verifyPhoneOTP(phoneForVerification, enteredPhoneOTP);
+    if (response.data.message === "Phone verified successfully") {
+      setPhoneVerified(true);
+      toast.success("Phone OTP Verified");
 
-    if (response.data.verified) {
-      // ✅ OTP verified – proceed to registration
-      await onSubmit(formDataCache);
-      setShowOTPModal(false); // Close the modal
-      toast.success("OTP Verified! Registration complete.");
+      if (emailVerified) {
+        await onSubmit(formDataCache); // Auto-submit if email already verified
+        setShowOTPModal(false);
+        toast.success("Both OTPs Verified! Submitted");
+      }
     } else {
-      // ❌ OTP is incorrect
-      toast.error("OTP not verified. Please try again.");
+      toast.error("Phone OTP verification failed");
     }
   } catch (error) {
-    console.error("OTP verification failed", error);
-    toast.error("An error occurred while verifying OTP.");
+    console.error(error);
+    toast.error("Error verifying Phone OTP");
   }
 };
+
+
+  // Initial submit (call OTP modal)
+  const handleInitialSubmit = async (data) => {
+    try {
+      const emailResponse = await sendEmailOTP(data.email);
+      const phoneResponse = await sendPhoneOTP(data.phone);
+
+      if (
+        emailResponse.data.message === "OTP sent to email" &&
+        phoneResponse.data.message === "OTP sent to phone"
+      ) {
+        setEmailForVerification(data.email);
+        setPhoneForVerification(data.phone);
+        setFormDataCache(data);
+        setShowOTPModal(true);
+        toast.success("OTPs sent to email and phone");
+      } else {
+        toast.error("Failed to send one or both OTPs");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error sending OTPs");
+    }
+  };
+
+
+
+
+
+  // Send Email OTP
+const sendEmailOTP = async (email) => {
+  return await axios.post("http://localhost:4001/Services/send-otp", { email });
+};
+
+// Send Phone OTP
+const sendPhoneOTP = async (phone) => {
+  return await axios.post("http://localhost:4001/Services/send-phone-otp", { phone });
+};
+
+// Verify Email OTP
+const verifyEmailOTP = async (email, otp) => {
+  return await axios.post("http://localhost:4001/Services/verify-otp", { email, otp });
+};
+
+// Verify Phone OTP
+const verifyPhoneOTP = async (phone, otp) => {
+  return await axios.post("http://localhost:4001/Services/verify-phone-otp", { phone, otp });
+};
+
+  
 
 
 
@@ -125,6 +223,7 @@ const handleOTPVerify = async () => {
         profession: data.profession,
         organization: data.organisation,
         password_hash: data.password,
+        type:"WelcomeAdminEmail",
       };
 
       await axios.post("http://localhost:4001/Admin/register", userInfo);
@@ -362,26 +461,68 @@ const handleOTPVerify = async () => {
           </div>
         </div>
       </form>
-{showOTPModal && (
+      {showOTPModal && (
   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-    <div className="bg-white p-6 rounded-md shadow-lg w-96">
-      <h2 className="text-xl font-bold mb-4">Enter OTP</h2>
-      <input
-        type="text"
-        value={enteredOTP}
-        onChange={(e) => setEnteredOTP(e.target.value)}
-        className="w-full p-2 border rounded mb-4"
-        placeholder="Enter OTP"
-      />
-      <button
-        onClick={handleOTPVerify}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        Verify
-      </button>
+    <div className="bg-white p-8 rounded-lg shadow-xl w-96 max-w-md">
+      <h2 className="text-2xl font-semibold text-center mb-6 text-blue-600">Enter OTPs</h2>
+
+      {/* Email OTP Section */}
+      <div className="mb-6">
+        <label htmlFor="emailOTP" className="block text-gray-600 mb-2">Email OTP</label>
+        <input
+          id="emailOTP"
+          type="text"
+          value={enteredOTP}
+          onChange={(e) => setEnteredOTP(e.target.value)}
+          className="w-full p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Enter Email OTP"
+        />
+        <button
+          onClick={handleEmailOTPVerify}
+          className="w-full mt-4 bg-blue-500 text-white py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-300"
+          disabled={emailVerified}
+        >
+          {emailVerified ? "Email Verified" : "Verify Email OTP"}
+        </button>
+        <button
+          onClick={handleResendEmailOTP}
+          className="w-full mt-2 bg-gray-300 text-gray-800 py-2 rounded-lg shadow-md hover:bg-gray-400 transition duration-300"
+        >
+          Resend Email OTP
+        </button>
+      </div>
+
+      {/* Phone OTP Section */}
+      <div className="mb-6">
+        <label htmlFor="phoneOTP" className="block text-gray-600 mb-2">Phone OTP</label>
+        <input
+          id="phoneOTP"
+          type="text"
+          value={enteredPhoneOTP}
+          onChange={(e) => setEnteredPhoneOTP(e.target.value)}
+          className="w-full p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Enter Phone OTP"
+        />
+        <button
+          onClick={handlePhoneOTPVerify}
+          className="w-full mt-4 bg-blue-500 text-white py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-300"
+          disabled={phoneVerified}
+        >
+          {phoneVerified ? "Phone Verified" : "Verify Phone OTP"}
+        </button>
+        <button
+          onClick={handleResendPhoneOTP}
+          className="w-full mt-2 bg-gray-300 text-gray-800 py-2 rounded-lg shadow-md hover:bg-gray-400 transition duration-300"
+        >
+          Resend Phone OTP
+        </button>
+      </div>
+
     </div>
   </div>
 )}
+
+
 
     </Wrapper>
   );

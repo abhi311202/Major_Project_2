@@ -33,7 +33,8 @@ const Navbar = () => {
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
   };
-
+ 
+  
   useEffect(() => {
     const handleScroll = () => {
       setSticky(window.scrollY > 0);
@@ -41,6 +42,13 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+  useEffect(() => {
+  const storedTheme = localStorage.getItem("theme");
+  if (storedTheme) {
+    setTheme(storedTheme);
+  }
+}, []);
+
 
   const navItems = (
     <>
@@ -78,7 +86,7 @@ const Navbar = () => {
         className={`w-full max-w-none px-4 md:px-5 top-0 left-0 right-0 z-50 font-sans ${
           sticky
             ? "sticky-navbar shadow-md text-white transition-all duration-300 ease-in-out"
-            : "bg-white text-black"
+            : "bg-white text-black dark:bg-black dark:text-white"
         }`}
       >
         <div className="navbar flex justify-between items-center mx-auto">

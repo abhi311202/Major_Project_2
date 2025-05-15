@@ -120,6 +120,7 @@
   "eyo": "Enter Organisation",
   "pn": "Phone Number",
   "eypn": "Enter Phone Number",
+  "eyp": "Enter Your Password",
   "dob": "Date of Birth",
   "r": "Register",
   "sal":"Super Admin Login",
@@ -142,7 +143,8 @@
   "Change Password": "Change Password",
   "Edit Profile": "Edit Profile",
   "Request For SuperAdmin": "Request For SuperAdmin",
-  "Profile": "Profile"
+  "Profile": "Profile",
+  "p":"Password"
 
   }
   

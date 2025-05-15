@@ -2,15 +2,15 @@ import React, { useState,useEffect } from "react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 
-const ManageAdmin = () => {
+const ManageSuperAdmin = () => {
   const [admins, setAdmins] = useState([]);
   const [removedId, setRemovedId] = useState(null); // To track which card is being removed
 
   const fetchAdmins = async () => {
     try {
-      const res = await axios.get("http://localhost:4001/SuperAdmin/AdminRequest");
+      const res = await axios.get("http://localhost:4001/SuperAdmin/super-admin-requests");
       if (res.data.success) {
-        // console.log(res.data.data,"Abh");
+        console.log(res.data.data,"Abh");
         setAdmins(res.data.data);
         console.log(admins);
 
@@ -80,9 +80,9 @@ const ManageAdmin = () => {
     setTimeout(async () => {
       try {
         const res = await axios.post(
-          "http://localhost:4001/SuperAdmin/DeleteReq",
+          "http://localhost:4001/SuperAdmin/delete-super-admin-request",
           {
-            Pending_Request_id: pendingId,
+            id: pendingId,
           }
         );
         toast.success(res.data.message);
@@ -101,7 +101,7 @@ const ManageAdmin = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">Manage Admin</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-2">Manage SuperAdmin</h1>
       
 
       <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
@@ -167,4 +167,4 @@ const ManageAdmin = () => {
   );
 };
 
-export default ManageAdmin;
+export default ManageSuperAdmin;

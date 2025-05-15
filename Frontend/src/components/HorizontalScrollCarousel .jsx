@@ -7,7 +7,7 @@ const TeamSection = () => {
         i18n.changeLanguage(lng);
       };
   return (
-    <div className="bg-gradient-to-r from-violet-300 via-green-200 indigo to-red-300 py-16 px-6 md:px-12">
+    <div className="bg-gradient-to-r from-violet-300 via-green-200 indigo to-red-300 py-16 px-6 md:px-12 ">
       <h2 className="text-4xl font-bold text-center text-gray-800 mb-10">
       {t("teamSection.heading")}
       </h2>

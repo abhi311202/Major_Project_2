@@ -15,7 +15,7 @@ function HeroPage() {
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-green-400 via-purple-300 to-orange-400 flex items-center justify-center px-6">
       <div className="max-w-4xl text-center space-y-6">
-        <h1 className="text-5xl font-extrabold text-gray  -800 drop-shadow-sm">
+        <h1 className="text-5xl font-extrabold text-gray-800 drop-shadow-sm">
         {t("wt")} {" "}
           <span className="bg-gradient-to-r from-[#FF00CC] via-[#333399] to-[#ff084a] bg-clip-text text-transparent animate-text-gradient">
             Legal AI
