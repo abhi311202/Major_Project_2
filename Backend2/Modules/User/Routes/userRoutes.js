@@ -17,6 +17,7 @@ import { logout } from "../Controllers/logout.js";
 router.post("/register", registerUser);
 router.post("/login", userLogin);
 router.post("/logout", logout);
+
 // router.post("/verify", userMiddleware, demo);
 
 export default router;

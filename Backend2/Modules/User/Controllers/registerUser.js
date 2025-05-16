@@ -3,10 +3,12 @@ import { createUser } from "../Models/createUser.js";
 import { checkUserExistByUsername } from "../Models/checkUserExistByUsernameModel.js";
 import { checkUserExistsByAadhar } from "../Models/checkUserExistsByAadharModel.js";
 import { checkUserExistsByEmail } from "../Models/checkUserExistsByEmailModel.js";
+import client from "../../../config/sqlDB.js";
 
 export const registerUser = async (req, res) => {
   console.log(req.body);
   try {
+    client.query("BEGIN");
     const user_exists = await checkUserExistsByEmail(req.body.email);
     const user_exist_aadhar = await checkUserExistsByAadhar(req.body.aadhar);
     const user_exist_username = await checkUserExistByUsername(
@@ -28,9 +30,11 @@ export const registerUser = async (req, res) => {
         .json({ error: "User with this Aadhar Number is already Registered!" });
     }
     const user = await createUser(req.body);
+    client.query("COMMIT");
     return res.status(201).json(user);
   } catch (err) {
     // console.error(err);
+    client.query("ROLLBACK");
     console.log(`Error in Controller: ${err}`);
     res.status(500).json({ error: err.detail });
     0;

@@ -8,6 +8,8 @@ import {
 } from "../Controllers/emailAuthController.js";
 import { welcomeEmailController } from "../Controllers/welcomeEmailController.js";
 import { sendPhoneOtpController, verifyPhoneOtpController } from "../Controllers/phoneAuthController.js";
+import { emailAvailabilityCheckController } from "../Controllers/emailAvailabilityCheckController.js";
+import { usernameAvailabilityCheckController } from "../Controllers/usernameAvailabilityCheckController.js";
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -23,5 +25,8 @@ router.post("/verify-otp", verifyOtpController);
 router.post("/send-phone-otp", sendPhoneOtpController);
 router.post("/verify-phone-otp", verifyPhoneOtpController);
 router.post("/send-welcome-email", welcomeEmailController);
+router.post("/check-email-availability", emailAvailabilityCheckController);
+router.post("/check-username-availability", usernameAvailabilityCheckController);
+
 
 export default router;
