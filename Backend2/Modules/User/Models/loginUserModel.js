@@ -20,6 +20,7 @@ export const loginUser = async (username, password) => {
     // console.log(result);
     // console.log(user);
     const isMatch = await bcryptjs.compare(password, user.password_hash);
+    console.log(isMatch, "abhi");
     if (!isMatch) {
       throw new Error("Invalid password");
     }
@@ -47,9 +48,9 @@ export const loginUser = async (username, password) => {
     };
   } catch (error) {
     console.log("Error Occured in loginUser : " + error);
+    throw error;
   }
 };
-
 
 export const loginUser1 = async (email, password) => {
   // console.log(password);
@@ -96,5 +97,6 @@ export const loginUser1 = async (email, password) => {
     };
   } catch (error) {
     console.log("Error Occured in loginUser1 : " + error);
+    throw error;
   }
 };
