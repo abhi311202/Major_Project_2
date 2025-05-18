@@ -13,7 +13,8 @@ export const userLogin = async (req, res) => {
       res.status(200).json(result);
     } catch (err) {
       console.log(`Error in Controller Login: ${err}`);
-      res.status(500).json({ error: err.detail });
+      // res.status(500).json({ error: err.detail });
+      res.status(500).json({ error: err.message || err.detail });
     }
   } else if (email && password_hash) {
     console.log("Email API Called " + email, password_hash);
@@ -24,8 +25,9 @@ export const userLogin = async (req, res) => {
       res.cookie("jwt", result.token);
       res.status(200).json(result);
     } catch (err) {
-      console.log(`Error in Controller Login: ${err}`);
-      res.status(500).json({ error: err.detail });
+      console.log(`Error in Controller Login 1: ${err}`);
+      console.log(err); // Log the error for further investigatio
+      res.status(500).json({ error: err.message || err.detail });
     }
   } else {
     res.status(400).json({ error: "Invalid Credentials" });
