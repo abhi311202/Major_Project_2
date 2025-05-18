@@ -33,7 +33,7 @@ export const changeUserPassword = async ({
   );
 
   if (currNewPassMatch) {
-    throw new Error("New password must be different from current password.");
+    throw new Error("New password cannot be same as current password.");
   }
 
   // Hash the new password
