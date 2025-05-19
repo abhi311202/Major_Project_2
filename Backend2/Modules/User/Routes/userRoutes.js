@@ -19,6 +19,7 @@ import { changeEmailController } from "../Controllers/changeEmailController.js";
 import { changePhoneController } from "../Controllers/changePhoneController.js";
 import { changeUserPersonalDetailController } from "../Controllers/changeUserPersonalDetailController.js";
 import { removeProfilePhotoController } from "../Controllers/removeProfilePhotoController.js";
+import { changeProfilePhotoController } from "../Controllers/changeProfilePhotoController.js";
 
 router.post("/register", registerUser);
 router.post("/login", userLogin);
@@ -29,6 +30,7 @@ router.post("/change-email", changeEmailController);
 router.post("/change-phone", changePhoneController);
 router.post("/change-personal-detail", changeUserPersonalDetailController);
 router.post("/remove-profile-photo", removeProfilePhotoController);
+router.post("/change-profile-photo", changeProfilePhotoController);
 
 // router.post("/verify", userMiddleware, demo);
 
