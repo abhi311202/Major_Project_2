@@ -1,8 +1,9 @@
 import client from "../../../config/sqlDB.js";
 
 export const docOwnerMap = async (doc_id, owner_id, owner_type) => {
-  values = [doc_id, owner_id, owner_type];
-  const query = `INSERT INTO document_owner_map (
+  try {
+    const values = [doc_id, owner_id, owner_type];
+    const query = `INSERT INTO document_owner_map (
         doc_id,
         owner_id,
         owner_type,
@@ -17,6 +18,10 @@ export const docOwnerMap = async (doc_id, owner_id, owner_type) => {
       RETURNING *;
 `;
 
-  const result = await client.query(query, values);
-  return result.rowCount > 0 ? result.rows[0].doc_id : false;
+    const result = await client.query(query, values);
+    return result.rowCount > 0 ? result.rows[0].doc_id : false;
+  } catch (error) {
+    console.log("In DocOwnerMapModel: " + error);
+    throw error;
+  }
 };

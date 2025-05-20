@@ -9,6 +9,9 @@ export const createDocument = async (doc_data) => {
     Access_id,
     Document_Hash,
     MongoDB_UID,
+    doc_title,
+    serial_no,
+    classification,
   } = doc_data;
   const query = `INSERT INTO document (
     s3_file_name,
@@ -17,6 +20,9 @@ export const createDocument = async (doc_data) => {
     access_id,
     document_hash,
     mongodb_uid,
+    doc_title,
+    serial_no,
+    classification,
     is_active,
     is_delete,
     created_at,
@@ -29,6 +35,9 @@ export const createDocument = async (doc_data) => {
     $4,
     $5,
     $6,
+    $7,
+    $8,
+    $9,
     TRUE,
     FALSE,
     CURRENT_TIMESTAMP,
@@ -44,6 +53,9 @@ RETURNING id;`;
     Access_id,
     Document_Hash,
     MongoDB_UID,
+    doc_title,
+    serial_no,
+    classification,
   ];
 
   const result = await client.query(query, values);
