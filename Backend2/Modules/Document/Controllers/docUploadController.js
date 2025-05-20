@@ -21,6 +21,7 @@ export const DocUpload = async (req, res) => {
 
     const title = MongoDB.Doc_Title;
     const serialnum = MongoDB.Serial_No;
+    const classification1 = MongoDB.Classification;
     const doc = await Document.findOne({ Doc_Title: title });
     const doc1 = await Document.findOne({ Serial_No: serialnum });
     if (doc) {
@@ -33,8 +34,8 @@ export const DocUpload = async (req, res) => {
       });
     } else {
       createdDocument = new Document({
-        Doc_Title: title,
-        Serial_No: serialnum,
+        Doc_Title: MongoDB.Doc_Title,
+        Serial_No: MongoDB.Serial_No,
         Classification: MongoDB.Classification,
         Classification_reason: MongoDB.Classification_reason,
         Summary: MongoDB.Summary,
@@ -47,6 +48,9 @@ export const DocUpload = async (req, res) => {
     const doc_data = {
       ...Doc,
       MongoDB_UID: createdDocument._id.toString(),
+      doc_title: title,
+      serial_no: serialnum,
+      classification: classification1,
     };
 
     await client.query("BEGIN");
@@ -75,22 +79,27 @@ export const DocUpload = async (req, res) => {
       console.log(metadata_id, entity_id);
 
       if (metadata_id && entity_id) {
-        // const doc_owner_map_id = await docOwnerMap(
-        //   doc_id,
-        //   owner_id,
-        //   owner_type
-        // );
-        // if (doc_owner_map_id) {
-        await client.query("COMMIT");
-        return res.status(200).json({
-          message: "Document Uploaded Successfully",
-          Doc_id: doc_id,
-          Meta_data: metadata_id,
-          Entity_id: entity_id,
-        });
-        // } else {
-        // throw new Error("Could not make entry in document_owner_map table");
-        // }
+        try {
+          const doc_owner_map_id = await docOwnerMap(
+            doc_id,
+            owner_id,
+            owner_type
+          );
+          if (doc_owner_map_id) {
+            await client.query("COMMIT");
+            return res.status(200).json({
+              message: "Document Uploaded Successfully",
+              Doc_id: doc_id,
+              Meta_data: metadata_id,
+              Entity_id: entity_id,
+            });
+          } else {
+            throw new Error("Could not make entry in document_owner_map table");
+          }
+        } catch (error) {
+          console.log("Error in DocUploadController: "+error);
+          throw error;
+        }
       } else {
         throw new Error("Could not make entry in Entity or Metadata Table");
       }
@@ -109,6 +118,6 @@ export const DocUpload = async (req, res) => {
       // console.log("Deleted" + deleted);
     }
     await client.query("ROLLBACK");
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message || error });
   }
 };
