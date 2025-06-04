@@ -6,7 +6,7 @@ import {
   loginAdmin,
 } from "../Models/AdminModel.js";
 
-import Admin from "../Models/AdminModel.js";
+// import Admin from "../Models/AdminModel.js";
 
 export const registerAdmin = async (req, res) => {
   console.log(req.body);

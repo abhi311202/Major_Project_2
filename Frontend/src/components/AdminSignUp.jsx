@@ -1,16 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Navbar from "../components/Navbar";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const AdminSignUp = () => {
   const [profilePic, setProfilePic] = useState(null);
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [preview, setPreview] = useState(null);
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [showOTPModal, setShowOTPModal] = useState(false);
+  const [enteredOTP, setEnteredOTP] = useState("");
+  const [serverOTP, setServerOTP] = useState("");
+  const [pendingData, setPendingData] = useState(null);
+  const [emailForVerification, setEmailForVerification] = useState("");
+  const [formDataCache, setFormDataCache] = useState(null);
+  const [phoneForVerification, setPhoneForVerification] = useState("");
+  const [enteredPhoneOTP, setEnteredPhoneOTP] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [phoneVerified, setPhoneVerified] = useState(false);
+
+  
+  useEffect(() => {
+    if (emailVerified && phoneVerified) {
+      onSubmit(formDataCache);
+      setShowOTPModal(false);
+      toast.success("Both OTPs Verified!");
+    }
+  }, [emailVerified, phoneVerified]);
+  
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -19,6 +40,16 @@ const AdminSignUp = () => {
       setProfilePic(file);
     }
   };
+
+    const { t, i18n } = useTranslation();
+  
+    const changeLanguage = (lng) => {
+      i18n.changeLanguage(lng);
+    };
+  
+    const handleClick = () => {
+      navigate("/AdminSignUp");
+    };
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,6 +60,134 @@ const AdminSignUp = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+
+
+  const handleResendEmailOTP = async () => {
+    try {
+      const response = await sendEmailOTP(emailForVerification);
+      if (response.data.message === "OTP sent to email") {
+        toast.success("OTP sent to email again");
+      } else {
+        toast.error("Failed to resend email OTP");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error resending email OTP");
+    }
+  };
+
+  // Trigger Phone OTP resend
+  const handleResendPhoneOTP = async () => {
+    try {
+      const response = await sendPhoneOTP(phoneForVerification);
+      if (response.data.message === "OTP sent to phone") {
+        toast.success("OTP sent to phone again");
+      } else {
+        toast.error("Failed to resend phone OTP");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error resending phone OTP");
+    }
+  };
+
+  // Verify Email OTP
+const handleEmailOTPVerify = async () => {
+  try {
+    const response = await verifyEmailOTP(emailForVerification, enteredOTP);
+    if (response.data.message === "Email verified successfully") {
+      setEmailVerified(true);
+      toast.success("Email OTP Verified");
+
+      if (phoneVerified) {
+        await onSubmit(formDataCache); // Auto-submit if phone already verified
+        setShowOTPModal(false);
+        toast.success("Both OTPs Verified! Submitted");
+      }
+    } else {
+      toast.error("Email OTP verification failed");
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("Error verifying Email OTP");
+  }
+};
+
+// Verify Phone OTP
+const handlePhoneOTPVerify = async () => {
+  try {
+    const response = await verifyPhoneOTP(phoneForVerification, enteredPhoneOTP);
+    if (response.data.message === "Phone verified successfully") {
+      setPhoneVerified(true);
+      toast.success("Phone OTP Verified");
+
+      if (emailVerified) {
+        await onSubmit(formDataCache); // Auto-submit if email already verified
+        setShowOTPModal(false);
+        toast.success("Both OTPs Verified! Submitted");
+      }
+    } else {
+      toast.error("Phone OTP verification failed");
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("Error verifying Phone OTP");
+  }
+};
+
+
+  // Initial submit (call OTP modal)
+  const handleInitialSubmit = async (data) => {
+    try {
+      const emailResponse = await sendEmailOTP(data.email);
+      const phoneResponse = await sendPhoneOTP(data.phone);
+
+      if (
+        emailResponse.data.message === "OTP sent to email" &&
+        phoneResponse.data.message === "OTP sent to phone"
+      ) {
+        setEmailForVerification(data.email);
+        setPhoneForVerification(data.phone);
+        setFormDataCache(data);
+        setShowOTPModal(true);
+        toast.success("OTPs sent to email and phone");
+      } else {
+        toast.error("Failed to send one or both OTPs");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error sending OTPs");
+    }
+  };
+
+
+
+
+
+  // Send Email OTP
+const sendEmailOTP = async (email) => {
+  return await axios.post("http://localhost:4001/Services/send-otp", { email });
+};
+
+// Send Phone OTP
+const sendPhoneOTP = async (phone) => {
+  return await axios.post("http://localhost:4001/Services/send-phone-otp", { phone });
+};
+
+// Verify Email OTP
+const verifyEmailOTP = async (email, otp) => {
+  return await axios.post("http://localhost:4001/Services/verify-otp", { email, otp });
+};
+
+// Verify Phone OTP
+const verifyPhoneOTP = async (phone, otp) => {
+  return await axios.post("http://localhost:4001/Services/verify-phone-otp", { phone, otp });
+};
+
+  
+
+
 
   const onSubmit = async (data) => {
     try {
@@ -64,6 +223,7 @@ const AdminSignUp = () => {
         profession: data.profession,
         organization: data.organisation,
         password_hash: data.password,
+        type:"WelcomeAdminEmail",
       };
 
       await axios.post("http://localhost:4001/Admin/register", userInfo);
@@ -78,8 +238,9 @@ const AdminSignUp = () => {
   return (
     <Wrapper>
       <Navbar />
-      <form className="form" onSubmit={handleSubmit(onSubmit)}>
-        <h2 className="title">Admin Registration</h2>
+      <form className="form" onSubmit={handleSubmit(handleInitialSubmit)}>
+
+        <h2 className="title">{t("ar")}</h2>
 
         <div className="form-control w-full max-w-xs items-center gap-4 ">
           <label htmlFor="profile-upload" className="cursor-pointer">
@@ -92,7 +253,7 @@ const AdminSignUp = () => {
                 />
               ) : (
                 <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
-                  Upload Profile
+                {t("up")}
                 </div>
               )}
             </div>
@@ -108,43 +269,43 @@ const AdminSignUp = () => {
 
         <div className="form-grid">
           <div className="form-group">
-            <label>Name</label>
+            <label>{t("name")}</label>
             <div className="input-wrapper">
               <input
                 type="text"
-                placeholder="Enter your Name"
+                placeholder={t("name")}
                 {...register("name", { required: true })}
               />
               {errors.name && (
                 <span className="p-2 text-sm text-red-500">
-                  This field is required
+                  {t("required")}
                 </span>
               )}
             </div>
           </div>
 
           <div className="form-group">
-            <label>User Name</label>
+            <label>{t("un")}</label>
             <div className="input-wrapper">
               <input
                 type="text"
-                placeholder="Enter your user name"
+                placeholder={t("eyun")}
                 {...register("username", { required: true })}
               />
               {errors.username && (
                 <span className="p-2 text-sm text-red-500">
-                  This field is required
+                  {t("required")}
                 </span>
               )}
             </div>
           </div>
 
           <div className="form-group">
-            <label>Email</label>
+            <label>{t("email")}</label>
             <div className="input-wrapper">
               <input
                 type="email"
-                placeholder="Enter your Email"
+                placeholder={t("email")}
                 {...register("email", {
                   required: "Email is required",
                   pattern: {
@@ -162,31 +323,33 @@ const AdminSignUp = () => {
                 </span>
               )}
             </div>
+      
+
           </div>
 
           <div className="form-group">
-            <label>Gender</label>
+            <label>{t("g")}</label>
             <div className="input-wrapper">
               <select {...register("gender", { required: true })}>
-                <option value="">Select Gender</option>
+                <option value="">{t("sg")}</option>
                 <option>Male</option>
                 <option>Female</option>
                 <option>Other</option>
               </select>
               {errors.gender && (
                 <span className="p-2 text-sm text-red-500">
-                  This field is required
+                  {t("required")}
                 </span>
               )}
             </div>
           </div>
 
           <div className="form-group">
-            <label>Organization</label>
+            <label>{t("o")}</label>
             <div className="input-wrapper">
               <input
                 type="text"
-                placeholder="Enter your Organization"
+                placeholder={t("eyo")}
                 {...register("organisation", { required: true })}
               />
               {errors.organisation && (
@@ -198,27 +361,27 @@ const AdminSignUp = () => {
           </div>
 
           <div className="form-group">
-            <label>Phone</label>
+            <label>{t("pn")}</label>
             <div className="input-wrapper">
               <input
                 type="phone"
-                placeholder="Enter your Phone Number"
+                placeholder={t("eypn")}
                 {...register("phone", { required: true })}
               />
               {errors.phone && (
                 <span className="p-2 text-sm text-red-500">
-                  This field is required
+                  {t("required")}
                 </span>
               )}
             </div>
           </div>
 
           <div className="form-group">
-            <label>Password</label>
+            <label>{t("p")}</label>
             <div className="input-wrapper relative">
               <input
                 type={passwordVisible ? "text" : "password"}
-                placeholder="Enter your Password"
+                placeholder={t("eyp")}
                 {...register("password", { required: true })}
               />
               <span
@@ -229,21 +392,21 @@ const AdminSignUp = () => {
               </span>
               {errors.password && (
                 <span className="p-2 text-sm text-red-500">
-                  This field is required
+                 {t("required")}
                 </span>
               )}
             </div>
           </div>
 
           <div className="form-group">
-            <label>Profession</label>
+            <label>{t("profession")}</label>
             <div className="input-wrapper">
               <select
                 {...register("profession", { required: true })}
                 className="select select-bordered select-md w-full"
               >
                 <option disabled selected>
-                  Select Profession
+                {t("selectProfession")}
                 </option>
                 <option value="Lawyer">Lawyer</option>
                 <option value="Judge">Judge</option>
@@ -252,18 +415,18 @@ const AdminSignUp = () => {
               </select>
               {errors.profession && (
                 <span className="p-2 text-sm text-red-500">
-                  This field is required
+                  {t("required")}
                 </span>
               )}
             </div>
           </div>
 
           <div className="form-group">
-            <label>Aadhar Number</label>
+            <label>{t("aadhaar")}</label>
             <div className="input-wrapper">
               <input
                 type="number"
-                placeholder="Enter your Aadhar Number"
+                placeholder={t("aadhaar")}
                 maxLength={12}
                 {...register("aadhaar", {
                   required: true,
@@ -279,12 +442,12 @@ const AdminSignUp = () => {
           </div>
 
           <div className="form-group">
-            <label>Date of Birth</label>
+            <label>{t("dob")}</label>
             <div className="input-wrapper">
               <input type="date" {...register("dob", { required: true })} />
               {errors.dob && (
                 <span className="p-2 text-sm text-red-500">
-                  This field is required
+                  {t("required")}
                 </span>
               )}
             </div>
@@ -293,11 +456,74 @@ const AdminSignUp = () => {
           <div className="form-group ml-64">
             <label style={{ visibility: "hidden" }}>Submit</label>
             <button type="submit" className="submit-btn">
-              Register
+            {t("r")}
             </button>
           </div>
         </div>
       </form>
+      {showOTPModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white p-8 rounded-lg shadow-xl w-96 max-w-md">
+      <h2 className="text-2xl font-semibold text-center mb-6 text-blue-600">Enter OTPs</h2>
+
+      {/* Email OTP Section */}
+      <div className="mb-6">
+        <label htmlFor="emailOTP" className="block text-gray-600 mb-2">Email OTP</label>
+        <input
+          id="emailOTP"
+          type="text"
+          value={enteredOTP}
+          onChange={(e) => setEnteredOTP(e.target.value)}
+          className="w-full p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Enter Email OTP"
+        />
+        <button
+          onClick={handleEmailOTPVerify}
+          className="w-full mt-4 bg-blue-500 text-white py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-300"
+          disabled={emailVerified}
+        >
+          {emailVerified ? "Email Verified" : "Verify Email OTP"}
+        </button>
+        <button
+          onClick={handleResendEmailOTP}
+          className="w-full mt-2 bg-gray-300 text-gray-800 py-2 rounded-lg shadow-md hover:bg-gray-400 transition duration-300"
+        >
+          Resend Email OTP
+        </button>
+      </div>
+
+      {/* Phone OTP Section */}
+      <div className="mb-6">
+        <label htmlFor="phoneOTP" className="block text-gray-600 mb-2">Phone OTP</label>
+        <input
+          id="phoneOTP"
+          type="text"
+          value={enteredPhoneOTP}
+          onChange={(e) => setEnteredPhoneOTP(e.target.value)}
+          className="w-full p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Enter Phone OTP"
+        />
+        <button
+          onClick={handlePhoneOTPVerify}
+          className="w-full mt-4 bg-blue-500 text-white py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-300"
+          disabled={phoneVerified}
+        >
+          {phoneVerified ? "Phone Verified" : "Verify Phone OTP"}
+        </button>
+        <button
+          onClick={handleResendPhoneOTP}
+          className="w-full mt-2 bg-gray-300 text-gray-800 py-2 rounded-lg shadow-md hover:bg-gray-400 transition duration-300"
+        >
+          Resend Phone OTP
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
+
+
     </Wrapper>
   );
 };

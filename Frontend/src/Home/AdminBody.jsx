@@ -14,8 +14,14 @@ import {
   FiUsers,
 } from "react-icons/fi";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export const AdminBody = () => {
+  const { t, i18n } = useTranslation();
+    
+  const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng);
+  };
   
   const [selected, setSelected] = useState("Dashboard");
 
@@ -27,7 +33,7 @@ export const AdminBody = () => {
       <Sidebar selected={selected} setSelected={setSelected} />
       
       {/* Right Side Content */}
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-6 dark:bg-black">
         {selected === "Dashboard" ? (
           <MyProfileSection />
         ): selected === "UploadNewDocument" ? (
@@ -45,6 +51,7 @@ export const AdminBody = () => {
 
 const Sidebar = ({ selected, setSelected }) => {
   const [open, setOpen] = useState(true);
+  const { t } = useTranslation(); 
   
 
   useEffect(() => {
@@ -52,57 +59,60 @@ const Sidebar = ({ selected, setSelected }) => {
   }, [selected]);
 
   return (
-    <motion.nav
-      layout
-      className="sticky top-0 h-screen shrink-0 border-r border-slate-300 bg-white p-2 "
-      style={{
-        width: open ? "300px" : "fit-content",
-      }}
-    >
-      {/* <TitleSection open={open} /> */}
+   <motion.nav
+  layout
+  className="sticky top-0 h-screen shrink-0 border-r border-slate-300 bg-white p-2 
+             dark:bg-[#1e1e2f] dark:border-slate-700 dark:text-white"
+  style={{
+    width: open ? "300px" : "fit-content",
+  }}
+>
+  {/* <TitleSection open={open} /> */}
 
-      <div className="space-y-1">
-        <Option
-          Icon={FiHome}
-          title="Dashboard"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-        />
-        <Option
-          Icon={FiUpload }
-          title="UploadNewDocument"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-          notifs={3}
-        />
+  <div className="space-y-1">
+    <Option
+      Icon={FiHome}
+      title="Dashboard"
+      selected={selected}
+      setSelected={setSelected}
+      open={open}
+      label={t("db")}
+    />
+    <Option
+      Icon={FiUpload}
+      title="UploadNewDocument"
+      selected={selected}
+      setSelected={setSelected}
+      open={open}
+      notifs={3}
+      label={t("uploadNew")}
+    />
+    <Option
+      Icon={FiUpload}
+      title="UploadedDocument"
+      selected={selected}
+      setSelected={setSelected}
+      open={open}
+      notifs={3}
+      label={t("uploadedDoc")}
+    />
+  </div>
 
-        <Option
-          Icon={FiUpload }
-          title="UploadedDocument"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-          notifs={3}
-        />
-        
-      </div>
+  <ToggleClose open={open} setOpen={setOpen} />
+</motion.nav>
 
-      <ToggleClose open={open} setOpen={setOpen} />
-    </motion.nav>
   );
 };
 
-const Option = ({ Icon, title, selected, setSelected, open, notifs }) => {
+const Option = ({ Icon, title, label, selected, setSelected, open, notifs }) => {
   return (
     <motion.button
       layout
       onClick={() => setSelected(title)}
       className={`relative flex h-10 w-full items-center rounded-md transition-colors ${
         selected === title
-          ? "bg-black text-white"
-          : "text-slate-500 hover:bg-slate-100"
+          ? "bg-black text-white dark:bg-white dark:text-black"
+          : "text-slate-500 hover:bg-slate-100 dark:text-white dark:hover:bg-white dark:hover:text-black"
       }`}
     >
       <motion.div
@@ -119,7 +129,7 @@ const Option = ({ Icon, title, selected, setSelected, open, notifs }) => {
           transition={{ delay: 0.125 }}
           className="text-xs font-medium"
         >
-          {title}
+        {label}
         </motion.span>
       )}
 
@@ -130,7 +140,7 @@ const Option = ({ Icon, title, selected, setSelected, open, notifs }) => {
 
 const TitleSection = ({ open }) => {
   return (
-    <div className="mb-3 border-b border-slate-300 pb-3">
+    <div className="mb-3 border-b border-slate-300 pb-3 ">
       <div className="flex cursor-pointer items-center justify-between rounded-md transition-colors hover:bg-slate-100">
         <div className="flex items-center gap-2">
           <Logo />

@@ -53,5 +53,8 @@ export default {
       },
     },
   },
+  
   plugins: [require("tailwindcss-animate"), require("daisyui")],
+  darkMode: ["class"],
+
 };

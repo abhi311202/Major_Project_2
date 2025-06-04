@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Globe, Moon, Sun, ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useTranslation } from "react-i18next";
 
 import {
   DropdownMenu,
@@ -16,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import SuperAdminLogout from "./SuperAdminLogout";
+import UserLogout from "./UserLogout";
 // import { useTheme } from "@/components/theme-provider";
 
 const Navbar = () => {
@@ -27,6 +29,13 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
+ 
+  
   useEffect(() => {
     const handleScroll = () => {
       setSticky(window.scrollY > 0);
@@ -34,32 +43,39 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+  useEffect(() => {
+  const storedTheme = localStorage.getItem("theme");
+  if (storedTheme) {
+    setTheme(storedTheme);
+  }
+}, []);
+
 
   const navItems = (
     <>
       <li>
         <a href="/" className="text-xs">
-          Home
+        {t("home")}
         </a>
       </li>
       <li>
         <a href="/search" className="text-xs">
-          Search
+        {t("search")}
         </a>
       </li>
       <li>
         <a href="/services" className="text-xs">
-          Services
+        {t("service")}
         </a>
       </li>
       <li>
         <a href="/team" className="text-xs">
-          Team
+        {t("team")}
         </a>
       </li>
       <li>
         <a href="/about" className="text-xs">
-          About
+        {t("about")}
         </a>
       </li>
     </>
@@ -71,7 +87,7 @@ const Navbar = () => {
         className={`w-full max-w-none px-4 md:px-5 top-0 left-0 right-0 z-50 font-sans ${
           sticky
             ? "sticky-navbar shadow-md text-white transition-all duration-300 ease-in-out"
-            : "bg-white text-black"
+            : "bg-white text-black dark:bg-black dark:text-white"
         }`}
       >
         <div className="navbar flex justify-between items-center mx-auto">
@@ -124,9 +140,9 @@ const Navbar = () => {
                 <ChevronDown size={20} />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem>English</DropdownMenuItem>
-                <DropdownMenuItem>Hindi</DropdownMenuItem>
-                <DropdownMenuItem>Bengali</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage("en")}>English</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage("hi")}>Hindi</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage("bn")}>Bengali</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -153,48 +169,68 @@ const Navbar = () => {
             </DropdownMenu>
 
             {/* Auth Buttons */}
-            {authUser || authAdmin ? (
-              <div className="flex items-center gap-2">
-                <Button onClick={() => navigate("/AdminHome")} size="sm">
-                  Dashboard
-                </Button>
-                <Logout />
-              </div>
-            ) : authAdmin2 ? (
-              <div className="flex items-center gap-2">
-                <Button onClick={() => navigate("/SuperAdminHome")} size="sm">
-                  Dashboard
-                </Button>
-                <SuperAdminLogout />
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Button
-                  onClick={() => navigate("/UserLogin")}
-                  size="sm"
-                  className="text-xs px-3 py-1.5"
-                >
-                  User Login
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button size="sm" className="text-xs px-3 py-1.5">
-                      Login
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => navigate("/AdminLogin")}>
-                      Admin Login
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => navigate("/SuperAdminLogin")}
-                    >
-                      Super Admin
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            )}
+{authAdmin ? (
+  <div className="flex items-center gap-2">
+    <Button onClick={() => navigate("/AdminHome")} size="sm">
+      {t("db")}
+    </Button>
+    <Logout />
+  </div>
+) : authUser ? (
+  <div className="flex items-center gap-2">
+    <Button onClick={() => navigate("/Services")} size="sm">
+      {t("Services")}
+    </Button>
+    
+    <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <Button size="sm">{t("MyProfile")}</Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+      <DropdownMenuItem onClick={() => navigate("/UserHome")}>
+        {t("MyProfile")}
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => navigate("/EditProfile")}>
+        {t("EditProfile")}
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+    <UserLogout />
+  </div>
+) : authAdmin2 ? (
+  <div className="flex items-center gap-2">
+    <Button onClick={() => navigate("/SuperAdminHome")} size="sm">
+      {t("db")}
+    </Button>
+    <SuperAdminLogout />
+  </div>
+) : (
+  <div className="flex items-center gap-2">
+    <Button
+      onClick={() => navigate("/UserLogin")}
+      size="sm"
+      className="text-xs px-3 py-1.5"
+    >
+      {t("userLogin")}
+    </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="sm" className="text-xs px-3 py-1.5">
+          {t("login")}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem onClick={() => navigate("/AdminLogin")}>
+          {t("al")}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate("/SuperAdminLogin")}>
+          {t("sl")}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  </div>
+)}
+
           </div>
         </div>
       </div>

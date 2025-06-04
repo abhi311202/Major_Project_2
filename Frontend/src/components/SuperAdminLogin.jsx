@@ -7,17 +7,26 @@ import axios from "axios";
 import { useAuth2 } from "../context/AuthProvider2";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Importing Font Awesome icons for eye toggle
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const SuperAdminLogin = () => {
   const [authUser, setAuthUser] = useAuth2();
   const [passwordVisible, setPasswordVisible] = useState(false); // State for password visibility
   const navigate = useNavigate();
 
+ const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+
+
 
   const onSubmit = async (data) => {
     try {
@@ -54,36 +63,36 @@ const SuperAdminLogin = () => {
         <Navbar />
       </div>
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
-        <h2 className="title">Super Admin Login</h2>
+        <h2 className="title">{t("sal")}</h2>
 
         <div className="form-group">
-          <label>User Name</label>
+          <label>{t("username")}</label>
           <div className="input-wrapper">
             <svg height={20} width={20} viewBox="0 0 32 32" fill="currentColor">
               <path d="..." />
             </svg>
             <input
               type="text"
-              placeholder="Enter your Email"
+              placeholder={t("usernamePlaceholder")}
               {...register("username", { required: true })}
             />
           </div>
         </div>
         {errors.username && (
           <span className="p-2 text-sm text-red-500">
-            This field is required
+             {t("required")}
           </span>
         )}
 
         <div className="form-group">
-          <label>Password</label>
+          <label>{t("password")}</label>
           <div className="input-wrapper">
             <svg height={20} width={20} viewBox="0 0 32 32" fill="currentColor">
               <path d="..." />
             </svg>
             <input
               type={passwordVisible ? "text" : "password"} // Toggle password visibility
-              placeholder="Enter your Password"
+              placeholder={t("passwordPlaceholder")}
               {...register("password_hash", { required: true })}
             />
             <span
@@ -100,12 +109,12 @@ const SuperAdminLogin = () => {
         </div>
         {errors.password_hash && (
           <span className="p-2 text-sm text-red-500">
-            This field is required
+          {t("required")}
           </span>
         )}
 
         <button type="submit" className="submit-btn">
-          Log In
+        {t("login2")}
         </button>
 
         <div className="divider"></div>
@@ -116,7 +125,7 @@ const SuperAdminLogin = () => {
             alt="Google icon"
             height="18"
           />
-          Continue with Google
+         {t("google")}
         </button>
       </form>
     </Wrapper>

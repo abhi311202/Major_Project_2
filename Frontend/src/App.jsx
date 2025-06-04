@@ -10,6 +10,13 @@ import SuperAdminHome from "./Home/SuperAdminHome";
 
 import SuperAdminLogin from "./components/SuperAdminLogin";
 import { Toaster } from "react-hot-toast";
+import UserHome from "./Home/UserHome";
+import EditProfile from "./User/EditProfile";
+import Services from "./User/Services";
+import SearchDocument from "./User/SearchDocument";
+import PaymentSuccess from "./components/PaymentSuccess";
+import DocumentDetails from "./User/DocumentDetails";
+
 const App = () => {
   const user = JSON.parse(localStorage.getItem("Users"));
   return (
@@ -32,13 +39,21 @@ const App = () => {
           <Route path="/:section" element={<Home />} />
           <Route path="/Home" element={<Home />} />
           <Route path="/Home2" element={<Home />} />
+          <Route path="/Home3" element={<Home />} />
           <Route path="/AdminHome" element={<AdminHome />} />
+          <Route path="/UserHome" element={<UserHome />} />
           <Route path="/SuperAdminHome" element={<SuperAdminHome />} />
           <Route path="/UserLogin" element={<UserLogin />} />
           <Route path="/AdminLogin" element={<AdminLogin />} />
           <Route path="/SuperAdminLogin" element={<SuperAdminLogin />} />
           <Route path="/UserSignUp" element={<UserSignUp />} />
           <Route path="/AdminSignUp" element={<AdminSignUp />} />
+          <Route path="/EditProfile" element={<EditProfile />} />
+          <Route path="/Services" element={<Services />} />
+          <Route path="/SearchDocument" element={<SearchDocument />} />
+          <Route path="/paymentSuccess" element={<PaymentSuccess/>}/>
+          <Route path="/document-details/:id" element={<DocumentDetails />} />
+
           
         </Routes>
 

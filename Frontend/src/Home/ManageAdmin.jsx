@@ -26,25 +26,34 @@ const ManageAdmin = () => {
   
 
   const handleApprove = async (pendingId) => {
-    const superAdmin = JSON.parse(localStorage.getItem("SuperAdmin")) // Dynamically fetched
-    console.log(superAdmin);
-    console.log(pendingId);
-    console.log(superAdmin.id);
+    const superAdmin = JSON.parse(localStorage.getItem("SuperAdmin")); // Dynamically fetched
+    const approvedAdmin = admins.find((admin) => admin.id === pendingId); // Get full admin data
+  
     try {
+      // First approve the admin
       const res = await axios.post("http://localhost:4001/SuperAdmin/ApproveReq", {
         SuperAdmin_id: superAdmin.id,
         Pending_Request_id: pendingId,
       });
   
       toast.success(res.data.message);
-      // Optionally refresh the list
-      fetchAdmins(); 
+  
+      // Now send welcome email
+      await axios.post("http://localhost:4001/Services/send-welcome-email", {
+        email: approvedAdmin.email,
+        username: approvedAdmin.name,
+      });
+  
+      toast.success("Welcome email sent!");
+  
+      // Refresh the list
+      fetchAdmins();
     } catch (err) {
       console.error("Approval error:", err);
-      toast.error("Failed to approve request");
+      toast.error("Failed to approve or send welcome email");
     }
   };
-
+  
   // const handleReject = async (pendingId) => {
   //   try {
   //     const res = await axios.post("http://localhost:4001/SuperAdmin/DeleteReq", {

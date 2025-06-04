@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import MyProfileSection2 from "./MyProfileSection2";
 import ManageAdmin from "./ManageAdmin";
+import ManageSuperAdmin from "./ManageSuperAdmin";
 import {
   FiBarChart,
   FiChevronDown,
@@ -34,6 +35,8 @@ export const SuperAdminBody = () => {
     <MyProfileSection2 />
   ) : selected === "Manage Admin" ? (
     <ManageAdmin />
+  ) : selected === "Manage SuperAdmin" ? (
+    <ManageSuperAdmin />
   ) : (
     <ExampleContent selected={selected} />
   )}
@@ -73,6 +76,15 @@ const Sidebar = ({ selected, setSelected }) => {
         <Option
           Icon={FiUsers}
           title="Manage Admin"
+          selected={selected}
+          setSelected={setSelected}
+          open={open}
+          notifs={3}
+        />
+
+        <Option
+          Icon={FiUsers}
+          title="Manage SuperAdmin"
           selected={selected}
           setSelected={setSelected}
           open={open}

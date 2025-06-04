@@ -11,6 +11,17 @@ import {
   del_th1,
 } from "../Models/SuperAdminModel.js";
 
+// const nodemailer = require('nodemailer');
+import nodemailer from "nodemailer";
+
+import {
+  Verification_Email_Template,
+  Welcome_Email_Template,
+} from "../Src/EmailTemplate.js";
+
+import dotenv from "dotenv";
+dotenv.config();
+
 export const adminRequest = async (req, res) => {
   try {
     const requests = await getAdminRequests();
@@ -195,5 +206,28 @@ export const Fetch_Threshold1 = async (req, res) => {
       message: "Threshol Fetching failed...",
       error: error.message || error,
     });
+  }
+};
+
+export const sendEmailOTP = async (email) => {
+  try {
+    console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Admin Request Accepted",
+      text: `Your request is accepted seccessfully...`,
+      html: Welcome_Email_Template.replace("{name}", email),
+    });
+  } catch (error) {
+    console.log(error);
   }
 };

@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { FiX } from "react-icons/fi";
-
+import { useTranslation } from "react-i18next";
 const ReadMore = () => {
   const [showModal, setShowModal] = useState(false);
-
+   const { t, i18n } = useTranslation();
+   
+   const changeLanguage = (lng) => {
+     i18n.changeLanguage(lng);
+   };
   const item = {
-    title: "Legal AI Development Process",
+    title: t("readMore.title"),
     imgSrc: "https://legalai-bucket.s3.ap-south-1.amazonaws.com/4.jpg",
-    description:
-      " In the legal sector, handling large volumes of documents is aroutine but essential task. Legal practitioners, researchers, and even clients frequently deal with extensive paperwork that demands careful review and analysis. However, this manual process is time-consuming, prone to errors, and can lead to inefficiencies within the legal workflow. Our solution aims to address these challenges through the power of ArtificialIntelligence and Machine Learning.",
+    shortDescription: t("readMore.shortDescription"),
+    fullDescription: t("readMore.fullDescription")
   };
 
   return (
@@ -20,16 +24,16 @@ const ReadMore = () => {
           className="rounded-2xl w-full h-72 object-cover shadow-lg"
         />
         <h2 className="text-4xl font-bold">{item.title}</h2>
-        <p className="text-black-300 text-lg max-w-3xl mx-auto">
+        {/* <p className="text-black-300 text-lg max-w-3xl mx-auto">
           {item.description.length > 200
             ? `${item.description.substring(0, 200)}...`
             : item.description}
-        </p>
+        </p> */}
         <button
           onClick={() => setShowModal(true)}
           className="px-8 py-3 bg-black hover:bg-gradient-to-r from-yellow-400 via green - 400 to-red-400 text-white rounded-full text-lg font-medium transition duration-300"
         >
-          Read More
+          {t("readMore.button") || "Read More"}
         </button>
       </div>
 
@@ -50,14 +54,10 @@ const ReadMore = () => {
             />
             <h2 className="text-3xl font-bold mb-4">{item.title}</h2>
             <p className="text-black text-lg leading-relaxed">
-              {item.description}
+            {item.shortDescription}
               <br />
               <br />
-              Our AI-based service specializes in summarizing and classifying
-              legal documents to streamline legal processes. By leveraging
-              advanced machine learning (ML) techniques, we have developed tools
-              that assist legal professionals in managing information overload,
-              improving accuracy, and enhancing workflow efficiency.
+              {item.fullDescription}
             </p>
           </div>
         </div>

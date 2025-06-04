@@ -1,6 +1,11 @@
 import React from "react";
-
+import { useTranslation } from "react-i18next";
 const Search = () => {
+  const { t, i18n } = useTranslation();
+  
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
   return (
     <>
       <div className="max-w-screen-2xl container mx-auto md:px-20 px-4 py-16 bg-gradient-to-r from-orange-200 via-green-200 pink to-red-200 py-16 px-6 md:px-12 text-black">
@@ -9,15 +14,11 @@ const Search = () => {
           <div className="w-full md:w-1/2">
             <div className="space-y-8">
               <h1 className="text-4xl md:text-5xl font-semibold text-center text-gray-800 mb-12">
-                Hello, Search your Documents with powerful RAG{" "}
+              {t("hs")}{" "}
                 <span className="text-4xl md:text-5xl font-semibold text-center text-gray-800 mb-12"></span>
               </h1>
               <p className="text-lg text-black">
-                The Document Search feature combines semantic and full-text
-                search to help users find the most relevant legal documents,
-                even if they don’t use exact keywords. It applies filters,
-                removes weak documents, and gives fast, accurate results using
-                AI — making legal research simple and effective.
+              {t("hsd")}
               </p>
             </div>
           </div>
@@ -27,14 +28,13 @@ const Search = () => {
             <div className="w-[420px] h-[360px] bg-gradient-to-r from-violet-300 via-green-200 indigo to-red-200 py-16 px-6 md:px-12 text-black rounded-3xl p-10   shadow-2xl hover:scale-105 transition-transform duration-300 ease-in-out flex flex-col justify-between">
               <div>
                 <p className="uppercase text-sm font-medium tracking-wide text-black mb-2">
-                  Your Gateway
+                  {t("yg")}
                 </p>
                 <h3 className="text-2xl md:text-3xl font-semibold mb-4">
-                  Document Search
+                {t("ds")}
                 </h3>
                 <p className="text-md md:text-lg mb-6 text-black">
-                  Easily access and search your legal, academic, or project
-                  documents in one click.
+                {t("dsd")}
                 </p>
               </div>
 
@@ -59,7 +59,7 @@ const Search = () => {
                 </span>
 
                 {/* Button Text */}
-                <span>Search Documents</span>
+                <span>{t("sd")}</span>
               </button>
             </div>
           </div>

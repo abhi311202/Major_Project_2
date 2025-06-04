@@ -7,11 +7,18 @@ import axios from "axios";
 import { useAuth } from "../context/AuthProvider";
 import { toast } from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
+import { useTranslation } from "react-i18next";
 const UserLogin = () => {
+
+  
   const [authUser, setAuthUser] = useAuth();
   const navigate = useNavigate();
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
 
   const handleClick = () => {
     navigate("/AdminSignUp");
@@ -51,38 +58,37 @@ const UserLogin = () => {
     <Wrapper>
       <Navbar />
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
-        <h2 className="title">Admin Login</h2>
+        <h2 className="title">{t("al")}</h2>
 
         <div className="form-group">
-          <label>User Name</label>
+        <label>{t("username")}</label>
           <div className="input-wrapper">
             <svg height={20} width={20} viewBox="0 0 32 32" fill="currentColor">
               <path d="..." />
             </svg>
             <input
-              type="text"
-              placeholder="Enter your Email"
-              {...register("username", { required: true })}
-            />
+            type="text"
+            placeholder={t("usernamePlaceholder")}
+            {...register("username", { required: true })}
+          />
           </div>
         </div>
         {errors.username && (
-          <span className="p-2 text-sm text-red-500">
-            This field is required
-          </span>
+          <span className="p-2 text-sm text-red-500">{t("required")}</span>
         )}
 
         <div className="form-group">
-          <label>Password</label>
+        <label>{t("password")}</label>
           <div className="input-wrapper">
             <svg height={20} width={20} viewBox="0 0 32 32" fill="currentColor">
               <path d="..." />
             </svg>
             <input
               type={passwordVisible ? "text" : "password"}
-              placeholder="Enter your Password"
+              placeholder={t("passwordPlaceholder")}
               {...register("password_hash", { required: true })}
             />
+
             <span
               className="eye-icon"
               onClick={() => setPasswordVisible(!passwordVisible)}
@@ -92,19 +98,17 @@ const UserLogin = () => {
           </div>
         </div>
         {errors.password_hash && (
-          <span className="p-2 text-sm text-red-500">
-            This field is required
-          </span>
-        )}
+  <span className="p-2 text-sm text-red-500">{t("required")}</span>
+)}
 
         <button type="submit" className="submit-btn">
-          Log In
+          {t("login2")}
         </button>
 
-        <p className="text-center">
-          Don't have an account?{" "}
+         <p className="text-center">
+          {t("noAccount")}{" "}
           <span className="link" onClick={handleClick}>
-            Sign Up
+            {t("signup")}
           </span>
         </p>
 
@@ -116,7 +120,7 @@ const UserLogin = () => {
             alt="Google icon"
             height="18"
           />
-          Continue with Google
+          {t("google")}
         </button>
       </form>
     </Wrapper>
@@ -136,6 +140,10 @@ const Wrapper = styled.div`
   align-items: center;
   overflow-y: scroll;
 
+  &.dark {
+    background: linear-gradient(135deg, #1e1e2f, #1c1c2e, #222233);
+  }
+
   .form {
     margin-top: 50px;
     background: white;
@@ -144,6 +152,10 @@ const Wrapper = styled.div`
     width: 100%;
     max-width: 420px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+
+    .dark & {
+      background: #2d2d3a;
+    }
   }
 
   .title {
@@ -152,6 +164,10 @@ const Wrapper = styled.div`
     font-size: 2rem;
     font-weight: 800;
     color: #222;
+
+    .dark & {
+      color: #fff;
+    }
   }
 
   .form-group {
@@ -162,6 +178,11 @@ const Wrapper = styled.div`
       margin-bottom: 8px;
       font-weight: 500;
       font-size: 0.95rem;
+      color: #333;
+
+      .dark & {
+        color: #ddd;
+      }
     }
 
     .input-wrapper {
@@ -174,9 +195,18 @@ const Wrapper = styled.div`
       transition: all 0.3s ease;
       position: relative;
 
+      .dark & {
+        background: #1e1e2f;
+        border: 2px solid #444;
+      }
+
       svg {
         margin-right: 10px;
         color: #888;
+
+        .dark & {
+          color: #aaa;
+        }
       }
 
       input {
@@ -186,6 +216,11 @@ const Wrapper = styled.div`
         font-size: 1rem;
         padding: 6px 0;
         outline: none;
+        color: #000;
+
+        .dark & {
+          color: #fff;
+        }
       }
 
       &:hover {
@@ -199,6 +234,10 @@ const Wrapper = styled.div`
         right: 10px;
         cursor: pointer;
         color: #888;
+
+        .dark & {
+          color: #ccc;
+        }
       }
     }
   }
@@ -220,17 +259,31 @@ const Wrapper = styled.div`
       background: linear-gradient(to right, #6a11cb, #2575fc);
       color: white;
     }
+
+    .dark & {
+      background: #4a4a6a;
+      color: #fff;
+    }
   }
 
   .text-center {
     text-align: center;
     font-size: 0.9rem;
     margin: 15px 0;
+    color: #333;
+
+    .dark & {
+      color: #ccc;
+    }
 
     .link {
       color: #2d79f3;
       font-weight: 500;
       cursor: pointer;
+
+      .dark & {
+        color: #7ab0ff;
+      }
     }
   }
 
@@ -240,24 +293,32 @@ const Wrapper = styled.div`
     font-size: 0.85rem;
     color: #aaa;
     position: relative;
-  }
 
-  .divider::before,
-  .divider::after {
-    content: "";
-    height: 1px;
-    background: #ddd;
-    position: absolute;
-    top: 50%;
-    width: 40%;
-  }
+    .dark & {
+      color: #666;
+    }
 
-  .divider::before {
-    left: 0;
-  }
+    &::before,
+    &::after {
+      content: "";
+      height: 1px;
+      background: #ddd;
+      position: absolute;
+      top: 50%;
+      width: 40%;
 
-  .divider::after {
-    right: 0;
+      .dark & {
+        background: #444;
+      }
+    }
+
+    &::before {
+      left: 0;
+    }
+
+    &::after {
+      right: 0;
+    }
   }
 
   .google-btn {
@@ -283,7 +344,14 @@ const Wrapper = styled.div`
       border-width: 2px;
       border-style: solid;
     }
+
+    .dark & {
+      background: #3a3a4a;
+      border: 2px solid #555;
+      color: #fff;
+    }
   }
 `;
+
 
 export default UserLogin;
