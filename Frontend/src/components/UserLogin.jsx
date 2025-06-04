@@ -31,7 +31,9 @@ const UserLogin = () => {
         // toast.success('Login successful!');
         alert("Login sucessful");
         setAuthUser(response.data.user);
-        navigate("/"); // ✅ Redirect to home/dashboard
+        navigate("/UserHome"); // ✅ Redirect to home/dashboard
+        localStorage.setItem("Users", JSON.stringify(response.data.user));
+        // console.log(response, "sans")
       }
     } catch (error) {
       console.error("Login error:", error);

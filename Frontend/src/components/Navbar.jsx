@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import SuperAdminLogout from "./SuperAdminLogout";
+import UserLogout from "./UserLogout";
 // import { useTheme } from "@/components/theme-provider";
 
 const Navbar = () => {
@@ -168,48 +169,68 @@ const Navbar = () => {
             </DropdownMenu>
 
             {/* Auth Buttons */}
-            {authUser || authAdmin ? (
-              <div className="flex items-center gap-2">
-                <Button onClick={() => navigate("/AdminHome")} size="sm">
-                {t("db")}
-                </Button>
-                <Logout />
-              </div>
-            ) : authAdmin2 ? (
-              <div className="flex items-center gap-2">
-                <Button onClick={() => navigate("/SuperAdminHome")} size="sm">
-                {t("db")}
-                </Button>
-                <SuperAdminLogout />
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Button
-                  onClick={() => navigate("/UserLogin")}
-                  size="sm"
-                  className="text-xs px-3 py-1.5"
-                >
-                 {t("userLogin")}
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button size="sm" className="text-xs px-3 py-1.5">
-                    {t("login")}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => navigate("/AdminLogin")}>
-                     {t("al")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => navigate("/SuperAdminLogin")}
-                    >
-                     {t("sl")}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            )}
+{authAdmin ? (
+  <div className="flex items-center gap-2">
+    <Button onClick={() => navigate("/AdminHome")} size="sm">
+      {t("db")}
+    </Button>
+    <Logout />
+  </div>
+) : authUser ? (
+  <div className="flex items-center gap-2">
+    <Button onClick={() => navigate("/Services")} size="sm">
+      {t("Services")}
+    </Button>
+    
+    <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <Button size="sm">{t("MyProfile")}</Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+      <DropdownMenuItem onClick={() => navigate("/UserHome")}>
+        {t("MyProfile")}
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => navigate("/EditProfile")}>
+        {t("EditProfile")}
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+    <UserLogout />
+  </div>
+) : authAdmin2 ? (
+  <div className="flex items-center gap-2">
+    <Button onClick={() => navigate("/SuperAdminHome")} size="sm">
+      {t("db")}
+    </Button>
+    <SuperAdminLogout />
+  </div>
+) : (
+  <div className="flex items-center gap-2">
+    <Button
+      onClick={() => navigate("/UserLogin")}
+      size="sm"
+      className="text-xs px-3 py-1.5"
+    >
+      {t("userLogin")}
+    </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="sm" className="text-xs px-3 py-1.5">
+          {t("login")}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem onClick={() => navigate("/AdminLogin")}>
+          {t("al")}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate("/SuperAdminLogin")}>
+          {t("sl")}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  </div>
+)}
+
           </div>
         </div>
       </div>

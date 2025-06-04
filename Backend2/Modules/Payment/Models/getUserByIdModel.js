@@ -3,8 +3,8 @@ import client from "../../../config/sqlDB.js";
 export const getUserById = async (user_id) => {
   //   console.log(Meta_data);
   try {
-    const query = `SELECT * FROM user
-WHERE id = $1;`;
+    console.log("User id in get user by id: "+ user_id);
+    const query = 'SELECT * FROM "user" WHERE id = $1';
 
     const result = await client.query(query, [user_id]);
     // console.log("Model " + result);

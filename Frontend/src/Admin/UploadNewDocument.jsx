@@ -592,27 +592,27 @@ console.log("hllllooo new "+PdfUrl)
 
 
     console.log(documentInfo, "abhi1");
-    // await axios
-    //   .post("http://localhost:4001/Admin/UploadDocument", documentInfo)
-    //   .then((res) => {
-    //     // console.log(res.data);
-    //     if (res.data) {
-    //       // console.log(res.data);
-    //       // Remove "Please wait..." toast
-    //       toast.success(res.data.message);
-    //       handleResetButton();
-    //       handleResetButton();
-    //       // **Force re-render of file input field**
-    //       document.getElementById("fileUploaded").value = "";
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     if (err.response) {
-    //       console.log(err);
-    //       console.log("Error from backend: " + err.response.data.message);
-    //       toast.error("Error: " + err.response.data.message);
-    //     }
-    //   });
+    await axios
+      .post("http://localhost:4001/Document/Upload", documentInfo)
+      .then((res) => {
+        // console.log(res.data);
+        if (res.data) {
+          // console.log(res.data);
+          // Remove "Please wait..." toast
+          toast.success(res.data.message);
+          handleResetButton();
+          handleResetButton();
+          // **Force re-render of file input field**
+          document.getElementById("fileUploaded").value = "";
+        }
+      })
+      .catch((err) => {
+        if (err.response) {
+          console.log(err);
+          console.log("Error from backend: " + err.response.data.message);
+          toast.error("Error: " + err.response.data.message);
+        }
+      });
   };
 
   const handleResetButton = () => {

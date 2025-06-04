@@ -4,7 +4,8 @@ export const insertSubscription = async (
   razorpay_order_id,
   razorpay_payment_id,
   razorpay_signature,
-  order
+  order,
+  superuser_id
 ) => {
   //   console.log(Meta_data);
   try {
@@ -15,13 +16,13 @@ export const insertSubscription = async (
       ) RETURNING *;`;
 
     const values = [
+      superuser_id,
       razorpay_order_id,
-      order.id,
       order.amount,
       razorpay_payment_id,
       razorpay_signature,
     ];
-
+    console.log(values);
     const result = await client.query(query, values);
     // console.log("Model " + result);
     if(result.rows.length > 0){

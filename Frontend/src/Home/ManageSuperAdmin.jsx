@@ -25,34 +25,37 @@ const ManageSuperAdmin = () => {
   }, []);
   
 
-  const handleApprove = async (pendingId) => {
-    const superAdmin = JSON.parse(localStorage.getItem("SuperAdmin")); // Dynamically fetched
-    const approvedAdmin = admins.find((admin) => admin.id === pendingId); // Get full admin data
-  
-    try {
-      // First approve the admin
-      const res = await axios.post("http://localhost:4001/SuperAdmin/ApproveReq", {
-        SuperAdmin_id: superAdmin.id,
-        Pending_Request_id: pendingId,
-      });
-  
-      toast.success(res.data.message);
-  
-      // Now send welcome email
-      await axios.post("http://localhost:4001/Services/send-welcome-email", {
-        email: approvedAdmin.email,
-        username: approvedAdmin.name,
-      });
-  
-      toast.success("Welcome email sent!");
-  
-      // Refresh the list
-      fetchAdmins();
-    } catch (err) {
-      console.error("Approval error:", err);
-      toast.error("Failed to approve or send welcome email");
-    }
-  };
+ const handleApprove = async (admin) => {
+  const superAdmin = JSON.parse(localStorage.getItem("SuperAdmin"));
+
+ console.log("Sending approval payload:", {
+    requestId: admin.id,              // ✅ this should match the backend DB
+    superAdminId: superAdmin?.id
+  });
+
+  try {
+    const res = await axios.post("http://localhost:4001/SuperAdmin/approve-super-admin-request", {
+      requestId: admin.id,
+      superAdminId: superAdmin.id,
+    });
+
+    toast.success(res.data.message);
+        // 2. Send welcome email
+    await axios.post("http://localhost:4001/Services/send-welcome-email", {
+      email: admin.email,
+      username: admin.username,
+      type: "WelcomeSuperAdminEmail"
+    });
+
+    toast.success("Welcome email sent!");
+  } catch (err) {
+    console.error("Approval error:", err.response?.data || err.message);
+    toast.error("Failed to approve or send welcome email");
+  }
+};
+
+
+
   
   // const handleReject = async (pendingId) => {
   //   try {
@@ -72,30 +75,45 @@ const ManageSuperAdmin = () => {
   //   }
   // };
   
-  const handleReject = (pendingId) => {
-    // Trigger animation
-    setRemovedId(pendingId);
+ const handleReject = (pendingId) => {
+  // Trigger animation
+  setRemovedId(pendingId);
 
-    // Wait for animation to finish before removing
-    setTimeout(async () => {
-      try {
-        const res = await axios.post(
-          "http://localhost:4001/SuperAdmin/delete-super-admin-request",
-          {
-            id: pendingId,
-          }
-        );
-        toast.success(res.data.message);
-        // Remove from state
-        setAdmins((prev) => prev.filter((admin) => admin.id !== pendingId));
-        setRemovedId(null);
-      } catch (err) {
-        console.error("Rejection error:", err);
-        toast.error("Failed to reject request");
-        setRemovedId(null);
-      }
-    }, 500); // Match duration with transition time
-  };
+  // Wait for animation to finish before removing
+  setTimeout(async () => {
+    try {
+      // ✅ Find the full admin object using the ID
+      const rejectedAdmin = admins.find((admin) => admin.id === pendingId);
+
+      // 🔁 Reject in backend
+      const res = await axios.post(
+        "http://localhost:4001/SuperAdmin/delete-super-admin-request",
+        {
+          id: pendingId,
+        }
+      );
+      toast.success(res.data.message);
+
+      // ✅ Send rejection email with correct info
+      await axios.post("http://localhost:4001/Services/send-welcome-email", {
+        email: rejectedAdmin.email,
+        username: rejectedAdmin.username,
+        type: "SuperAdminRequestRejected",
+      });
+
+      toast.success("Rejection email sent!");
+
+      // 🧹 Remove from state
+      setAdmins((prev) => prev.filter((admin) => admin.id !== pendingId));
+      setRemovedId(null);
+    } catch (err) {
+      console.error("Rejection error:", err);
+      toast.error("Failed to reject request");
+      setRemovedId(null);
+    }
+  }, 500); // Match with CSS animation time
+};
+
 
   
 
@@ -120,7 +138,7 @@ const ManageSuperAdmin = () => {
               
                   <>
                     <button
-                      onClick={() => handleApprove(admin.id)}
+                      onClick={() => handleApprove(admin)}
                       className="bg-black text-white font-medium px-3 py-1.5 rounded text-xs border shadow-sm transition hover:bg-gradient-to-r hover:from-gray-700 hover:to-green-600"
                     >
                       Approve

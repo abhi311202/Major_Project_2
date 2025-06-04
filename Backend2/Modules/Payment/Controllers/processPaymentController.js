@@ -15,9 +15,9 @@ export const processPayment = async (req, res) => {
       amount: Number(req.body.amount * 100),
       currency: "INR",
     };
-
+    console.log(options);
     const order = await instance.orders.create(options);
-
+    console.log(order);
     if (!order) {
       throw new Error("Some error occured while creating order");
     }

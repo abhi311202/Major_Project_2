@@ -29,7 +29,8 @@ export const paymentVerification = async (req, res) => {
       // take entry from user table
       const user = await getUserById(order.user_id);
       // insert entry in super user table
-      const admin = await insertSuperUser(user);
+      const superuser = await insertSuperUser(user);
+      console.log(superuser);
       // make changes in user table
       const updatedUser = await updateUser(user.id);
       //insert into transaction table
@@ -37,7 +38,8 @@ export const paymentVerification = async (req, res) => {
         razorpay_order_id,
         razorpay_payment_id,
         razorpay_signature,
-        order
+        order,
+        superuser.id,
       );
 
       if (!result) {
@@ -51,10 +53,10 @@ export const paymentVerification = async (req, res) => {
         `http://localhost:5173/paymentSuccess?reference=${razorpay_payment_id}`
       );
 
-      return res.status(200).json({
-        success: true,
-        message: "Payment Verified Successfully",
-      }); // Handle the error and send an appropriate response
+      // return res.status(200).json({
+      //   success: true,
+      //   message: "Payment Verified Successfully",
+      // }); // Handle the error and send an appropriate response
     } else {
       throw new Error("Payment Failed");
     }
