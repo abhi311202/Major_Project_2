@@ -1,27 +1,40 @@
 import client from "../../../config/sqlDB.js";
 
 export async function changeUserEmail({ id, currentEmail, newEmail }) {
-  await client.query('BEGIN');
+  await client.query("BEGIN");
   try {
     // Verify user exists and current email matches
-    const checkQuery = 'SELECT email FROM "user" WHERE id = $1 AND email = $2 AND is_delete = false AND is_active = true';
+    const checkQuery =
+      'SELECT email FROM "active_user_subscription_view_2" WHERE id = $1 AND email = $2 AND is_delete = false AND is_active = true';
     const checkResult = await client.query(checkQuery, [id, currentEmail]);
     if (checkResult.rows.length === 0) {
-      throw new Error('User not found or current email does not match');
+      throw new Error("User not found or current email does not match");
     }
     // Check if new email already exists
-    const existsQuery = 'SELECT 1 FROM "user" WHERE email = $1';
+    const existsQuery =
+      'SELECT 1 FROM "active_user_subscription_view_2" WHERE email = $1';
     const existsResult = await client.query(existsQuery, [newEmail]);
     if (existsResult.rows.length > 0) {
-      throw new Error('New email already in use');
+      throw new Error("New email already in use");
     }
-    // Update email
-    const updateQuery = 'UPDATE "user" SET email = $1 WHERE id = $2 RETURNING email';
+    // Update email in user table
+    const updateQuery =
+      'UPDATE "user" SET email = $1 WHERE id = $2 RETURNING email';
     const updateResult = await client.query(updateQuery, [newEmail, id]);
-    await client.query('COMMIT');
-    return updateResult.rows[0];
+    // update email in super user table
+    const updateQuery1 =
+      'UPDATE "super_user" SET email = $1 WHERE id = $2 RETURNING email';
+    const updateResult1 = await client.query(updateQuery1, [newEmail, id]);
+    // console.log(updateResult.rows[0], "updated email user");
+    // console.log(updateResult1.rows[0], "updated email su");
+    if (updateResult.rows[0].email === updateResult1.rows[0].email) {
+      await client.query("COMMIT");
+      return updateResult.rows[0];
+    } else {
+      throw new Error("Email update failed");
+    }
   } catch (error) {
-    await client.query('ROLLBACK');
+    await client.query("ROLLBACK");
     throw error;
   }
 }

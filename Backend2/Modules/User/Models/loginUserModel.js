@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 export const loginUser = async (username, password) => {
   // console.log(password);
   try {
-    const query = `SELECT * FROM "user"
+    const query = `SELECT * FROM "active_user_subscription_view_2"
       WHERE username = $1 AND is_delete = false AND is_active = true
       LIMIT 1;`;
 
