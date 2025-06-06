@@ -44,8 +44,10 @@ export const changeUserPassword = async ({
     const updateQuery = `UPDATE "user" SET password_hash = $1 WHERE ${identifierField} = $2`;
     await client.query(updateQuery, [newPassword, identifierValue]);
 
-    const updateQuery1 = `UPDATE "super_user" SET password_hash = $1 WHERE ${identifierField} = $2`;
-    await client.query(updateQuery1, [newPassword, identifierValue]);
+    if (checkResult.rows[0].user_type === "super user") {
+      const updateQuery1 = `UPDATE "super_user" SET password_hash = $1 WHERE ${identifierField} = $2`;
+      await client.query(updateQuery1, [newPassword, identifierValue]);
+    }
     // console.log(updateQuery, updateQuery1);
     client.query("COMMIT");
     return true;

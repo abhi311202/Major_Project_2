@@ -10,7 +10,6 @@ export const loginUser = async (username, password) => {
       LIMIT 1;`;
 
     const result = await client.query(query, [username]);
-
     if (result.rows.length === 0) {
       console.log(result);
       throw new Error("User not found");

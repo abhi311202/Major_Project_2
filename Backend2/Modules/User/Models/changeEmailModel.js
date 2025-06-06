@@ -5,7 +5,7 @@ export async function changeUserEmail({ id, currentEmail, newEmail }) {
   try {
     // Verify user exists and current email matches
     const checkQuery =
-      'SELECT email FROM "active_user_subscription_view_2" WHERE id = $1 AND email = $2 AND is_delete = false AND is_active = true';
+      'SELECT user_type FROM "active_user_subscription_view_2" WHERE id = $1 AND email = $2 AND is_delete = false AND is_active = true';
     const checkResult = await client.query(checkQuery, [id, currentEmail]);
     if (checkResult.rows.length === 0) {
       throw new Error("User not found or current email does not match");
@@ -21,18 +21,31 @@ export async function changeUserEmail({ id, currentEmail, newEmail }) {
     const updateQuery =
       'UPDATE "user" SET email = $1 WHERE id = $2 RETURNING email';
     const updateResult = await client.query(updateQuery, [newEmail, id]);
-    // update email in super user table
-    const updateQuery1 =
-      'UPDATE "super_user" SET email = $1 WHERE id = $2 RETURNING email';
-    const updateResult1 = await client.query(updateQuery1, [newEmail, id]);
-    // console.log(updateResult.rows[0], "updated email user");
-    // console.log(updateResult1.rows[0], "updated email su");
-    if (updateResult.rows[0].email === updateResult1.rows[0].email) {
-      await client.query("COMMIT");
-      return updateResult.rows[0];
-    } else {
+
+    if (updateResult.rows.length === 0) {
       throw new Error("Email update failed");
     }
+
+    // update email in super user table
+
+    if (checkResult.rows[0].user_type === "super user") {
+      const updateQuery1 =
+        'UPDATE "super_user" SET email = $1 WHERE id = $2 RETURNING email';
+      const updateResult1 = await client.query(updateQuery1, [newEmail, id]);
+
+      if (
+        updateResult.rows[0].email === updateResult1.rows[0].email &&
+        updateResult1.rows.length > 0
+      ) {
+        await client.query("COMMIT");
+        return updateResult.rows[0];
+      } else {
+        throw new Error("Email update failed");
+      }
+    }
+
+    await client.query("COMMIT");
+    return updateResult.rows[0];
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;
