@@ -55,7 +55,7 @@ export const loginUser = async (username, password) => {
 export const loginUser1 = async (email, password) => {
   // console.log(password);
   try {
-    const query = `SELECT * FROM "user"
+    const query = `SELECT * FROM "active_user_subscription_view_2"
       WHERE email = $1 AND is_delete = false AND is_active = true
       LIMIT 1;`;
 
