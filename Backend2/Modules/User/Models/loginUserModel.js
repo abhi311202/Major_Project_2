@@ -5,12 +5,11 @@ import jwt from "jsonwebtoken";
 export const loginUser = async (username, password) => {
   // console.log(password);
   try {
-    const query = `SELECT * FROM "user"
+    const query = `SELECT * FROM "active_user_subscription_view_2"
       WHERE username = $1 AND is_delete = false AND is_active = true
       LIMIT 1;`;
 
     const result = await client.query(query, [username]);
-
     if (result.rows.length === 0) {
       console.log(result);
       throw new Error("User not found");
@@ -55,7 +54,7 @@ export const loginUser = async (username, password) => {
 export const loginUser1 = async (email, password) => {
   // console.log(password);
   try {
-    const query = `SELECT * FROM "user"
+    const query = `SELECT * FROM "active_user_subscription_view_2"
       WHERE email = $1 AND is_delete = false AND is_active = true
       LIMIT 1;`;
 

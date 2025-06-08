@@ -1,5 +1,6 @@
 import client from "../../config/sqlDB.js";
 
+// "SELECT id FROM "active_user_subscription_view_2" WHERE "username" = $1 AND id != $2 AND is_delete = false AND is_active = true"
 export async function isUsernameAvailable(username) {
   const queries = [
     "SELECT 1 FROM admin WHERE username = $1 AND is_delete=false LIMIT 1",

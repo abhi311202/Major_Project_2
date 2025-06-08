@@ -19,7 +19,7 @@ export const Approve_Req = async (req, res) => {
   
         if (!AproovedAdmin) {
           return res.status(404).json({
-            error: "Insetion of Pending Request in Admin Table Failed",
+            error: "Insertion of Pending Request in Admin Table Failed",
             message: "Error in Approving request",
           });
         } else {
@@ -46,4 +46,8 @@ export const Approve_Req = async (req, res) => {
       console.log("Error in Approving Request: ", error);
       return res.status(500).json({ errors: "Error in Approving Request." });
     }
-  };
+};
+  
+
+
+
