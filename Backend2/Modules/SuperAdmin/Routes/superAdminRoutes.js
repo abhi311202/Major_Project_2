@@ -24,6 +24,7 @@ import { Fetch_Threshold1 } from "../Controllers/Fetch_Threshold1Controller.js";
 import { getSuperAdminRequests } from "../Controllers/GetSupAdminReqController.js";
 import { approveSuperAdminRequestController } from "../Controllers/ApproveSupAdminReqController.js";
 import { deleteSuperAdminRequest } from "../Controllers/DeleteSupAdminReqController.js";
+import { getSuperAdminDetails } from "../Controllers/getSuperAdminDetailsController.js";
 
 router.post("/login", adminLogin);
 router.get("/AdminRequest", adminRequest);
@@ -35,6 +36,7 @@ router.get("/get-threshhold1", Fetch_Threshold1);
 router.get("/super-admin-requests", getSuperAdminRequests);
 router.post("/approve-super-admin-request", approveSuperAdminRequestController);
 router.post("/delete-super-admin-request", deleteSuperAdminRequest);
+router.post("/get-super-admin-details", getSuperAdminDetails);
 
 //   router.post("/verify", userMiddleware, demo);
 

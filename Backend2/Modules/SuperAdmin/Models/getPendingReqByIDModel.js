@@ -14,11 +14,11 @@ export const getPendingReqByID = async (Pending_Request_id) => {
         aadhar,
         profession,
         organization,
-        profile_picture_url
+        profile_picture_url,
+        profile_picture_key
     FROM pending_admin_req
     WHERE id = $1;`;
 
   const result = await client.query(query, [Pending_Request_id]);
-
   return result.rows.length > 0 ? result.rows[0] : false;
 };

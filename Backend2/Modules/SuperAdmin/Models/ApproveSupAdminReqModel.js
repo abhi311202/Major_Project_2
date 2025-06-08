@@ -40,7 +40,7 @@ export const getAdminID = async (requestID) => {
 export const getAdminData = async (adminId) => {
   try {
     const query = `
-      SELECT id,name, username, password_hash, email, phone, dob, gender, aadhar, profession, organization, profile_picture_url
+      SELECT id,name, username, password_hash, email, phone, dob, gender, aadhar, profession, organization, profile_picture_url, profile_picture_key
       FROM admin
       WHERE id = $1 AND is_active = TRUE AND is_delete = FALSE
     `;
@@ -71,6 +71,7 @@ export const putSuperAdminData = async (adminData, superAdminId) => {
       profession,
       organization,
       profile_picture_url,
+      profile_picture_key
     } = adminData;
     const values = [
       id,
@@ -85,6 +86,7 @@ export const putSuperAdminData = async (adminData, superAdminId) => {
       profession,
       organization,
       profile_picture_url,
+      profile_picture_key,
       superAdminId,
     ];
     const query = `
@@ -101,6 +103,7 @@ export const putSuperAdminData = async (adminData, superAdminId) => {
       profession,
       organization,
       profile_picture_url,
+      profile_picture_key,
       is_active,
       is_delete,
       created_at,
@@ -109,14 +112,14 @@ export const putSuperAdminData = async (adminData, superAdminId) => {
       approver
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9, 
-      $10, $11, $12, TRUE , FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, $13
+      $10, $11, $12,$13, TRUE , FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, $14
     ) RETURNING is_active;
   `;
 
     const result = await client.query(query, values);
     // console.log(result);
     if (result.rowCount === 0) {
-      throw new Error("Insetion in Super Admin Table failed");
+      throw new Error("Insertion in Super Admin Table failed");
     }
     console.log(result);
     return result.rows[0].is_active;

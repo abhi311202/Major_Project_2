@@ -15,6 +15,7 @@ export const Approve_Pending_Req = async (SuperAdmin_id, pendingReq) => {
       profession,
       organization,
       profile_picture_url,
+      profile_picture_key,
       is_active,
       is_delete,
       created_at,
@@ -33,12 +34,13 @@ export const Approve_Pending_Req = async (SuperAdmin_id, pendingReq) => {
       $9,
       $10,
       $11,
+      $12,
       TRUE,
       FALSE,
       CURRENT_TIMESTAMP,
       CURRENT_TIMESTAMP,
       NULL,
-      $12 
+      $13 
   ) RETURNING id;`;
 
   const result = await client.query(query, [
@@ -53,6 +55,7 @@ export const Approve_Pending_Req = async (SuperAdmin_id, pendingReq) => {
     pendingReqWithoutId.profession,
     pendingReqWithoutId.organization,
     pendingReqWithoutId.profile_picture_url,
+    pendingReqWithoutId.profile_picture_key,
     SuperAdmin_id,
   ]);
 

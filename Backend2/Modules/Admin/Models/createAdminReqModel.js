@@ -14,6 +14,7 @@ export const createAdminReq = async (adminData) => {
     profession,
     organization,
     profile_picture_url,
+    profile_picture_key
   } = adminData;
 
   // const result = await client.query("", []);
@@ -23,10 +24,10 @@ export const createAdminReq = async (adminData) => {
   const query = `
         INSERT INTO "pending_admin_req" (
           name, username, password_hash, email, phone, dob, gender,
-          aadhar, profession, organization, profile_picture_url,
+          aadhar, profession, organization, profile_picture_url, profile_picture_key,
           is_active, is_delete, created_at, updated_at, deleted_at
         ) VALUES (
-          $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,true,false,NOW(),NOW(),NOW()
+          $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,true,false,NOW(),NOW(),NOW()
         )
         RETURNING *;
       `;
@@ -43,6 +44,7 @@ export const createAdminReq = async (adminData) => {
     profession,
     organization,
     profile_picture_url,
+    profile_picture_key
   ];
 
   const result = await client.query(query, values);
