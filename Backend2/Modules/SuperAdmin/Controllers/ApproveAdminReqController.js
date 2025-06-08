@@ -5,7 +5,6 @@ import { Delete_From_Admin_Table_By_ID } from "../Models/DeleteFromAdminTableByI
 import client from "../../../config/sqlDB.js";
 
 export const Approve_Req = async (req, res) => {
-  console.log("Hello");
     try {
       const { SuperAdmin_id, Pending_Request_id } = req.body;
       // console.log(Pending_Request_id);

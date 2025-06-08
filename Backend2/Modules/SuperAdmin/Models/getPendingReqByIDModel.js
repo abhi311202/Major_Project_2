@@ -20,6 +20,5 @@ export const getPendingReqByID = async (Pending_Request_id) => {
     WHERE id = $1;`;
 
   const result = await client.query(query, [Pending_Request_id]);
-  console.log(result);
   return result.rows.length > 0 ? result.rows[0] : false;
 };
