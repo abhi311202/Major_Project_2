@@ -18,11 +18,6 @@ export const passwordChangeController = async (req, res) => {
       .status(400)
       .json({ error: "New password and confirm password do not match." });
   }
-  // if (newPassword === currentPassword) {
-  //   return res
-  //     .status(400)
-  //     .json({ error: "New password must be different from current password." });
-  // }
   try {
     await changeUserPassword({ username, email, currentPassword, newPassword });
     res.status(200).json({ message: "Password changed successfully." });
