@@ -5,9 +5,11 @@ import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthProvider";
+import { toast } from "react-hot-toast";
 
 const UserLogin = () => {
   const [authUser, setAuthUser] = useAuth();
+  const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
   const navigate = useNavigate();
   const handleClick = () => {
     navigate("/UserSignUp"); // opens the new page
@@ -21,7 +23,7 @@ const UserLogin = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post("http://localhost:4001/User/login", {
+      const response = await axios.post(`${baseURL}/User/login`, {
         username: data.username,
         password_hash: data.password_hash,
       });
@@ -29,7 +31,7 @@ const UserLogin = () => {
       // If login is successful, you get a token and user info in response.data
       if (response.status === 200) {
         // toast.success('Login successful!');
-        alert("Login sucessful");
+        toast.success("Login sucessful");
         setAuthUser(response.data.user);
         navigate("/UserHome"); // ✅ Redirect to home/dashboard
         localStorage.setItem("Users", JSON.stringify(response.data.user));

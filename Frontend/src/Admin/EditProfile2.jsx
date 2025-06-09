@@ -4,9 +4,8 @@ import axios from "axios";
 import Navbar from "@/components/Navbar";
 import toast from "react-hot-toast";
 import debounce from "lodash/debounce";
-const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
 
-const EditProfile = () => {
+const EditProfile2 = () => {
     const fileInputRef = useRef();
   
 
@@ -25,7 +24,7 @@ const [phoneVerified, setPhoneVerified] = useState(false);
 const [typedUsername, setTypedUsername] = useState("");
 const [usernameAvailable, setUsernameAvailable] = useState(null);
 const [hasTyped, setHasTyped] = useState(false);
-
+const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
 
 
 
@@ -83,7 +82,7 @@ useEffect(() => {
 
 
 
-  const storedObjectString = localStorage.getItem("Users");
+  const storedObjectString = localStorage.getItem("Admin");
  
   const myObject = JSON.parse(storedObjectString);
   console.log(myObject);
@@ -112,38 +111,13 @@ useEffect(() => {
 
   const fetchSuperAdminStatus = async (userId) => {
     try {
-      const res = await axios.post(`${baseURL}/User/get-profile-data`, {
-        id: userId,
-      });
-  
-      const data = res.data;
-  
-      // Set profile data from response
-      setProfileData({
-        userId: data.id || userId,
-        profile: data.profile_picture_url,
-        name: data.name,
-        username: data.username,
-        email: data.email,
-        phone: data.phone,
-        dob: data.dob,
-        gender: data.gender,
-        aadhaar: data.aadhar,
-        profession: data.profession,
-        organisation: data.organization,
-        created_at: data.created_at,
-      });
-  
-      // Also update status if returned
-      if (data.status) {
-        setSuperAdminStatus(data.status); // Optional, only if the status is part of the response
-      }
-  
+      const res = await axios.post(`${baseURL}/User/get-profile-data`);
+      // Example backend expected to return { status: 'approved' | 'requested' | 'not_requested' }
+      setSuperAdminStatus(res.data.status);
     } catch (err) {
-      console.error("Could not fetch user profile data:", err);
+      console.error("Could not fetch Super Admin request status.");
     }
   };
-  
 
   const handleChangePassword = async () => {
   const { current, new: newPassword, confirm } = passwords;
@@ -409,32 +383,11 @@ const handleSaveChanges = async () => {
   console.log("Sending payload:", payload);
 
   try {
-    const response = await axios.post(`${baseURL}/User/change-personal-detail`, payload); // 👈 your actual API route
+    const response = await axios.post(
+      `${baseURL}/User/change-personal-detail`,
+      payload
+    );
     toast.success("Profile updated successfully!");
-
-    // ✅ Update profileData state immediately
-    setProfileData(prev => ({
-      ...prev,
-      name: typedName,
-      username: typedUsername,
-      dob: typedDob,
-      gender: typedGender,
-      profession: typedProfession,
-      organisation: typedOrganization
-    }));
-
-    // ✅ Update localStorage (optional but good for persistence)
-    const updatedUser = {
-      ...myObject,
-      name: typedName,
-      username: typedUsername,
-      dob: typedDob,
-      gender: typedGender,
-      profession: typedProfession,
-      organization: typedOrganization
-    };
-    localStorage.setItem("Users", JSON.stringify(updatedUser));
-
   } catch (error) {
     const msg = error.response?.data?.error || "Failed to update profile.";
     toast.error(msg);
@@ -914,4 +867,4 @@ useEffect(() => {
 
 };
 
-export default EditProfile;
+export default EditProfile2;

@@ -8,6 +8,7 @@ const MyProfileSection = () => {
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
   };
+  const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
 
   const [profileData, setProfileData] = useState({});
   const [superAdminStatus, setSuperAdminStatus] = useState("not_requested");
@@ -16,30 +17,45 @@ const MyProfileSection = () => {
   const myObject = JSON.parse(storedObjectString);
 
   useEffect(() => {
-    if (myObject) {
-      setProfileData({
-        adminId: myObject.id || "48",
-        profile: myObject.profile_picture_url,
-        name: myObject.name,
-        username: myObject.username,
-        email: myObject.email,
-        phone: myObject.phone,
-        dob: myObject.dob,
-        gender: myObject.gender,
-        aadhaar: myObject.aadhar,
-        profession: myObject.profession,
-        organisation: myObject.organization,
-        created_at: myObject.created_at,
-      });
-
-      // Optionally: check current Super Admin request status
-      fetchSuperAdminStatus(myObject.id || "48");
+    if (myObject?.id) {
+      fetchAdminDetails(myObject.id);
+      fetchSuperAdminStatus(myObject.id); // Optional
     }
   }, []);
+  
+  const fetchAdminDetails = async (adminId) => {
+    try {
+      const response = await axios.post(`${baseURL}/Admin/get-admin-details`, {
+        id: adminId,
+      });
+  
+      console.log("API response:", response.data); // Add this to debug
+      const data = response.data.admin; // or data.result / data[0] based on what you see
+  
+      setProfileData({
+        adminId: data.id,
+        profile: data.profile_picture_url,
+        name: data.name,
+        username: data.username,
+        email: data.email,
+        phone: data.phone,
+        dob: data.dob,
+        gender: data.gender,
+        aadhaar: data.aadhar,
+        profession: data.profession,
+        organisation: data.organization,
+        created_at: data.created_at,
+      });
+    } catch (error) {
+      console.error("Failed to fetch admin details:", error);
+    }
+  };
+  
+  
 
   const fetchSuperAdminStatus = async (adminId) => {
     try {
-      const res = await axios.get(`http://localhost:4001/Admin/check-super-admin-status/${adminId}`);
+      const res = await axios.get(`${baseURL}/Admin/check-super-admin-status/${adminId}`);
       // Example backend expected to return { status: 'approved' | 'requested' | 'not_requested' }
       setSuperAdminStatus(res.data.status);
     } catch (err) {
@@ -49,7 +65,7 @@ const MyProfileSection = () => {
 
   const handleSuperAdminRequest = async () => {
     try {
-      const response = await axios.post("http://localhost:4001/Admin/apply-super-admin", {
+      const response = await axios.post(`${baseURL}/Admin/apply-super-admin`, {
         adminId: profileData.adminId,
       });
 
@@ -101,7 +117,8 @@ const MyProfileSection = () => {
       <div className="grid grid-cols-3 gap-4 mb-8">
         <div className={`bg-white p-4 rounded-xl dark:bg-black dark:text-white shadow text-center ${gradientHover}`}>
           <div className="text-xl font-bold text-black dark:text-white">
-            {profileData.created_at?.split("T")[0]}
+          {myObject.created_at?.split("T")[0]}
+
           </div>
           <div className="text-sm text-black mt-1 dark:text-white">{t("Registration Date")}</div>
         </div>

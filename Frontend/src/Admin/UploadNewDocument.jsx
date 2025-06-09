@@ -23,6 +23,7 @@ GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 function UploadNewDocument() {
+  const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
   const [selectedFileName, setSelectedFileName] = useState('');
 
   const editor = useRef(null);
@@ -593,7 +594,7 @@ console.log("hllllooo new "+PdfUrl)
 
     console.log(documentInfo, "abhi1");
     await axios
-      .post("http://localhost:4001/Document/Upload", documentInfo)
+      .post(`${baseURL}/Document/Upload`, documentInfo)
       .then((res) => {
         // console.log(res.data);
         if (res.data) {
@@ -719,7 +720,7 @@ console.log("hllllooo new "+PdfUrl)
   useEffect(() => {
     const fetchExpectedValue = async () => {
       try {
-        const response = await axios.get("http://localhost:4001/SuperAdmin/get-threshhold1");
+        const response = await axios.get(`${baseURL}/SuperAdmin/get-threshhold1`);
         const expectedValue = response.data.data.threshold_value;
         localStorage.setItem("Threshold_Id", response.data.data.threshold_id);
         console.log("Fetched Expected Value:", expectedValue);

@@ -5,6 +5,8 @@ export const uploadS3PdfController = async (req, res) => {
   if (!file) return res.status(400).json({ error: "No file uploaded" });
   try {
     const { fileUrl, fileKey } = await uploadPdfToS3(file);
+    console.log(fileUrl);
+    console.log(fileKey);
     res.json({
       message: "File uploaded successfully",
       pdf: fileUrl,

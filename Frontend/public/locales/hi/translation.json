@@ -144,7 +144,8 @@
   "Change Password": "पासवर्ड बदलें",
   "Edit Profile": "प्रोफ़ाइल संपादित करें",
   "Request For SuperAdmin": "सुपरएडमिन के लिए अनुरोध करें",
-  "Profile": "प्रोफ़ाइल"
+  "Profile": "प्रोफ़ाइल",
+   "welcome_message_with_placeholder": "{{legalAI}} भविष्य की कानूनी तकनीक है"
 
 
 

@@ -5,10 +5,11 @@ import toast, { Toaster } from "react-hot-toast";
 const ManageSuperAdmin = () => {
   const [admins, setAdmins] = useState([]);
   const [removedId, setRemovedId] = useState(null); // To track which card is being removed
+  const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
 
   const fetchAdmins = async () => {
     try {
-      const res = await axios.get("http://localhost:4001/SuperAdmin/super-admin-requests");
+      const res = await axios.get(`${baseURL}/SuperAdmin/super-admin-requests`);
       if (res.data.success) {
         console.log(res.data.data,"Abh");
         setAdmins(res.data.data);
@@ -34,14 +35,14 @@ const ManageSuperAdmin = () => {
   });
 
   try {
-    const res = await axios.post("http://localhost:4001/SuperAdmin/approve-super-admin-request", {
+    const res = await axios.post(`${baseURL}/SuperAdmin/approve-super-admin-request`, {
       requestId: admin.id,
       superAdminId: superAdmin.id,
     });
 
     toast.success(res.data.message);
         // 2. Send welcome email
-    await axios.post("http://localhost:4001/Services/send-welcome-email", {
+    await axios.post(`${baseURL}/Services/send-welcome-email`, {
       email: admin.email,
       username: admin.username,
       type: "WelcomeSuperAdminEmail"
@@ -87,7 +88,7 @@ const ManageSuperAdmin = () => {
 
       // 🔁 Reject in backend
       const res = await axios.post(
-        "http://localhost:4001/SuperAdmin/delete-super-admin-request",
+        `${baseURL}/SuperAdmin/delete-super-admin-request`,
         {
           id: pendingId,
         }
@@ -95,7 +96,7 @@ const ManageSuperAdmin = () => {
       toast.success(res.data.message);
 
       // ✅ Send rejection email with correct info
-      await axios.post("http://localhost:4001/Services/send-welcome-email", {
+      await axios.post(`${baseURL}/Services/send-welcome-email`, {
         email: rejectedAdmin.email,
         username: rejectedAdmin.username,
         type: "SuperAdminRequestRejected",

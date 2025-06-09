@@ -144,7 +144,8 @@
   "Edit Profile": "Edit Profile",
   "Request For SuperAdmin": "Request For SuperAdmin",
   "Profile": "Profile",
-  "p":"Password"
+  "p":"Password",
+  "welcome_message_with_placeholder": "{{legalAI}} is the future of legal tech"
 
   }
   

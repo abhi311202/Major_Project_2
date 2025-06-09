@@ -16,6 +16,8 @@ import Services from "./User/Services";
 import SearchDocument from "./User/SearchDocument";
 import PaymentSuccess from "./components/PaymentSuccess";
 import DocumentDetails from "./User/DocumentDetails";
+import EditProfile2 from "./Admin/EditProfile2";
+import EditProfile3 from "./Admin/EditProfile3";
 
 const App = () => {
   const user = JSON.parse(localStorage.getItem("Users"));
@@ -49,6 +51,8 @@ const App = () => {
           <Route path="/UserSignUp" element={<UserSignUp />} />
           <Route path="/AdminSignUp" element={<AdminSignUp />} />
           <Route path="/EditProfile" element={<EditProfile />} />
+          <Route path="/EditProfile2" element={<EditProfile2 />} />
+          <Route path="/EditProfile3" element={<EditProfile3 />} />
           <Route path="/Services" element={<Services />} />
           <Route path="/SearchDocument" element={<SearchDocument />} />
           <Route path="/paymentSuccess" element={<PaymentSuccess/>}/>

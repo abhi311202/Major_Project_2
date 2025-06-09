@@ -171,9 +171,21 @@ const Navbar = () => {
             {/* Auth Buttons */}
 {authAdmin ? (
   <div className="flex items-center gap-2">
-    <Button onClick={() => navigate("/AdminHome")} size="sm">
+       <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+    <Button size="sm">
       {t("db")}
     </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+      <DropdownMenuItem onClick={() => navigate("/AdminHome")}>
+        {t("MyProfile")}
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => navigate("/EditProfile2")}>
+        {t("EditProfile")}
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+    </DropdownMenu>
     <Logout />
   </div>
 ) : authUser ? (
@@ -199,9 +211,21 @@ const Navbar = () => {
   </div>
 ) : authAdmin2 ? (
   <div className="flex items-center gap-2">
-    <Button onClick={() => navigate("/SuperAdminHome")} size="sm">
+    <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+    <Button  size="sm">
       {t("db")}
     </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+      <DropdownMenuItem onClick={() => navigate("/SuperAdminHome")}>
+        {t("MyProfile")}
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => navigate("/EditProfile3")}>
+        {t("EditProfile")}
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+    </DropdownMenu>
     <SuperAdminLogout />
   </div>
 ) : (

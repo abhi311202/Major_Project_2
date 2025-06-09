@@ -4,7 +4,7 @@ export const adminLogin = async (req, res) => {
   console.log(req.body);
   const { username, password_hash, email } = req.body;
   if (username && password_hash) {
-    console.log("Username API CAlled " + username, password_hash);
+    console.log("1Username API CAlled " + username, password_hash);
 
     try {
       const result = await loginAdmin(
