@@ -4,11 +4,13 @@ import toast, { Toaster } from "react-hot-toast";
 
 const ManageAdmin = () => {
   const [admins, setAdmins] = useState([]);
-  const [removedId, setRemovedId] = useState(null); // To track which card is being removed
+  const [removedId, setRemovedId] = useState(null); 
+  // To track which card is being removed
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   const fetchAdmins = async () => {
     try {
-      const res = await axios.get("http://localhost:4001/SuperAdmin/AdminRequest");
+      const res = await axios.get(`${baseURL}/SuperAdmin/AdminRequest`);
       if (res.data.success) {
         // console.log(res.data.data,"Abh");
         setAdmins(res.data.data);
@@ -31,7 +33,7 @@ const ManageAdmin = () => {
   
     try {
       // First approve the admin
-      const res = await axios.post("http://localhost:4001/SuperAdmin/ApproveReq", {
+      const res = await axios.post(`${baseURL}/SuperAdmin/ApproveReq`, {
         SuperAdmin_id: superAdmin.id,
         Pending_Request_id: pendingId,
       });
@@ -39,7 +41,7 @@ const ManageAdmin = () => {
       toast.success(res.data.message);
   
       // Now send welcome email
-      await axios.post("http://localhost:4001/Services/send-welcome-email", {
+      await axios.post(`${baseURL}/Services/send-welcome-email`, {
         email: approvedAdmin.email,
         username: approvedAdmin.name,
       });
@@ -50,7 +52,7 @@ const ManageAdmin = () => {
       fetchAdmins();
     } catch (err) {
       console.error("Approval error:", err);
-      toast.error("Failed to approve or send welcome email");
+      // toast.error("Failed to approve or send welcome email");
     }
   };
   
@@ -80,7 +82,7 @@ const ManageAdmin = () => {
     setTimeout(async () => {
       try {
         const res = await axios.post(
-          "http://localhost:4001/SuperAdmin/DeleteReq",
+          `${baseURL}/SuperAdmin/DeleteReq`,
           {
             Pending_Request_id: pendingId,
           }

@@ -21,6 +21,7 @@ export const set_th1 = async (threshold_value, super_admin_id) => {
       return false;
     }
   } catch (error) {
+    console.log(error);
     throw new Error("Error in making new entry");
   }
 };

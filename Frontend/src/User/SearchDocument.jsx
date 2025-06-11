@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import axios from "axios";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-
+const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
 const SearchDocument = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -61,7 +61,7 @@ const [sortOrder, setSortOrder] = React.useState('asc'); // or 'desc'
   useEffect(() => {
     const fetchDocuments = async () => {
       try {
-        const res = await axios.get("http://localhost:4001/Document/get-documents");
+        const res = await axios.get(`${baseURL}/Document/get-documents`);
         console.log("Documents response:", res.data);
 
         if (res.data && res.data.documents) {

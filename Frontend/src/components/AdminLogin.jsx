@@ -10,7 +10,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 const UserLogin = () => {
 
-  
+  const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
   const [authUser, setAuthUser] = useAuth();
   const navigate = useNavigate();
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -32,7 +32,7 @@ const UserLogin = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post("http://localhost:4001/Admin/login", {
+      const response = await axios.post(`${baseURL}/Admin/login`, {
         username: data.username,
         password_hash: data.password_hash,
       });
@@ -40,8 +40,9 @@ const UserLogin = () => {
       if (response.status === 200) {
         toast.success("Login sucessfull");
         setAuthUser(response.data.Admin);
-        navigate("/");
         localStorage.setItem("Admin", JSON.stringify(response.data.Admin));
+        navigate("/", { replace: true});
+        window.location.reload();
       }
     } catch (error) {
       console.error("Login error:", error);

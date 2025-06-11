@@ -5,6 +5,7 @@ import axios from "axios";
 const UserMyProfileSection = () => {
   const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
   const { t, i18n } = useTranslation();
+  
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
@@ -19,36 +20,51 @@ const UserMyProfileSection = () => {
   console.log(myObject);
   
   useEffect(() => {
-    if (myObject) {
-      setProfileData({
-        userId: myObject.id || "49",
-        profile: myObject.profile_picture_url,
-        name: myObject.name,
-        username: myObject.username,
-        email: myObject.email,
-        phone: myObject.phone,
-        dob: myObject.dob,
-        gender: myObject.gender,
-        aadhaar: myObject.aadhar,
-        profession: myObject.profession,
-        organisation: myObject.organization,
-        created_at: myObject.created_at,
-      });
+    const fetchProfileData = async () => {
+      try {
+        const storedObjectString = localStorage.getItem("Users");
+        const myObject = JSON.parse(storedObjectString);
+  
+        if (!myObject?.id) return console.error("User ID not found in localStorage");
+  
+        const payload = { id: myObject.id };
+        const res = await axios.post(`${baseURL}/User/get-profile-data`, payload);
+  
+        console.log("✅ Profile Data Response from Backend:", res.data);
+  
+        // ✅ Access only the 'data' inside res.data
+        const profile = res.data.data;
+  
+        setProfileData({
+          userId: profile.id,
+          profile: profile.profile_picture_url,
+          name: profile.name,
+          username: profile.username,
+          email: profile.email,
+          phone: profile.phone,
+          dob: profile.dob,
+          gender: profile.gender,
+          aadhaar: profile.aadhar,
+          profession: profile.profession,
+          organisation: profile.organization,
+          created_at: profile.created_at,
+          validity_start_date: profile.validity_start_date,
+          validity_end_date: profile.validity_end_date,
+          user_type: profile.user_type,
+          order_id: profile.order_id,
 
-      // Optionally: check current Super Admin request status
-      fetchSuperAdminStatus(myObject.id || "48");
-    }
+        });
+  
+      } catch (error) {
+        console.error("❌ Error fetching profile data:", error);
+      }
+    };
+  
+    fetchProfileData();
   }, []);
-
-  const fetchSuperAdminStatus = async (userId) => {
-    try {
-      const res = await axios.get(`http://localhost:4001/User/check-user-status/${userId}`);
-      // Example backend expected to return { status: 'approved' | 'requested' | 'not_requested' }
-      setSuperAdminStatus(res.data.status);
-    } catch (err) {
-      console.error("Could not fetch Super Admin request status.");
-    }
-  };
+  
+  
+  
 const product = {
   name: "Product Name",
   price: 999,
@@ -91,6 +107,16 @@ const checkoutHandler = async (amount) => {
     console.error("Payment initialization error:", error);
   }
 };
+const isExpiringSoon = (expiryDate) => {
+  if (!expiryDate) return false;
+
+  const today = new Date();
+  const expiry = new Date(expiryDate);
+  const diffInTime = expiry.getTime() - today.getTime();
+  const diffInDays = diffInTime / (1000 * 3600 * 24);
+
+  return diffInDays < 7;
+};
 
 
   
@@ -102,7 +128,10 @@ const checkoutHandler = async (amount) => {
   <div className="p-6 w-full bg-white text-gray-800 rounded-xl min-h-screen">
     {/* Header */}
     <div className="mb-6">
-      <h1 className="text-3xl text-slate-700">Profile</h1>
+    <h1 className="text-3xl text-slate-700">
+  {profileData.user_type === "super user" ? "Super User" : "User"} Profile
+</h1>
+
       <p className="text-gray-500">View all your profile details here.</p>
     </div>
 
@@ -121,7 +150,7 @@ const checkoutHandler = async (amount) => {
             { label: "Profession", value: profileData.profession },
             { label: "Organization", value: profileData.organisation },
             { label: "Aadhaar ID", value: profileData.aadhaar },
-            { label: "Registration Date", value: profileData.created_at?.split("T")[0] },
+            { label: "Registration Date", value: myObject.created_at?.split("T")[0] },
           ].map(({ label, value }, i) => (
             <div key={i}>
              <p className="text-gray-500">{t(label)}</p>
@@ -150,25 +179,70 @@ const checkoutHandler = async (amount) => {
   </div>
 
   {/* ⬇️ New separate box BELOW the profile image card */}
- <div className="bg-white rounded-xl p-6 mt-6 text-left border border-gray-200 shadow-sm">
-    <h3 className="text-lg font-semibold mb-4 text-gray-800">{product.name}</h3>
-    <div className="space-y-3 text-sm">
-      <div className="flex justify-between">
-        <p className="text-gray-600">Price</p>
-        <p className="font-medium text-green-700">₹{product.price}</p>
+  <div
+  className={`rounded-xl p-6 mt-6 text-left shadow-md transition-all duration-800 
+    ${
+      profileData.user_type === "super user"
+        ? "border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 via-white to-yellow-100 shadow-yellow-400 hover:shadow-2xl animate-pulse"
+        : "border border-gray-200 bg-white"
+    }`}
+>
+  {profileData.user_type === "super user" ? (
+    <>
+      <h3 className="text-xl font-semibold mb-4 text-yellow-700 flex items-center gap-2">
+        👑 Premium Plan
+      </h3>
+      <div className="space-y-4 text-sm text-gray-700">
+        <div className="flex justify-between">
+          <p className="text-gray-600">Purchase Date</p>
+          <p className="font-medium">
+            {profileData.validity_start_date?.split("T")[0] || "N/A"}
+          </p>
+        </div>
+        <div className="flex justify-between">
+          <p className="text-gray-600">Expiry Date</p>
+          <p
+            className={`font-medium ${
+              isExpiringSoon(profileData.validity_end_date)
+                ? "text-red-600"
+                : "text-green-600"
+            }`}
+          >
+            {profileData.validity_end_date?.split("T")[0] || "N/A"}
+          </p>
+        </div>
+        <div className="flex justify-between">
+          <p className="text-gray-600">Order ID</p>
+          <p className="font-medium text-blue-600">
+            {profileData.order_id || "N/A"}
+          </p>
+        </div>
       </div>
-      <div className="flex justify-between">
-        <p className="text-gray-600">Availability</p>
-        <p className="font-medium text-green-600">{product.availability}</p>
+    </>
+  ) : (
+    <>
+      <h3 className="text-xl font-semibold mb-4 text-gray-800">{product.name}</h3>
+      <div className="space-y-4 text-sm text-gray-700">
+        <div className="flex justify-between">
+          <p className="text-gray-600">Price</p>
+          <p className="font-medium text-green-700">₹{product.price}</p>
+        </div>
+        <div className="flex justify-between">
+          <p className="text-gray-600">Availability</p>
+          <p className="font-medium text-green-600">{product.availability}</p>
+        </div>
       </div>
-    </div>
-    <button
-      className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md transition"
-      onClick={() => checkoutHandler(product.price)}
-    >
-      Buy Now
-    </button>
-  </div>
+      <button
+        className="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-all duration-300"
+        onClick={() => checkoutHandler(product.price)}
+      >
+        Buy Now
+      </button>
+    </>
+  )}
+</div>
+
+
 
 
 

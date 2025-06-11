@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 const SuperAdminLogin = () => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [authUser, setAuthUser] = useAuth2();
   const [passwordVisible, setPasswordVisible] = useState(false); // State for password visibility
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const SuperAdminLogin = () => {
   const onSubmit = async (data) => {
     try {
       const response = await axios.post(
-        "http://localhost:4001/SuperAdmin/login",
+        `${baseURL}/SuperAdmin/login`,
         {
           username: data.username,
           password_hash: data.password_hash,
@@ -41,11 +42,13 @@ const SuperAdminLogin = () => {
       if (response.status === 200) {
         toast.success("Login successful");
         setAuthUser(response.data.SuperAdmin);
-        navigate("/Home2");
+        // navigate("/Home2");
         localStorage.setItem(
           "SuperAdmin",
           JSON.stringify(response.data.SuperAdmin)
         );
+        navigate("/Home2", { replace: true});
+        window.location.reload();
       }
     } catch (error) {
       console.error("Login error:", error);

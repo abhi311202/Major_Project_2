@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 const AdminSignUp = () => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
   const [profilePic, setProfilePic] = useState(null);
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [preview, setPreview] = useState(null);
@@ -22,7 +23,7 @@ const AdminSignUp = () => {
   const [enteredPhoneOTP, setEnteredPhoneOTP] = useState("");
   const [emailVerified, setEmailVerified] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
-
+  let fileK, url, imgK, imgUrl;
   
   useEffect(() => {
     if (emailVerified && phoneVerified) {
@@ -167,73 +168,81 @@ const handlePhoneOTPVerify = async () => {
 
   // Send Email OTP
 const sendEmailOTP = async (email) => {
-  return await axios.post("http://localhost:4001/Services/send-otp", { email });
+  return await axios.post(`${baseURL}/Services/send-otp`, { email });
 };
 
 // Send Phone OTP
 const sendPhoneOTP = async (phone) => {
-  return await axios.post("http://localhost:4001/Services/send-phone-otp", { phone });
+  return await axios.post(`${baseURL}/Services/send-phone-otp`, { phone });
 };
 
 // Verify Email OTP
 const verifyEmailOTP = async (email, otp) => {
-  return await axios.post("http://localhost:4001/Services/verify-otp", { email, otp });
+  return await axios.post(`${baseURL}/Services/verify-otp`, { email, otp });
 };
 
 // Verify Phone OTP
 const verifyPhoneOTP = async (phone, otp) => {
-  return await axios.post("http://localhost:4001/Services/verify-phone-otp", { phone, otp });
+  return await axios.post(`${baseURL}/Services/verify-phone-otp`, { phone, otp });
 };
 
   
 
 
 
-  const onSubmit = async (data) => {
-    try {
-      let uploadedImageUrl = profilePicUrl;
-
-      if (profilePic) {
-        const formData = new FormData();
-        formData.append("file", profilePic);
-        formData.append("upload_preset", "sanskar");
-        formData.append("cloud_name", "dbvwkqrol");
-
-        const res = await fetch(
-          "https://api.cloudinary.com/v1_1/dbvwkqrol/image/upload",
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
-
-        const result = await res.json();
-        uploadedImageUrl = result.url;
-      }
-
-      const userInfo = {
-        profile_picture_url: uploadedImageUrl,
-        username: data.username,
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        dob: data.dob,
-        gender: data.gender,
-        aadhar: data.aadhaar,
-        profession: data.profession,
-        organization: data.organisation,
-        password_hash: data.password,
-        type:"WelcomeAdminEmail",
-      };
-
-      await axios.post("http://localhost:4001/Admin/register", userInfo);
-      toast.success("Signup successful!");
-      navigate("/AdminLogin");
-    } catch (err) {
-      console.error(err);
-      toast.error("Registration failed!");
+const onSubmit = async (data) => {
+  try {
+    // Upload image to server
+    const imageUploadSuccess = await uploadImage(profilePic);
+    if (!imageUploadSuccess) {
+      toast.error("Image upload failed!");
+      return;
     }
-  };
+
+    const adminInfo = {
+      profile_picture_url: imgUrl || "",
+      profile_picture_key: imgK || "",
+      username: data.username,
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      dob: data.dob,
+      gender: data.gender,
+      aadhar: data.aadhaar,
+      profession: data.profession,
+      organization: data.organisation,
+      password_hash: data.password,
+      type: "WelcomeAdminEmail",
+    };
+
+    await axios.post(`${baseURL}/Admin/register`, adminInfo);
+    toast.success("Admin Signup successful!");
+    navigate("/AdminLogin");
+  } catch (err) {
+    console.error(err);
+    // toast.error("Admin registration failed!");
+  }
+};
+const uploadImage = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  try {
+    const response = await axios.post(
+      `${baseURL}/Services/upload-pdf`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+    imgK = response.data.filekey;
+    imgUrl = response.data.pdf;
+    return true;
+  } catch (error) {
+    console.error("Image upload error:", error);
+    return false;
+  }
+};
+
 
   return (
     <Wrapper>

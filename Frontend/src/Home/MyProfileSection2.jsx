@@ -4,12 +4,13 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 
 const MyProfileSection2 = () => {
-  const superAdminId = 1;
+
   const [profileData, setProfileData] = useState({});
   const [thresholdValue, setThresholdValue] = useState("");
   const [customValue, setCustomValue] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [expectedValue, setExpectedValue] = useState(null);
+  const [expectedValue, setExpectedValue] = useState(null);  
+  const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
 
   const predefinedOptions = ["10", "20", "30", "50", "100"];
 
@@ -19,19 +20,19 @@ const MyProfileSection2 = () => {
 
   const handleSetThreshold = async () => {
     const valueToSend = customValue !== "" ? customValue : thresholdValue;
-
+  
     if (!valueToSend) {
       toast.error("Please select or enter a threshold value.");
       return;
     }
-
+  
     try {
-      const response = await axios.post("http://localhost:4001/SuperAdmin/set-threshhold1", {
-        threshold_id:  localStorage.getItem("Threshold_Id"), // Optional or use `null` if inserting new
+      const response = await axios.post(`${baseURL}/SuperAdmin/set-threshhold1`, {
+        threshold_id: localStorage.getItem("Threshold_Id"),
         threshold_value: valueToSend,
-        super_admin_id: superAdminId,
+        super_admin_id: myObject?.id, // ✅ Use from your parsed localStorage object
       });
-
+  
       console.log(response.data);
       toast.success("Threshold set successfully!");
     } catch (error) {
@@ -39,6 +40,7 @@ const MyProfileSection2 = () => {
       toast.error("Failed to set threshold");
     }
   };
+  
   useEffect(() => {
     setProfileData({
       profile: myObject.profile_picture_url,
@@ -64,7 +66,7 @@ const MyProfileSection2 = () => {
   useEffect(() => {
     const fetchExpectedValue = async () => {
       try {
-        const response = await axios.get("http://localhost:4001/SuperAdmin/get-threshhold1");
+        const response = await axios.get(`${baseURL}/SuperAdmin/get-threshhold1`);
         const expectedValue = response.data.data.threshold_value;
         localStorage.setItem("Threshold_Id", response.data.data.threshold_id);
         console.log("Fetched Expected Value:", expectedValue);
@@ -211,16 +213,7 @@ const MyProfileSection2 = () => {
       </div>
 
       {/* Buttons */}
-      <div className="flex flex-wrap gap-4 justify-start mt-4">
-        {["Change Password", "Edit Profile"].map((btn, i) => (
-          <button
-            key={i}
-            className="bg-black text-white font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-300 hover:bg-gradient-to-r hover:from-green-400 hover:via-blue-500 hover:to-purple-600"
-          >
-            {btn}
-          </button>
-        ))}
-      </div>
+   
     </div>
   );
 };

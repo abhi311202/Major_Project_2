@@ -23,6 +23,7 @@ GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 function UploadNewDocument() {
+  const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
   const [selectedFileName, setSelectedFileName] = useState('');
 
   const editor = useRef(null);
@@ -286,10 +287,10 @@ function UploadNewDocument() {
           };
 
           // Send data to the classification API
-          const response = await axios.post(
-            "http://52.66.174.249:8000/classify",
-            jsonData1
-          );
+          // const response = await axios.post(
+          //   "http://52.66.174.249:8000/classify",
+          //   jsonData1
+          // );
 
           // console.log(JSON.stringify(response.data.classification));
 
@@ -323,139 +324,85 @@ function UploadNewDocument() {
     }
   };
 
-  const handleEntitymeta = async () => {
-    console.log("Meta and Entity extraction");
-    setLoading2(true);
-    setEntitymetaError(null); // Reset error state before starting
-    setEntitymeta(""); // Clear previous summary
+  // const handleEntitymeta = async () => {
+  //   console.log("Meta and Entity extraction");
+  //   setLoading2(true);
+  //   setEntitymetaError(null); // Reset error state before starting
+  //   setEntitymeta(""); // Clear previous summary
 
-    let pages = [];
-    if (!file) {
-      setEntitymetaError("No file selected.");
-      setLoading2(false);
-      return;
-    }
+  //   let pages = [];
+  //   if (!file) {
+  //     setEntitymetaError("No file selected.");
+  //     setLoading2(false);
+  //     return;
+  //   }
 
-    const reader = new FileReader();
-    reader.readAsArrayBuffer(file);
+  //   const reader = new FileReader();
+  //   reader.readAsArrayBuffer(file);
 
-    reader.onload = async function () {
-      try {
-        const pdfData = new Uint8Array(reader.result);
-        const pdf = await getDocument({
-          data: pdfData,
-          standardFontDataUrl: "node_modules/pdfjs-dist/standard_fonts/",
-        }).promise;
+  //   reader.onload = async function () {
+  //     try {
+  //       const pdfData = new Uint8Array(reader.result);
+  //       const pdf = await getDocument({
+  //         data: pdfData,
+  //         standardFontDataUrl: "node_modules/pdfjs-dist/standard_fonts/",
+  //       }).promise;
 
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const textContent = await page.getTextContent();
-          const text = textContent.items.map((item) => item.str).join(" ");
+  //       for (let i = 1; i <= pdf.numPages; i++) {
+  //         const page = await pdf.getPage(i);
+  //         const textContent = await page.getTextContent();
+  //         const text = textContent.items.map((item) => item.str).join(" ");
 
-          pages.push({
-            page_number: i,
-            page_char_count: text.length,
-            page_token_count: text.length / 4,
-            page_word_count: text.split(" ").length,
-            page_sentence_count_raw: text.split(".").length,
-            text: cleanString(text),
-          });
-        }
+  //         pages.push({
+  //           page_number: i,
+  //           page_char_count: text.length,
+  //           page_token_count: text.length / 4,
+  //           page_word_count: text.split(" ").length,
+  //           page_sentence_count_raw: text.split(".").length,
+  //           text: cleanString(text),
+  //         });
+  //       }
 
-        const jsonData = {
-          doc_id: 12345,
-          doc_name: file.name,
-          metadata: {},
-          pages: pages,
-        };
+  //       const jsonData = {
+  //         doc_id: 12345,
+  //         doc_name: file.name,
+  //         metadata: {},
+  //         pages: pages,
+  //       };
 
-        await axios
-          .post("http://52.66.174.249:7000/apirequired", jsonData)
-          .then((res) => {
-            console.log(JSON.stringify(res.data));
-            reset({ entitymeta: res.data.entitymetapipeline });
-            setSummary(markdownToPlainText(res.data.entitymetapipeline));
-          })
-          .catch((err) => {
-            console.error(err);
-            setEntitymetaError("Failed to fetch summary."); // Show error message in UI
-          })
-          .finally(() => {
-            setLoading(false); // Stop loading after request completes
-          });
-      } catch (error) {
-        console.error("Error processing file:", error);
-        setEntitymetaError(
-          "An error occurred while processing the document."
-        );
-        setLoading2(false);
-      }
-    };
+  //       await axios
+  //         .post("http://52.66.174.249:7000/apirequired", jsonData)
+  //         .then((res) => {
+  //           console.log(JSON.stringify(res.data));
+  //           reset({ entitymeta: res.data.entitymetapipeline });
+  //           setSummary(markdownToPlainText(res.data.entitymetapipeline));
+  //         })
+  //         .catch((err) => {
+  //           console.error(err);
+  //           setEntitymetaError("Failed to fetch summary."); // Show error message in UI
+  //         })
+  //         .finally(() => {
+  //           setLoading(false); // Stop loading after request completes
+  //         });
+  //     } catch (error) {
+  //       console.error("Error processing file:", error);
+  //       setEntitymetaError(
+  //         "An error occurred while processing the document."
+  //       );
+  //       setLoading2(false);
+  //     }
+  //   };
 
-    reader.onerror = () => {
-      console.error("Error reading the file.");
-      setEntitymetaError("Failed to read the file.");
-      setLoading2(false);
-    };
-  };
+  //   reader.onerror = () => {
+  //     console.error("Error reading the file.");
+  //     setEntitymetaError("Failed to read the file.");
+  //     setLoading2(false);
+  //   };
+  // };
 
 
 
-const s3 = new S3Client({
-  region: "ap-south-1",
-  credentials: {
-    accessKeyId: "AKIARWPFIIDC7HN6OB5J",
-    secretAccessKey: "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",
-  },
-});
 
-const uploadToS3 = async (file) => {
-  try {
-    const timestamp = Date.now();
-    const fileKey = `uploads/${timestamp}-${file.name}`;
-    const target = {
-      Bucket: "legalai-bucket",
-      Key: fileKey,
-      Body: file,
-      ContentType: file.type,
-    };
-
-    const upload = new Upload({
-      client: s3,
-      params: target,
-    });
-
-    upload.on("httpUploadProgress", (progress) => {
-      console.log("Upload Progress:", progress);
-    });
-
-    const result = await upload.done();
-    console.log("Upload Success", result);
-
-    // ✅ Fix: Get region properly
-    const region = await s3.config.region();
-    const pdfUrl = `https://${target.Bucket}.s3.${region}.amazonaws.com/${fileKey}`;
-    const fileName = file.name;
-    setPdfUrl(pdfUrl);
-    // ✅ Console outputs
-    console.log("PDF URL:", pdfUrl);
-    console.log("File Key:", fileKey);
-    console.log("File Name:", fileName);
-    
-    setFileKey(fileKey);
-    setFileName(fileName);
-
-    return {
-      pdfUrl,
-      fileKey,
-      fileName,
-    };
-
-  } catch (err) {
-    console.error("Upload failed:", err);
-    return null;
-  }
-};
 
 console.log("hiiii"+fileName);
 console.log("hellll"+fileKey);
@@ -593,7 +540,7 @@ console.log("hllllooo new "+PdfUrl)
 
     console.log(documentInfo, "abhi1");
     await axios
-      .post("http://localhost:4001/Document/Upload", documentInfo)
+      .post(`${baseURL}/Document/Upload`, documentInfo)
       .then((res) => {
         // console.log(res.data);
         if (res.data) {
@@ -719,7 +666,7 @@ console.log("hllllooo new "+PdfUrl)
   useEffect(() => {
     const fetchExpectedValue = async () => {
       try {
-        const response = await axios.get("http://localhost:4001/SuperAdmin/get-threshhold1");
+        const response = await axios.get(`${baseURL}/SuperAdmin/get-threshhold1`);
         const expectedValue = response.data.data.threshold_value;
         localStorage.setItem("Threshold_Id", response.data.data.threshold_id);
         console.log("Fetched Expected Value:", expectedValue);
