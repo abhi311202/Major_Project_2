@@ -86,12 +86,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static files (e.g., for React frontend)
 // ✅ Serve static files from React build folder
-app.use(express.static(path.join(__dirname, "../Frontend/dist")));
+// app.use(express.static(path.join(__dirname, "../Frontend/dist")));
 
-// // ✅ Catch-all for SPA client-side routing
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../Frontend/dist/index.html"));
-});
+// // // ✅ Catch-all for SPA client-side routing
+// app.get("/", (req, res) => {
+//   res.sendFile(path.join(__dirname, "../Frontend/dist/index.html"));
+// });
 
 
 // DB connection
