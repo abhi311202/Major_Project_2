@@ -4,9 +4,11 @@ const router = express.Router();
 import { DocUpload } from "../Controllers/docUploadController.js";
 import { getDocumentController } from "../Controllers/getDocumentController.js";
 import { getDocumentByIdController } from "../Controllers/getDocumentByIdController.js";
+import { getDocumentsByOwnerIdController } from "../Controllers/getDocumentByOwnerIdController.js";
+
 // router.post("/register", registerAdmin);
 router.post("/Upload", DocUpload);
 router.get("/get-documents", getDocumentController);
 router.post("/get-document-by-id", getDocumentByIdController);
-
+router.post("/get-document-by-owner-id", getDocumentsByOwnerIdController);
 export default router;
