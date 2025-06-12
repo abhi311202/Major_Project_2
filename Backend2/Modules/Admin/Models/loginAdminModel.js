@@ -4,7 +4,7 @@ import client from "../../../config/sqlDB.js";
 
 export const loginAdmin = async (username, password) => {
   const query = `SELECT * FROM "admin"
-        WHERE username = $1 AND is_delete = false
+        WHERE username = $1 AND is_delete = false AND is_active = true
         LIMIT 1;`;
 
   const result = await client.query(query, [username]);
