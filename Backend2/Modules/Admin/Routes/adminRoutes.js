@@ -10,6 +10,9 @@ import { changeAdminPersonalDetailController } from "../Controllers/changeAdminP
 import { passwordChangeController } from "../Controllers/passwordChangeController.js";
 import { changePhoneController } from "../Controllers/changePhoneController.js";
 import { changeEmailController } from "../Controllers/changeAdminEmailController.js";
+import { getChats } from "../Controllers/getChatsController.js";
+import { newMessage } from "../Controllers/sendNewMessageController.js";
+import { getChatById } from "../Controllers/getChatByIdController.js";
 
 router.post("/register", registerAdmin);
 router.post("/login", adminLogin);
@@ -21,5 +24,9 @@ router.post("/change-password", passwordChangeController);
 router.post("/change-phone", changePhoneController);
 router.post("/change-email", changeEmailController);
 // router.post("/verify", userMiddleware, demo);
+
+router.post("/get-chats", getChats);
+router.post("/send-message", newMessage);
+router.post("/get-msg-by-chat-id", getChatById);
 
 export default router;
