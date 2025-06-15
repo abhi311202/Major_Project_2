@@ -41,7 +41,7 @@ const UserLogin = () => {
         toast.success("Login sucessfull");
         setAuthUser(response.data.Admin);
         localStorage.setItem("Admin", JSON.stringify(response.data.Admin));
-        navigate("/", { replace: true});
+        navigate("/AdminHome", { replace: true});
         window.location.reload();
       }
     } catch (error) {

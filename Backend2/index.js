@@ -88,10 +88,10 @@ app.use(express.urlencoded({ extended: true }));
 // ✅ Serve static files from React build folder
 // app.use(express.static(path.join(__dirname, "../Frontend/dist")));
 
-// // // ✅ Catch-all for SPA client-side routing
-// app.get("/", (req, res) => {
-//   res.sendFile(path.join(__dirname, "../Frontend/dist/index.html"));
-// });
+// // ✅ Catch-all for SPA client-side routing
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../Frontend/dist/index.html"));
+});
 
 
 // DB connection
@@ -101,7 +101,7 @@ connectMongo();
 // app.get("/", (req, res) => {
 //   res.send("Hello Abi!");
 // });
-
+  
 app.use("/User", userRoutes);
 app.use("/Admin", adminRoutes);
 app.use("/SuperAdmin", superAdminRoutes);

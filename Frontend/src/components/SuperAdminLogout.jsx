@@ -22,7 +22,7 @@ function SuperAdminLogout() {
       setTimeout(() => {
         window.location.reload();
       }, 1000);
-      window.history.replaceState(null, "", "/Home2");
+      window.history.replaceState(null, "", "/");
       // navigate("/", { replace: true });
     } catch (error) {
       toast.error("Error: " + error.message);

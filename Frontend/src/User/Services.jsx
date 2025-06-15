@@ -2,50 +2,53 @@ import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import Navbar from "@/components/Navbar";
 import { useNavigate } from 'react-router-dom';
-const services = [
-  {
-    title: 'RAG on Specific Doc',
-    category: 'Service',
-    description: 'Use Retrieval-Augmented Generation for individual documents',
-    link: '#'
-  },
-  {
-    title: 'Use RAG on Global/State/Local Scope',
-    category: 'Service',
-    description: 'Apply RAG across large document collections by scope',
-    link: '#'
-  },
-  {
-    title: 'Search Document',
-    category: 'Data',
-    description: 'Perform smart search across indexed legal or academic documents',
-    link: '/SearchDocument'
-  },
-  {
-    title: 'Vision RAG on Single Doc',
-    category: 'Infrastructure',
-    description: 'Integrate image understanding with RAG for single docs',
-    link: '#'
-  },
-  {
-    title: 'Vision RAG with Global Scope',
-    category: 'Infrastructure',
-    description: 'Scale Vision + RAG across massive document stores',
-    link: '#'
-  }
-];
+import { useTranslation } from 'react-i18next';
 
 export default function Services() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const services = [
+    {
+      title: t('services.ragSingleDoc.title'),
+      category: t('services.ragSingleDoc.category'),
+      description: t('services.ragSingleDoc.description'),
+      link: '#',
+    },
+    {
+      title: t('services.ragGlobalScope.title'),
+      category: t('services.ragGlobalScope.category'),
+      description: t('services.ragGlobalScope.description'),
+      link: '#',
+    },
+    {
+      title: t('services.search.title'),
+      category: t('services.search.category'),
+      description: t('services.search.description'),
+      link: '/SearchDocument',
+    },
+    {
+      title: t('services.visionSingle.title'),
+      category: t('services.visionSingle.category'),
+      description: t('services.visionSingle.description'),
+      link: '#',
+    },
+    {
+      title: t('services.visionGlobal.title'),
+      category: t('services.visionGlobal.category'),
+      description: t('services.visionGlobal.description'),
+      link: '#',
+    },
+  ];
+
   return (
     <>
-    <Navbar />
-    
-      <h2 className="text-4xl font-bold text-center text-gray-800 mb-12 underline">Services</h2>
+      <Navbar />
+      <h2 className="text-4xl font-bold text-center text-gray-800 mb-12 underline">
+        {t('servicesPageTitle')}
+      </h2>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-10">
-   
-      
         {services.map((service, index) => (
           <div
             key={index}
@@ -60,12 +63,11 @@ export default function Services() {
               onClick={() => navigate(service.link)}
               className="flex items-center text-sm font-medium text-indigo-600 hover:underline"
             >
-              View service <ArrowRight className="ml-2 w-4 h-4" />
+              {t('viewService')} <ArrowRight className="ml-2 w-4 h-4" />
             </button>
           </div>
         ))}
       </div>
-   
     </>
   );
 }

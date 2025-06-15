@@ -4,6 +4,7 @@ import axios from "axios";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
+import { useTranslation } from "react-i18next";
 const SearchDocument = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -39,7 +40,11 @@ const [title, setTitle]=useState('');
 const [titleInput, setTitleInput] = useState('');
 const [sortOrder, setSortOrder] = React.useState('asc'); // or 'desc'
 
-
+const { t, i18n } = useTranslation();
+  
+const changeLanguage = (lng) => {
+  i18n.changeLanguage(lng);
+};
 
 
 
@@ -364,25 +369,25 @@ const filteredDocs = documents.filter((doc) => {
 
   {/* Left sidebar for filters */}
   <aside className="w-64 sticky top-20 h-fit bg-white p-4 rounded-lg shadow-md">
-    <h3 className="text-lg font-semibold mb-4">Filters</h3>
+    <h3 className="text-lg font-semibold mb-4">{t("filters")}</h3>
     
     <div className="mb-4">
-  <label className="block font-medium mb-1">Classification</label>
+  <label className="block font-medium mb-1">{t("classification")}</label>
   <select
     value={classification}
     onChange={(e) => setClassification(e.target.value)}
     className="w-full border rounded px-2 py-1"
   >
-    <option value="">All</option>
-    <option value="Civil Case">Civil Case</option>
-    <option value="Criminal Case">Criminal Case</option>
+    <option value="">{t("all")}</option>
+    <option value="Civil Case">{t("civilCase")}</option>
+    <option value="Criminal Case">{t("criminalCase")}</option>
   </select>
 </div>
 
     
 {/* Court Name */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">Court Name</label>
+  <label className="block font-medium mb-1">{t("courtName")}</label>
   <Autocomplete
     freeSolo
     options={[
@@ -410,7 +415,7 @@ const filteredDocs = documents.filter((doc) => {
     renderInput={(params) => (
       <TextField
         {...params}
-        placeholder="Enter court name"
+        placeholder={t("enterCourtName")}
         variant="outlined"
         className="w-full"
         size="small"
@@ -437,7 +442,7 @@ const filteredDocs = documents.filter((doc) => {
     {/* Judgement Author filter */}
  {/* Judgement Author */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">Judgement Author</label>
+  <label className="block font-medium mb-1">{t("judgementAuthor")}</label>
   <Autocomplete
     freeSolo
     options={[
@@ -465,7 +470,7 @@ const filteredDocs = documents.filter((doc) => {
     renderInput={(params) => (
       <TextField
         {...params}
-        placeholder="Enter author name"
+        placeholder={t("enterAuthorName")}
         variant="outlined"
         className="w-full"
         size="small"
@@ -489,7 +494,7 @@ const filteredDocs = documents.filter((doc) => {
 
   {/* Judgement Date Range */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">Judgement Date From</label>
+  <label className="block font-medium mb-1">{t("judgementDateFrom")}</label>
   <input
     type="date"
     value={judgementDateFrom}
@@ -500,7 +505,7 @@ const filteredDocs = documents.filter((doc) => {
 
 {/* Filing Date To */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">Judgement Date To</label>
+  <label className="block font-medium mb-1">{t("judgementDateTo")}</label>
   <input
     type="date"
     value={judgementDateTo}
@@ -510,7 +515,7 @@ const filteredDocs = documents.filter((doc) => {
 </div>
 
 <div className="mb-4">
-  <label className="block font-medium mb-1">Adv. of Petitioner</label>
+  <label className="block font-medium mb-1">{t("advOfPetitioner")}</label>
  <Autocomplete
   freeSolo
   options={[
@@ -545,7 +550,7 @@ const filteredDocs = documents.filter((doc) => {
   renderInput={(params) => (
     <TextField
       {...params}
-      placeholder="Enter adv."
+      placeholder={t("enterAdv")}
       variant="outlined"
       className="w-full"
       size="small"
@@ -573,7 +578,7 @@ const filteredDocs = documents.filter((doc) => {
 
 
 <div className="mb-4">
-  <label className="block font-medium mb-1">Adv. of Respondent</label>
+  <label className="block font-medium mb-1">{t("advOfRespondent")}</label>
    <Autocomplete
   freeSolo
   options={[
@@ -608,7 +613,7 @@ const filteredDocs = documents.filter((doc) => {
   renderInput={(params) => (
     <TextField
       {...params}
-      placeholder="Enter adv."
+      placeholder={t("enterAdv")}
       variant="outlined"
       className="w-full"
       size="small"
@@ -632,7 +637,7 @@ const filteredDocs = documents.filter((doc) => {
 
 {/* Bench */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">Bench</label>
+  <label className="block font-medium mb-1">{t("bench")}</label>
   <Autocomplete
     freeSolo
     options={[
@@ -660,7 +665,7 @@ const filteredDocs = documents.filter((doc) => {
     renderInput={(params) => (
       <TextField
         {...params}
-        placeholder="Enter bench"
+        placeholder={t("enterBench")}
         variant="outlined"
         className="w-full"
         size="small"
@@ -684,22 +689,22 @@ const filteredDocs = documents.filter((doc) => {
 
 {/* Case Status */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">Case Status</label>
+  <label className="block font-medium mb-1">{t("caseStatus")}</label>
   <select
     value={caseStatus}
     onChange={e => setCaseStatus(e.target.value)}
     className="w-full border rounded px-2 py-1"
   >
-    <option value="">All</option>
-    <option value="open">Open</option>
-    <option value="closed">Closed</option>
-    <option value="pending">Pending</option>
+    <option value="">{t("caseStatusAll")}</option>
+    <option value="open">{t("caseStatusOpen")}</option>
+    <option value="closed">{t("caseStatusClosed")}</option>
+    <option value="pending">{t("caseStatusPending")}</option>
   </select>
 </div>
 
 {/* Filing Date From */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">Filing Date From</label>
+  <label className="block font-medium mb-1">{t("filingDateFrom")}</label>
   <input
     type="date"
     value={filingDateFrom}
@@ -710,7 +715,7 @@ const filteredDocs = documents.filter((doc) => {
 
 {/* Filing Date To */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">Filing Date To</label>
+  <label className="block font-medium mb-1">{t("filingDateTo")}</label>
   <input
     type="date"
     value={filingDateTo}
@@ -722,7 +727,7 @@ const filteredDocs = documents.filter((doc) => {
 {/* Judgement Type */}
 {/* Judgement Type */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">Judgement Type</label>
+  <label className="block font-medium mb-1">{t("judgementType")}</label>
   <Autocomplete
     freeSolo
     options={[
@@ -750,7 +755,7 @@ const filteredDocs = documents.filter((doc) => {
     renderInput={(params) => (
       <TextField
         {...params}
-        placeholder="Enter judgement type"
+        placeholder={t("enterJudgementType")}
         variant="outlined"
         className="w-full"
         size="small"
@@ -774,7 +779,7 @@ const filteredDocs = documents.filter((doc) => {
 
 {/* Language of Judgement */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">Language of Judgement</label>
+  <label className="block font-medium mb-1">{t("languageOfJudgement")}</label>
   <Autocomplete
     freeSolo
     options={[
@@ -802,7 +807,7 @@ const filteredDocs = documents.filter((doc) => {
     renderInput={(params) => (
       <TextField
         {...params}
-        placeholder="Enter language"
+        placeholder={t("enterLanguage")}
         variant="outlined"
         className="w-full"
         size="small"
@@ -831,7 +836,7 @@ const filteredDocs = documents.filter((doc) => {
   {/* Right side: Cards */}
   <main className="flex-1 flex flex-col gap-6 pr-6 mt-4">
      <h1 className="text-4xl font-bold text-center w-full text-gray-800">
-  Search Document Using Advance Filters
+     {t("searchDocumentAdvanced")}
 </h1>
 
   <div className="mb-4 flex items-center gap-2">
@@ -863,7 +868,7 @@ const filteredDocs = documents.filter((doc) => {
   renderInput={(params) => (
     <TextField
       {...params}
-      placeholder="Enter document title"
+      placeholder={t("enterDocumentTitle")}
       variant="outlined"
       className="w-full"
       size="small"
@@ -900,7 +905,7 @@ const filteredDocs = documents.filter((doc) => {
 <div key={index} className="bg-white rounded-2xl shadow-md p-5 border hover:shadow-lg transition relative">
   {/* Top section with Title and PDF link */}
   <div className="flex items-start justify-between mb-2">
-    <h2 className="text-xl font-semibold">{MongoDB?.Doc_Title || 'Untitled Document'}</h2>
+    <h2 className="text-xl font-semibold">{MongoDB?.Doc_Title || t("untitledDocument")}</h2>
     {Doc?.S3_url && (
       <a
         href={Doc.S3_url}
@@ -908,17 +913,17 @@ const filteredDocs = documents.filter((doc) => {
         rel="noopener noreferrer"
         className="text-sm text-blue-600 font-medium hover:underline"
       >
-        View PDF
+        {t("viewPDF")}
       </a>
     )}
   </div>
 
   {/* Details */}
-  <p className="text-sm text-gray-500 mb-1"><strong>Classification:</strong> {MongoDB?.Classification || 'N/A'}</p>
-  <p className="text-sm text-gray-500 mb-1"><strong>Case No:</strong> {Key_Entities?.Case_no || 'N/A'}</p>
-  <p className="text-sm text-gray-500 mb-1"><strong>Court:</strong> {Key_Entities?.Court_name || 'N/A'}</p>
-  <p className="text-sm text-gray-500 mb-1"><strong>Judgement Date:</strong> {Key_Entities?.Judgement_date || 'N/A'}</p>
-  <p className="text-sm text-gray-500 mb-4"><strong>Judgement Author:</strong> {Metadata?.Judgement_author || 'N/A'}</p>
+  <p className="text-sm text-gray-500 mb-1"><strong>{t("classification")}:</strong> {MongoDB?.Classification || 'N/A'}</p>
+  <p className="text-sm text-gray-500 mb-1"><strong>{t("caseNo")}:</strong> {Key_Entities?.Case_no || 'N/A'}</p>
+  <p className="text-sm text-gray-500 mb-1"><strong>{t("court")}:</strong> {Key_Entities?.Court_name || 'N/A'}</p>
+  <p className="text-sm text-gray-500 mb-1"><strong>{t("judgementDate")}:</strong> {Key_Entities?.Judgement_date || 'N/A'}</p>
+  <p className="text-sm text-gray-500 mb-4"><strong>{t("judgementAuthor")}:</strong> {Metadata?.Judgement_author || 'N/A'}</p>
 
   {/* Bottom-right View More button */}
   <div className="flex justify-start">
@@ -926,7 +931,7 @@ const filteredDocs = documents.filter((doc) => {
       onClick={() => handleViewMore(docItem)}
       className="bg-blue-600 text-white text-sm px-3 py-1.5 rounded-md hover:bg-blue-700 transition"
     >
-      View More
+     {t("viewMore")}
     </button>
   </div>
 </div>
@@ -937,7 +942,7 @@ const filteredDocs = documents.filter((doc) => {
   </main>
 
     <aside className="w-64 sticky top-20 h-fit bg-white p-4 rounded-lg shadow-md">
-    <h3 className="text-lg font-semibold mb-4">Filters</h3>
+    <h3 className="text-lg font-semibold mb-4">{t("filters")}</h3>
     
  
 
@@ -946,7 +951,7 @@ const filteredDocs = documents.filter((doc) => {
 
   {/* Judgement Date Range */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">Judgement Date From</label>
+  <label className="block font-medium mb-1">{t("judgementDateFrom")}</label>
   <input
     type="date"
     value={judgementDateFrom}
@@ -957,7 +962,7 @@ const filteredDocs = documents.filter((doc) => {
 
 {/* Filing Date To */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">Judgement Date To</label>
+  <label className="block font-medium mb-1">{t("judgementDateTo")}</label>
   <input
     type="date"
     value={judgementDateTo}
@@ -973,7 +978,7 @@ const filteredDocs = documents.filter((doc) => {
 
 
 <div className="mb-4">
-  <label className="block font-medium mb-1">Case No.</label>
+  <label className="block font-medium mb-1">{t("caseNo")}</label>
    <Autocomplete
   freeSolo
   options={[
@@ -1008,7 +1013,7 @@ const filteredDocs = documents.filter((doc) => {
   renderInput={(params) => (
     <TextField
       {...params}
-      placeholder="Enter Case No."
+      placeholder={t("enterCaseNo")}
       variant="outlined"
       className="w-full"
       size="small"
@@ -1032,7 +1037,7 @@ const filteredDocs = documents.filter((doc) => {
 
 {/* Bench */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">Court No.</label>
+  <label className="block font-medium mb-1">{t("courtNo")}</label>
   <Autocomplete
     freeSolo
     options={[
@@ -1060,7 +1065,7 @@ const filteredDocs = documents.filter((doc) => {
     renderInput={(params) => (
       <TextField
         {...params}
-        placeholder="Enter Court NO."
+        placeholder={t("enterCourtNo")}
         variant="outlined"
         className="w-full"
         size="small"
@@ -1087,7 +1092,7 @@ const filteredDocs = documents.filter((doc) => {
 
 
 <div className="mb-4">
-  <label className="block font-medium mb-1">Order of Pronouncement From</label>
+  <label className="block font-medium mb-1">{t("orderPronounceFrom")}</label>
   <input
     type="date"
     value={orderDateFrom}
@@ -1098,7 +1103,7 @@ const filteredDocs = documents.filter((doc) => {
 
 
 <div className="mb-4">
-  <label className="block font-medium mb-1">Order of Pronouncement To</label>
+  <label className="block font-medium mb-1">{t("orderPronounceTo")}</label>
    <input
     type="date"
     value={orderDateTo}
@@ -1108,7 +1113,7 @@ const filteredDocs = documents.filter((doc) => {
 </div>
 
 <div className="mb-4">
-  <label className="block font-medium mb-1">Uploaded date from</label>
+  <label className="block font-medium mb-1">{t("uploadDateFrom")}</label>
    <input
     type="date"
     value={uploadDateFrom}
@@ -1118,7 +1123,7 @@ const filteredDocs = documents.filter((doc) => {
 </div>
 
 <div className="mb-4">
-  <label className="block font-medium mb-1">Uploaded date to</label>
+  <label className="block font-medium mb-1">{t("uploadDateTo")}</label>
   <input
     type="date"
     value={uploadDateTo}
@@ -1128,7 +1133,7 @@ const filteredDocs = documents.filter((doc) => {
 </div>
 
 <div className="mb-4">
-  <label className="block font-medium mb-1">Hearing date from</label>
+  <label className="block font-medium mb-1">{t("hearingDateFrom")}</label>
    <input
     type="date"
     value={hearingDateFrom}
@@ -1138,7 +1143,7 @@ const filteredDocs = documents.filter((doc) => {
 </div>
 
 <div className="mb-4">
-  <label className="block font-medium mb-1">Hearing date to</label>
+  <label className="block font-medium mb-1">{t("hearingDateTo")}</label>
   <input
     type="date"
     value={hearingDateTo}
@@ -1148,15 +1153,15 @@ const filteredDocs = documents.filter((doc) => {
 </div>
 {/* Sort By */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">Sort By</label>
+  <label className="block font-medium mb-1">{t("sortBy")}</label>
   <select
     value={sortOrder}
     onChange={(e) => setSortOrder(e.target.value)}
     className="w-full border rounded px-2 py-1"
   >
-    <option value="">Select Order</option>
-    <option value="A-Z">Title (A - Z)</option>
-    <option value="Z-A">Title (Z - A)</option>
+    <option value="">{t("selectSortOrder")}r</option>
+    <option value="A-Z">{t("sortAZ")}</option>
+    <option value="Z-A">{t("sortZA")}</option>
   </select>
 </div>
 

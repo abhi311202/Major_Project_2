@@ -14,25 +14,22 @@ function UserLogout() {
   };
   const handleLogout = () => {
     try {
-      setAuthUser({
-        ...authUser,
-        user: null,
-      });
-      localStorage.removeItem("Users");
+      setAuthUser(null);               // Clear auth user state completely
+      localStorage.removeItem("Users"); // Remove from localStorage
       toast.success("Logged out successfully");
-    //   toast.success("Logged out successfully");
-
+  
       setTimeout(() => {
+        // Navigate to home
+        navigate("/", { replace: true });
+  
+        // Reload page to reset everything
         window.location.reload();
-      }, 1000);
-      // window.location.href = "/";
-      window.history.replaceState(null, "", "/");
-      navigate("/", { replace: true });
+      }, 1000); // Wait 1 second to show toast before reload
     } catch (error) {
       toast.error("Error: " + error.message);
-      setTimeout(() => {}, 3000);
     }
   };
+  
   return (
     <div>
       <button

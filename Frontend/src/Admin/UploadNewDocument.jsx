@@ -10,17 +10,15 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 
 
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
+import workerUrl from "pdfjs-dist/legacy/build/pdf.worker.min?url";
 
-// import toast from "react-hot-toast";
-// import "../App.css";
+// Tell PDF.js where to find the worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 
-import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
-import { use } from "react";
-// GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
-GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.js",
-  import.meta.url
-).toString();
+
+
+
 
 function UploadNewDocument() {
   const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
@@ -180,56 +178,56 @@ function UploadNewDocument() {
     reader.readAsArrayBuffer(file);
 
     reader.onload = async function () {
-      try {
-        const pdfData = new Uint8Array(reader.result);
-        const pdf = await getDocument({
-          data: pdfData,
-          standardFontDataUrl: "node_modules/pdfjs-dist/standard_fonts/",
-        }).promise;
+      // try {
+      //   const pdfData = new Uint8Array(reader.result);
+      //   const pdf = await getDocument({
+      //     data: pdfData,
+      //     standardFontDataUrl: "node_modules/pdfjs-dist/standard_fonts/",
+      //   }).promise;
 
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const textContent = await page.getTextContent();
-          const text = textContent.items.map((item) => item.str).join(" ");
+      //   for (let i = 1; i <= pdf.numPages; i++) {
+      //     const page = await pdf.getPage(i);
+      //     const textContent = await page.getTextContent();
+      //     const text = textContent.items.map((item) => item.str).join(" ");
 
-          pages.push({
-            page_number: i,
-            page_char_count: text.length,
-            page_token_count: text.length / 4,
-            page_word_count: text.split(" ").length,
-            page_sentence_count_raw: text.split(".").length,
-            text: cleanString(text),
-          });
-        }
+      //     pages.push({
+      //       page_number: i,
+      //       page_char_count: text.length,
+      //       page_token_count: text.length / 4,
+      //       page_word_count: text.split(" ").length,
+      //       page_sentence_count_raw: text.split(".").length,
+      //       text: cleanString(text),
+      //     });
+      //   }
 
-        const jsonData = {
-          doc_id: 12345,
-          doc_name: file.name,
-          metadata: {},
-          pages: pages,
-        };
+      //   const jsonData = {
+      //     doc_id: 12345,
+      //     doc_name: file.name,
+      //     metadata: {},
+      //     pages: pages,
+      //   };
 
-        await axios
-          .post("http://52.66.174.249:7000/summarize", jsonData)
-          .then((res) => {
-            console.log(JSON.stringify(res.data));
-            reset({ summary: res.data.summarization });
-            setSummary(markdownToPlainText(res.data.summarization));
-          })
-          .catch((err) => {
-            console.error(err);
-            setSummarizationError("Failed to fetch summary."); // Show error message in UI
-          })
-          .finally(() => {
-            setLoading(false); // Stop loading after request completes
-          });
-      } catch (error) {
-        console.error("Error processing file:", error);
-        setSummarizationError(
-          "An error occurred while processing the document."
-        );
-        setLoading(false);
-      }
+      //   await axios
+      //     .post("http://52.66.174.249:7000/summarize", jsonData)
+      //     .then((res) => {
+      //       console.log(JSON.stringify(res.data));
+      //       reset({ summary: res.data.summarization });
+      //       setSummary(markdownToPlainText(res.data.summarization));
+      //     })
+      //     .catch((err) => {
+      //       console.error(err);
+      //       setSummarizationError("Failed to fetch summary."); // Show error message in UI
+      //     })
+      //     .finally(() => {
+      //       setLoading(false); // Stop loading after request completes
+      //     });
+      // } catch (error) {
+      //   console.error("Error processing file:", error);
+      //   setSummarizationError(
+      //     "An error occurred while processing the document."
+      //   );
+      //   setLoading(false);
+      // }
     };
 
     reader.onerror = () => {
@@ -258,65 +256,65 @@ function UploadNewDocument() {
       reader.onload = async function () {
         const pdfData = new Uint8Array(reader.result);
 
-        try {
-          const pdf = await getDocument({
-            data: pdfData,
-            standardFontDataUrl: "node_modules/pdfjs-dist/standard_fonts/",
-          }).promise;
+        // try {
+        //   const pdf = await getDocument({
+        //     data: pdfData,
+        //     standardFontDataUrl: "node_modules/pdfjs-dist/standard_fonts/",
+        //   }).promise;
 
-          for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const textContent = await page.getTextContent();
-            const text = textContent.items.map((item) => item.str).join(" ");
+        //   for (let i = 1; i <= pdf.numPages; i++) {
+        //     const page = await pdf.getPage(i);
+        //     const textContent = await page.getTextContent();
+        //     const text = textContent.items.map((item) => item.str).join(" ");
 
-            pages.push({
-              page_number: i,
-              page_char_count: text.length,
-              page_token_count: text.length / 4,
-              page_word_count: text.split(" ").length,
-              page_sentence_count_raw: text.split(".").length,
-              text: cleanString(text),
-            });
-          }
+        //     pages.push({
+        //       page_number: i,
+        //       page_char_count: text.length,
+        //       page_token_count: text.length / 4,
+        //       page_word_count: text.split(" ").length,
+        //       page_sentence_count_raw: text.split(".").length,
+        //       text: cleanString(text),
+        //     });
+        //   }
 
-          const jsonData1 = {
-            doc_id: 12345, // You might want to generate a unique ID
-            doc_name: file.name,
-            metadata: {},
-            pages: pages,
-          };
+        //   const jsonData1 = {
+        //     doc_id: 12345, // You might want to generate a unique ID
+        //     doc_name: file.name,
+        //     metadata: {},
+        //     pages: pages,
+        //   };
 
-          // Send data to the classification API
-          // const response = await axios.post(
-          //   "http://52.66.174.249:8000/classify",
-          //   jsonData1
-          // );
+        //   // Send data to the classification API
+        //   // const response = await axios.post(
+        //   //   "http://52.66.174.249:8000/classify",
+        //   //   jsonData1
+        //   // );
 
-          // console.log(JSON.stringify(response.data.classification));
+        //   // console.log(JSON.stringify(response.data.classification));
 
-          // const classificationvalue = "• " + response.data.classification.category.join("<br/>• ");
-          // console.log(classificationvalue);
+        //   // const classificationvalue = "• " + response.data.classification.category.join("<br/>• ");
+        //   // console.log(classificationvalue);
 
-          // Update state with classification results
+        //   // Update state with classification results
 
-          setClassification(
-            // markdownToPlainText(JSON.stringify(response.data.classification.category))
-            // classificationvalue
-            response.data.classification.category.join("\n")
-          );
-          setClassificationReason(
-            markdownToPlainText(
-              JSON.stringify(response.data.classification.reason)
-            )
-          );
-        } catch (err) {
-          console.error("Error during classification:", err);
-          setClassificationError(
-            "Failed to classify the document. Please try again."
-          );
-        } finally {
-          setLoading1(false); // Unset loading state
-        }
+        //   setClassification(
+        //     // markdownToPlainText(JSON.stringify(response.data.classification.category))
+        //     // classificationvalue
+        //     response.data.classification.category.join("\n")
+        //   );
+        //   setClassificationReason(
+        //     markdownToPlainText(
+        //       JSON.stringify(response.data.classification.reason)
+        //     )
+        //   );
+        // } catch (err) {
+        //   console.error("Error during classification:", err);
+        //   setClassificationError(
+        //     "Failed to classify the document. Please try again."
+        //   );
+        // } finally {
+        //   setLoading1(false); // Unset loading state
+        // }
       };
     } else {
       setClassificationError("Please upload a file before classification.");
@@ -431,6 +429,34 @@ const pdfu= PdfUrl;
     "Constitutional Case\nCivil Case\nCriminal Case",
     "Constitutional Case\nCriminal Case\nCivil Case",
   ];
+  const uploadToS3 = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file); // key must match your backend route (e.g., 'file')
+  
+    try {
+      const response = await axios.post(
+        `${baseURL}/Services/upload-pdf`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+  
+      console.log("S3 Upload Success", response.data);
+  
+      return {
+        pdfUrl: response.data.pdf,         // e.g., S3 URL
+        fileKey: response.data.filekey,    // e.g., S3 key
+        fileName: file?.name || "",        // original filename
+      };
+    } catch (error) {
+      console.error("S3 Upload Error:", error);
+      return false;
+    }
+  };
+  
 
   const onSubmit = async (data) => {
     console.log("IN ON SUBMIT");
@@ -625,7 +651,7 @@ console.log("hllllooo new "+PdfUrl)
       // }, 1000);
     }
   };
-  const handleClear = () => {
+  const handleClear_Keyentity = () => {
     setCaseno("");
     setCasetype("");
     setCasestatus("");
@@ -645,6 +671,27 @@ console.log("hllllooo new "+PdfUrl)
     // Optional: if you're using useForm() from react-hook-form
     // reset();
   };
+  const handleClear_Metadata = () => {
+    // Reset state values
+    setJudgementauthor("");
+    setJudgementtype("");
+    setLangofjudgement("");
+    setDateofhearing("");
+    setDateoforderpro("");
+    setBenchcomposition("");
+    setReferredacts("");
+  
+ 
+  };
+
+  const handleClear_Classification = () => {
+    // Clear state
+    setClassification("");
+    setClassificationReason("");
+  
+  };
+  
+  
   
 
   const handleFileClick = () => {
@@ -680,48 +727,67 @@ console.log("hllllooo new "+PdfUrl)
   }, []);
   
 
-  
-
   const handleFileChange = async (e) => {
     const selected = e.target.files[0];
-    if (selected) {
-      setFile(selected); // ✅ Save file for Helper()
-      setLoading(true);
-      setSelectedFileName(selected.name);
+    if (!selected) {
+      setSelectedFileName('');
+      setFile(null);
+      setDocumentContent('');
+      return;
+    }
   
-      // 1. Generate PDF SHA-256 hash
-      const arrayBuffer = await selected.arrayBuffer();
-      const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHexValue = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      console.log('SHA-256 Hash:', hashHexValue);
-
-      setHashHex(hashHexValue);
-
-    
-      setLoading(false);
+    setFile(selected);
+    setLoading(true);
+    setSelectedFileName(selected.name);
   
-      // 2. Read file content as text
+    // 1. Generate SHA-256 hash
+    const arrayBuffer = await selected.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHexValue = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    setHashHex(hashHexValue);
+    console.log('SHA-256 Hash:', hashHexValue);
+  
+    // 2. Extract content based on file type
+    if (selected.type === "application/pdf") {
+      try {
+        const typedArray = new Uint8Array(arrayBuffer);
+        const pdf = await pdfjsLib.getDocument(typedArray).promise;
+  
+        let fullText = "";
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items.map(item => item.str).join(" ");
+          fullText += pageText + "\n\n";
+        }
+  
+        setDocumentContent(fullText);
+        setContent(fullText);
+        setValue("content", fullText);
+      } catch (err) {
+        console.error("PDF parsing error:", err);
+      }
+  
+    } else {
       const reader = new FileReader();
       reader.onload = () => {
         const content = reader.result;
         setDocumentContent(content);
-  
-        const simulatedResponseValue = 75;
-        setResponseValue(simulatedResponseValue);
-        setLoading(false);
-  
-        if (expectedValue !== null) {
-          setIsInScope(simulatedResponseValue >= expectedValue);
-        }
+        setContent(content);
+        setValue("content", content);
       };
-  
       reader.readAsText(selected);
-    } else {
-      setSelectedFileName('');
-      setFile(null); // Clear file if nothing selected
     }
+  
+    const simulatedResponseValue = 75;
+    setResponseValue(simulatedResponseValue);
+    setIsInScope(expectedValue !== null && simulatedResponseValue >= expectedValue);
+  
+    setLoading(false);
   };
+  
+
   
   
   
@@ -835,6 +901,7 @@ return (
       Case No:
     </label>
     <textarea
+    value={caseno}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -850,6 +917,7 @@ return (
       Case Type:
     </label>
     <textarea
+    value={casetype}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -865,6 +933,7 @@ return (
       Case Status:
     </label>
     <textarea
+    value={casestatus}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -880,6 +949,8 @@ return (
       Filing Date:
     </label>
     <textarea
+    type="date"
+    value={filingdate}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -895,6 +966,8 @@ return (
       Judgment Date:
     </label>
     <textarea
+    type="date"
+    value={judgmentdate}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -910,6 +983,7 @@ return (
       Court No:
     </label>
     <textarea
+    value={courtno}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -925,6 +999,7 @@ return (
       Court Name:
     </label>
     <textarea
+    value={courtname}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -940,6 +1015,7 @@ return (
       Bench:
     </label>
     <textarea
+    value={bench}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -955,6 +1031,7 @@ return (
       Petitioner:
     </label>
     <textarea
+    value={petitioner}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -970,6 +1047,7 @@ return (
       Respondent:
     </label>
     <textarea
+    value={respondent}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -985,6 +1063,7 @@ return (
       Adv. of Petitioner:
     </label>
     <textarea
+    value={advofpetitioner}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -1000,6 +1079,7 @@ return (
       Adv. of Respondent:
     </label>
     <textarea
+    value={advofrespondent}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -1015,6 +1095,7 @@ return (
       Previous Case Citation:
     </label>
     <textarea
+    value={prevcasecitation}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -1030,6 +1111,7 @@ return (
       Penalty Detail:
     </label>
     <textarea
+    value={penaltydetail}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -1045,6 +1127,7 @@ return (
       Head Note:
     </label>
     <textarea
+    value={headnote}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -1063,7 +1146,7 @@ return (
   </button>
 
   <button
-    onClick={handleClear}
+    onClick={handleClear_Keyentity}
     className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
   >
     Clear
@@ -1090,6 +1173,7 @@ return (
       Judgement Author:
     </label>
     <textarea
+    value={judgementauthor}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -1105,6 +1189,7 @@ return (
       Judgement Type:
     </label>
     <textarea
+    value={judgementtype}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -1120,6 +1205,7 @@ return (
       Language of Judgement:
     </label>
     <textarea
+    value={langofjudgement}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -1135,6 +1221,7 @@ return (
      Date of Hearing:
     </label>
     <textarea
+    value={dateofhearing}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -1150,6 +1237,7 @@ return (
       Date of Order Pronouncement:
     </label>
     <textarea
+    value={dateoforderpro}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -1165,6 +1253,7 @@ return (
       Bench Composition:
     </label>
     <textarea
+    value={benchcomposition}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -1180,6 +1269,7 @@ return (
       Referred acts:
     </label>
     <textarea
+    value={referredacts}
       rows="2"
       className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
@@ -1200,7 +1290,7 @@ return (
   </button>
 
   <button
-    onClick={handleClear}
+    onClick={handleClear_Metadata}
     className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
   >
     Clear
@@ -1303,7 +1393,7 @@ return (
   </button>
 
   <button
-    onClick={handleClear}
+    // onClick={handleClear_Classification}
     className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
   >
     Clear
@@ -1358,7 +1448,7 @@ return (
   </button>
 
   <button
-    onClick={handleClear}
+    // onClick={handleClear}
     className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
   >
     Clear
@@ -1369,13 +1459,13 @@ return (
          
 
                     {/* Content */}
-                    <div>
+<div>
             <label className="block text-gray-600 dark:text-white font-medium mb-1">
               Document Content:
             </label>
             <textarea
               rows="10"
-              // value={content}
+              value={content}
               onChange={(e) => {
                 setContent(e.target.value);
                 setValue("content", e.target.value);

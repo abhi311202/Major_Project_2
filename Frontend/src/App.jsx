@@ -1,6 +1,6 @@
 import Home from "./Home/Home";
 import React, { useEffect } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, Navigate  } from "react-router-dom";
 import UserLogin from "./components/UserLogin";
 import UserSignUp from "./components/UserSignUp";
 import AdminHome from "./Home/AdminHome";
@@ -18,9 +18,15 @@ import PaymentSuccess from "./components/PaymentSuccess";
 import DocumentDetails from "./User/DocumentDetails";
 import EditProfile2 from "./Admin/EditProfile2";
 import EditProfile3 from "./Admin/EditProfile3";
+import { useAuth1 } from "./context/AuthProvider1";
+import { Notifications } from "@mui/icons-material";
 
 const App = () => {
-  const user = JSON.parse(localStorage.getItem("Users"));
+  const [authAdmin] = useAuth1();
+ 
+  const isAdminLoggedIn = localStorage.getItem("Admin") !== null;
+  const isSuperAdminLoggedIn = localStorage.getItem("SuperAdmin") !== null;
+const isUserLoggedIn = localStorage.getItem("Users") !== null;
   return (
     <>
 
@@ -35,31 +41,226 @@ const App = () => {
         }}
       />
 
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/Home2" element={<Home />} />
-          <Route path="/:section" element={<Home />} />
-          <Route path="/Home" element={<Home />} />
-          <Route path="/Home2" element={<Home />} />
-          <Route path="/Home3" element={<Home />} />
-          <Route path="/AdminHome" element={<AdminHome />} />
-          <Route path="/UserHome" element={<UserHome />} />
-          <Route path="/SuperAdminHome" element={<SuperAdminHome />} />
-          <Route path="/UserLogin" element={<UserLogin />} />
-          <Route path="/AdminLogin" element={<AdminLogin />} />
-          <Route path="/SuperAdminLogin" element={<SuperAdminLogin />} />
-          <Route path="/UserSignUp" element={<UserSignUp />} />
-          <Route path="/AdminSignUp" element={<AdminSignUp />} />
-          <Route path="/EditProfile" element={<EditProfile />} />
-          <Route path="/EditProfile2" element={<EditProfile2 />} />
-          <Route path="/EditProfile3" element={<EditProfile3 />} />
-          <Route path="/Services" element={<Services />} />
-          <Route path="/SearchDocument" element={<SearchDocument />} />
-          <Route path="/paymentSuccess" element={<PaymentSuccess/>}/>
-          <Route path="/document-details/:id" element={<DocumentDetails />} />
+<Routes>
+  {/* Default Routes */}
+  <Route
+  path="/"
+  element={
+    isAdminLoggedIn || isSuperAdminLoggedIn || isUserLoggedIn
+      ? (
+          isAdminLoggedIn
+            ? <Navigate to="/AdminHome" replace />
+            : isSuperAdminLoggedIn
+            ? <Navigate to="/SuperAdminHome" replace />
+            : <Navigate to="/UserHome" replace />
+        )
+      : <Home />
+  }
+/>
 
-          
-        </Routes>
+<Route
+  path="/Home"
+  element={
+    isAdminLoggedIn || isSuperAdminLoggedIn || isUserLoggedIn
+      ? (
+          isAdminLoggedIn
+            ? <Navigate to="/AdminHome" replace />
+            : isSuperAdminLoggedIn
+            ? <Navigate to="/SuperAdminHome" replace />
+            : <Navigate to="/UserHome" replace />
+        )
+      : <Home />
+  }
+/>
+
+
+  {/* Login Routes */}
+  <Route
+  path="/UserLogin"
+  element={
+    isAdminLoggedIn || isSuperAdminLoggedIn || isUserLoggedIn
+      ? (
+          isAdminLoggedIn
+            ? <Navigate to="/AdminHome" replace />
+            : isSuperAdminLoggedIn
+            ? <Navigate to="/SuperAdminHome" replace />
+            : <Navigate to="/UserHome" replace />
+        )
+      : <UserLogin />
+  }
+/>
+
+<Route
+  path="/AdminLogin"
+  element={
+    isAdminLoggedIn || isSuperAdminLoggedIn || isUserLoggedIn
+      ? (
+          isAdminLoggedIn
+            ? <Navigate to="/AdminHome" replace />
+            : isSuperAdminLoggedIn
+            ? <Navigate to="/SuperAdminHome" replace />
+            : <Navigate to="/UserHome" replace />
+        )
+      : <AdminLogin />
+  }
+/>
+
+<Route
+  path="/SuperAdminLogin"
+  element={
+    isAdminLoggedIn || isSuperAdminLoggedIn || isUserLoggedIn
+      ? (
+          isAdminLoggedIn
+            ? <Navigate to="/AdminHome" replace />
+            : isSuperAdminLoggedIn
+            ? <Navigate to="/SuperAdminHome" replace />
+            : <Navigate to="/UserHome" replace />
+        )
+      : <SuperAdminLogin />
+  }
+/>
+
+
+  {/* Admin-only Routes */}
+  <Route
+  path="/AdminHome"
+  element={
+    isAdminLoggedIn && !isUserLoggedIn && !isSuperAdminLoggedIn
+      ? <AdminHome />
+      : <Navigate to="/AdminLogin" replace />
+  }
+/>
+
+<Route
+  path="/EditProfile2"
+  element={
+    isAdminLoggedIn && !isUserLoggedIn && !isSuperAdminLoggedIn
+      ? <EditProfile2 />
+      : <Navigate to="/AdminLogin" replace />
+  }
+/>
+
+
+  {/* SuperAdmin-only Routes */}
+  <Route
+  path="/SuperAdminHome"
+  element={
+    isSuperAdminLoggedIn && !isAdminLoggedIn && !isUserLoggedIn
+      ? <SuperAdminHome />
+      : <Navigate to="/SuperAdminLogin" replace />
+  }
+/>
+
+<Route
+  path="/EditProfile3"
+  element={
+    isSuperAdminLoggedIn && !isAdminLoggedIn && !isUserLoggedIn
+      ? <EditProfile3 />
+      : <Navigate to="/SuperAdminLogin" replace />
+  }
+/>
+
+
+  {/* Restricted for Admin and SuperAdmin */}
+  <Route
+  path="/UserHome"
+  element={
+    isUserLoggedIn && !isAdminLoggedIn && !isSuperAdminLoggedIn
+      ? <UserHome />
+      : <Navigate to="/UserLogin" replace />
+  }
+/>
+
+<Route
+  path="/UserSignUp"
+  element={
+    isAdminLoggedIn || isSuperAdminLoggedIn || isUserLoggedIn
+      ? (
+          isAdminLoggedIn
+            ? <Navigate to="/AdminHome" replace />
+            : isSuperAdminLoggedIn
+            ? <Navigate to="/SuperAdminHome" replace />
+            : <Navigate to="/UserHome" replace />
+        )
+      : <UserSignUp />
+  }
+/>
+
+<Route
+  path="/AdminSignUp"
+  element={
+    isAdminLoggedIn || isSuperAdminLoggedIn || isUserLoggedIn
+      ? (
+          isAdminLoggedIn
+            ? <Navigate to="/AdminHome" replace />
+            : isSuperAdminLoggedIn
+            ? <Navigate to="/SuperAdminHome" replace />
+            : <Navigate to="/UserHome" replace />
+        )
+      : <AdminSignUp />
+  }
+/>
+
+  <Route
+    path="/EditProfile"
+    element={
+      isAdminLoggedIn || isSuperAdminLoggedIn
+        ? <Navigate to={isAdminLoggedIn ? "/AdminHome" : "/SuperAdminHome"} replace />
+        : <EditProfile />
+    }
+  />
+ <Route
+  path="/UserServices"
+  element={
+    isUserLoggedIn && !isAdminLoggedIn && !isSuperAdminLoggedIn
+      ? <Services />
+      : <Navigate to="/" replace />
+  }
+/>
+<Route
+  path="/SearchDocument"
+  element={
+    isUserLoggedIn && !isAdminLoggedIn && !isSuperAdminLoggedIn
+      ? <SearchDocument />
+      : <Navigate to="/" replace />
+  }
+/>
+<Route
+  path="/paymentSuccess"
+  element={
+    isUserLoggedIn && !isAdminLoggedIn && !isSuperAdminLoggedIn
+      ? <PaymentSuccess />
+      : <Navigate to="/" replace />
+  }
+/>
+
+<Route
+  path="/document-details/:id"
+  element={
+    isUserLoggedIn && !isAdminLoggedIn && !isSuperAdminLoggedIn
+      ? <DocumentDetails />
+      : <Navigate to="/" replace />
+  }
+/>
+<Route
+  path="/:section"
+  element={
+    isUserLoggedIn || isAdminLoggedIn || isSuperAdminLoggedIn
+      ? <Navigate to={
+          isAdminLoggedIn
+            ? "/AdminHome"
+            : isSuperAdminLoggedIn
+            ? "/SuperAdminHome"
+            : "/UserHome"
+        } replace />
+      : <Home />
+  }
+/>
+<Route path="/notifications" element={<Notifications />} />
+
+
+</Routes>
+
 
     </>
   );

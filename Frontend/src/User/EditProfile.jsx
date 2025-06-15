@@ -496,259 +496,265 @@ useEffect(() => {
     <>
     <Navbar />
     <div className="w-full max-w-screen-lg mx-auto p-6 bg-white rounded-xl shadow-md text-gray-800">
+  {/* Profile Image Section */}
+  <h2 className="text-xl font-semibold mb-4">{t("profile.title")}</h2>
 
-
-    {/* Profile Image Section */}
-    <h2 className="text-xl font-semibold mb-4">My Profile</h2>
-   <div className="flex items-center gap-4 mb-6">
-  <img
-    src={profileData.profile}
-    alt="Profile"
-    className="w-20 h-20 rounded-full object-cover border"
-  />
-  <div>
-    {/* Hidden input for file upload */}
-    <input
-      type="file"
-      accept="image/png, image/jpeg, image/jpg, image/gif"
-      style={{ display: 'none' }}
-      ref={fileInputRef}
-      onChange={handleProfilePhotoChange}
+  <div className="flex items-center gap-4 mb-6">
+    <img
+      src={profileData.profile}
+      alt={t("profile.imageAlt")}
+      className="w-20 h-20 rounded-full object-cover border"
     />
-
-    {/* Trigger input via button */}
-    <button
-      className="bg-black text-white px-4 py-2 rounded-md mr-2"
-      onClick={() => fileInputRef.current.click()}
-    >
-      + Change Image
-    </button>
-
-    {/* Remove button */}
-    <button
-      className="text-sm text-red-500 hover:underline"
-      onClick={handleRemoveImage}
-    >
-      Remove Image
-    </button>
-
-    <p className="text-xs text-gray-400 mt-1">
-      We support PNGs, JPEGs and GIFs under 2MB
-    </p>
-  </div>
-</div>
-
-
-    {/* Name Fields */}
-    {/* Name Fields */}
-<div className="space-y-6">
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    {/* Name */}
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
       <input
-        type="text"
-        value={typedName}
-        onChange={(e) => setTypedName(e.target.value)}
-        className="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
-        placeholder="Enter your name"
+        type="file"
+        accept="image/png, image/jpeg, image/jpg, image/gif"
+        style={{ display: 'none' }}
+        ref={fileInputRef}
+        onChange={handleProfilePhotoChange}
       />
-    </div>
-
-    {/* Username */}
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-      <input
-        type="text"
-        value={typedUsername}
-        onChange={(e) => {
-          setTypedUsername(e.target.value);
-          setHasTyped(true);
-        }}
-        className="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
-        placeholder="Choose a username"
-      />
-      {hasTyped && usernameAvailable === true && (
-        <p className="mt-1 text-sm text-green-600">This username is available ✅</p>
-      )}
-      {hasTyped && usernameAvailable === false && (
-        <p className="mt-1 text-sm text-red-600">This username is already taken ❌</p>
-      )}
-    </div>
-  </div>
-
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-    {/* Gender */}
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-      <select
-        value={typedGender}
-        onChange={(e) => setTypedGender(e.target.value)}
-        className="block w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+      <button
+        className="bg-black text-white px-4 py-2 rounded-md mr-2"
+        onClick={() => fileInputRef.current.click()}
       >
-        <option value="">Select Gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-      </select>
+        {t("profile.changeImage")}
+      </button>
+
+      <button
+        className="text-sm text-red-500 hover:underline"
+        onClick={handleRemoveImage}
+      >
+        {t("profile.removeImage")}
+      </button>
+
+      <p className="text-xs text-gray-400 mt-1">
+        {t("profile.imageNote")}
+      </p>
+    </div>
+  </div>
+
+  {/* Name Fields */}
+  <div className="space-y-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {t("profile.name")}
+        </label>
+        <input
+          type="text"
+          value={typedName}
+          onChange={(e) => setTypedName(e.target.value)}
+          className="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400"
+          placeholder={t("profile.namePlaceholder")}
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {t("profile.username")}
+        </label>
+        <input
+          type="text"
+          value={typedUsername}
+          onChange={(e) => {
+            setTypedUsername(e.target.value);
+            setHasTyped(true);
+          }}
+          className="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400"
+          placeholder={t("profile.usernamePlaceholder")}
+        />
+        {hasTyped && usernameAvailable === true && (
+          <p className="mt-1 text-sm text-green-600">{t("profile.usernameAvailable")}</p>
+        )}
+        {hasTyped && usernameAvailable === false && (
+          <p className="mt-1 text-sm text-red-600">{t("profile.usernameTaken")}</p>
+        )}
+      </div>
     </div>
 
-    {/* Date of Birth */}
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-      <input
-        type="date"
-        value={typedDob?.split("T")[0]}
-        onChange={(e) => setTypedDob(e.target.value)}
-        className="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
-      />
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {t("gender1")}
+        </label>
+        <select
+          value={typedGender}
+          onChange={(e) => setTypedGender(e.target.value)}
+          className="block w-full rounded-md border border-gray-300 px-3 py-2 bg-white"
+        >
+          <option value="">{t("selectGender1")}</option>
+          <option value="Male">{t("genderMale1")}</option>
+          <option value="Female">{t("genderFemale1")}</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {t("profile.dob")}
+        </label>
+        <input
+          type="date"
+          value={typedDob?.split("T")[0]}
+          onChange={(e) => setTypedDob(e.target.value)}
+          className="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {t("profile.profession")}
+        </label>
+        <input
+          type="text"
+          value={typedProfession}
+          onChange={(e) => setTypedProfession(e.target.value)}
+          className="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400"
+          placeholder={t("profile.professionPlaceholder")}
+        />
+      </div>
     </div>
 
-    {/* Profession */}
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">Profession</label>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {t("profile.organization")}
+      </label>
       <input
         type="text"
-        value={typedProfession}
-        onChange={(e) => setTypedProfession(e.target.value)}
-        className="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
-        placeholder="Your profession"
+        value={typedOrganization}
+        onChange={(e) => setTypedOrganization(e.target.value)}
+        className="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400"
+        placeholder={t("profile.organizationPlaceholder")}
       />
+    </div>
+
+    <div className="flex justify-end">
+      <button
+        onClick={handleSaveChanges}
+        className="inline-flex items-center justify-center rounded-md bg-black px-6 py-2 text-white hover:bg-blue-700"
+      >
+        {t("profile.saveChanges")}
+      </button>
     </div>
   </div>
 
-  <div>
-    {/* Organization */}
-    <label className="block text-sm font-medium text-gray-700 mb-1">Organization</label>
-    <input
-      type="text"
-      value={typedOrganization}
-      onChange={(e) => setTypedOrganization(e.target.value)}
-      className="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
-      placeholder="Your organization"
-    />
-  </div>
-
-  <div className="flex justify-end">
-    <button
-      onClick={handleSaveChanges}
-      className="inline-flex items-center justify-center rounded-md bg-black px-6 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-    >
-      Save Changes
-    </button>
-  </div>
-</div>
 
 
     {/* Account Security */}
     <hr className="my-6" />
-    <h2 className="text-lg font-semibold mb-4">Account Security</h2>
+    <h2 className="text-lg font-semibold mb-4">{t("accountSecurity.title")}</h2>
+
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mb-4">
-        <div>
-        <label className="text-sm text-gray-600">Email</label>
+  <div>
+    <label className="text-sm text-gray-600">{t('profile.email')}</label>
+    <input
+      type="email"
+      value={profileData.email}
+      disabled
+      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+    />
+  </div>
+  <button
+    className="bg-gray-100 text-sm px-4 py-2 rounded-md w-fit self-end"
+    onClick={() => setShowEmailModal(true)}
+  >
+    {t('profile.changeEmail')}
+  </button>
+
+  {/* Email Modal */}
+  {showEmailModal && (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
+        <h3 className="text-lg font-semibold mb-4">{t('profile.changeEmail')}</h3>
+
+        <label className="text-sm text-gray-600">{t('profile.newEmail')}</label>
         <input
-            type="email"
-            value={profileData.email}
-            disabled
-            className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
-        />
-        </div>
-        <button className="bg-gray-100 text-sm px-4 py-2 rounded-md w-fit self-end" onClick={() => setShowEmailModal(true)}>Change email</button>
-
-{showEmailModal && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
-      <h3 className="text-lg font-semibold mb-4">Change Email</h3>
-
-      <label className="text-sm text-gray-600">New Email</label>
-      <input
-        type="email"
-        value={emailData.new}
-        onChange={(e) => {
-    const updatedEmail = e.target.value;
-    setNewEmail(updatedEmail); // For availability + OTP logic
-    setEmailData({ ...emailData, new: updatedEmail }); // For form state
-    setEmailVerified(false); // Reset OTP verification
-  }}
-        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
-      />
-
-      {/* Availability Status */}
-      {emailAvailable === false && (
-        <p className="text-red-600 text-sm mt-1">Email is already in use.</p>
-      )}
-      {emailAvailable === true && (
-        <p className="text-green-600 text-sm mt-1">Email is not available.</p>
-      )}
-
-      {/* OTP Section */}
-      {!emailVerified && (
-        <>
-          <div className="flex gap-2 mt-3">
-            <button
-              onClick={() => sendEmailOTP(newEmail)}
-              className="px-3 py-1 rounded-md bg-blue-500 text-white"
-            >
-              Send OTP
-            </button>
-            <button
-              onClick={() => handleResendEmailOTP(newEmail)}
-              className="px-3 py-1 rounded-md bg-gray-500 text-white"
-            >
-              Resend OTP
-            </button>
-          </div>
-
-          <input
-            type="text"
-            value={emailOTP}
-            onChange={(e) => setEmailOTP(e.target.value)}
-            placeholder="Enter OTP"
-            className="mt-3 w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-
-          <button
-            onClick={handleEmailOTPVerify}
-            className="mt-2 px-4 py-1 rounded-md bg-green-600 text-white"
-          >
-            Verify OTP
-          </button>
-        </>
-      )}
-
-      {emailVerified && (
-        <p className="text-green-600 text-sm mt-2">Email verified ✅</p>
-      )}
-
-      {/* Buttons */}
-      <div className="flex justify-end gap-2 mt-4">
-        <button
-          onClick={() => setShowEmailModal(false)}
-          className="px-4 py-2 rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={() => {
-            if (!emailAvailable) return toast.error("Email already in use");
-            if (!emailVerified) return toast.error("Please verify OTP first");
-            handleChangeEmail();
+          type="email"
+          value={emailData.new}
+          onChange={(e) => {
+            const updatedEmail = e.target.value;
+            setNewEmail(updatedEmail);
+            setEmailData({ ...emailData, new: updatedEmail });
+            setEmailVerified(false);
           }}
-          className="px-4 py-2 rounded-md text-white bg-black hover:bg-blue-700"
-        >
-          Save
-        </button>
+          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+        />
+
+        {emailAvailable === false && (
+          <p className="text-red-600 text-sm mt-1">{t('profile.emailInUse')}</p>
+        )}
+        {emailAvailable === true && (
+          <p className="text-green-600 text-sm mt-1">{t('profile.emailAvailable')}</p>
+        )}
+
+        {!emailVerified && (
+          <>
+            <div className="flex gap-2 mt-3">
+              <button
+                onClick={() => sendEmailOTP(newEmail)}
+                className="px-3 py-1 rounded-md bg-blue-500 text-white"
+              >
+                {t('sendOtp')}
+              </button>
+              <button
+                onClick={() => handleResendEmailOTP(newEmail)}
+                className="px-3 py-1 rounded-md bg-gray-500 text-white"
+              >
+                {t('resendOtp')}
+              </button>
+            </div>
+
+            <input
+              type="text"
+              value={emailOTP}
+              onChange={(e) => setEmailOTP(e.target.value)}
+              placeholder={t('enterOtp')}
+              className="mt-3 w-full px-3 py-2 border border-gray-300 rounded-md"
+            />
+
+            <button
+              onClick={handleEmailOTPVerify}
+              className="mt-2 px-4 py-1 rounded-md bg-green-600 text-white"
+            >
+              {t('verifyOtp')}
+            </button>
+          </>
+        )}
+
+        {emailVerified && (
+          <p className="text-green-600 text-sm mt-2">{t('profile.emailVerified')}</p>
+        )}
+
+        <div className="flex justify-end gap-2 mt-4">
+          <button
+            onClick={() => setShowEmailModal(false)}
+            className="px-4 py-2 rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300"
+          >
+            {t('cancel')}
+          </button>
+          <button
+            onClick={() => {
+              if (!emailAvailable) return toast.error(t('profile.emailInUse'));
+              if (!emailVerified) return toast.error(t('profile.verifyOtpFirst'));
+              handleChangeEmail();
+            }}
+            className="px-4 py-2 rounded-md text-white bg-black hover:bg-blue-700"
+          >
+            {t('save')}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-)}
+  )}
+
+  {/* Similar translations can be applied to Password and Phone Modals below */}
 
 
 
 
 
   <div>
-    <label className="text-sm text-gray-600">Password</label>
+    <label className="text-sm text-gray-600">{t('account.password')}d</label>
     <input
       type="password"
       value="********"
@@ -760,33 +766,33 @@ useEffect(() => {
     className="bg-gray-100 text-sm px-4 py-2 rounded-md w-fit self-end"
     onClick={() => setShowPasswordModal(true)}
   >
-    Change password
+    {t("changePhone")}
   </button>
 
-{showPasswordModal && (
+  {showPasswordModal && (
   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
     <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
-      <h3 className="text-lg font-semibold mb-4">Change Password</h3>
-      
-      <label className="text-sm text-gray-600">Current Password</label>
+      <h3 className="text-lg font-semibold mb-4">{t('profile.changePassword')}</h3>
+
+      <label className="text-sm text-gray-600">{t('profile.currentPassword')}</label>
       <input
-        type="text"
+        type="password"
         value={passwords.current}
         onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
         className="mt-1 mb-3 w-full px-3 py-2 border border-gray-300 rounded-md"
       />
 
-      <label className="text-sm text-gray-600">New Password</label>
+      <label className="text-sm text-gray-600">{t('profile.newPassword')}</label>
       <input
-        type="text"
+        type="password"
         value={passwords.new}
         onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
         className="mt-1 mb-3 w-full px-3 py-2 border border-gray-300 rounded-md"
       />
 
-      <label className="text-sm text-gray-600">Confirm Password</label>
+      <label className="text-sm text-gray-600">{t('profile.confirmPassword')}</label>
       <input
-        type="text"
+        type="password"
         value={passwords.confirm}
         onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
         className="mt-1 mb-4 w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -797,23 +803,23 @@ useEffect(() => {
           onClick={() => setShowPasswordModal(false)}
           className="px-4 py-2 rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300"
         >
-          Cancel
+          {t('cancel')}
         </button>
         <button
-        onClick={handleChangePassword}
-        className="px-4 py-2 rounded-md text-white bg-black hover:bg-blue-700"
+          onClick={handleChangePassword}
+          className="px-4 py-2 rounded-md text-white bg-black hover:bg-blue-700"
         >
-        Save
+          {t('save')}
         </button>
-
       </div>
     </div>
   </div>
 )}
 
 
+
        <div>
-  <label className="text-sm text-gray-600">Current Phone No</label>
+  <label className="text-sm text-gray-600">{t('account.currentPhoneNo')}</label>
   <input
     type="text"
     value={profileData.phone}
@@ -826,15 +832,15 @@ useEffect(() => {
   className="bg-gray-100 text-sm px-4 py-2 rounded-md w-fit self-end"
   onClick={() => setShowPhoneModal(true)}
 >
-  Change Phone No
+{t("changePhone")}
 </button>
 
 {showPhoneModal && (
   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
     <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
-      <h3 className="text-lg font-semibold mb-4">Change Phone No</h3>
+      <h3 className="text-lg font-semibold mb-4">{t('profile.changePhone')}</h3>
 
-      <label className="text-sm text-gray-600">New Phone No</label>
+      <label className="text-sm text-gray-600">{t('profile.newPhone')}</label>
       <input
         type="text"
         value={newPhone}
@@ -845,7 +851,6 @@ useEffect(() => {
         className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
       />
 
-      {/* OTP Section */}
       {!phoneVerified && (
         <>
           <div className="flex gap-2 mt-3">
@@ -853,13 +858,13 @@ useEffect(() => {
               onClick={() => sendPhoneOTP(newPhone)}
               className="px-3 py-1 rounded-md bg-blue-500 text-white"
             >
-              Send OTP
+              {t('sendOtp')}
             </button>
             <button
               onClick={handleResendPhoneOTP}
               className="px-3 py-1 rounded-md bg-gray-500 text-white"
             >
-              Resend OTP
+              {t('resendOtp')}
             </button>
           </div>
 
@@ -867,7 +872,7 @@ useEffect(() => {
             type="text"
             value={phoneOTP}
             onChange={(e) => setPhoneOTP(e.target.value)}
-            placeholder="Enter OTP"
+            placeholder={t('enterOtp')}
             className="mt-3 w-full px-3 py-2 border border-gray-300 rounded-md"
           />
 
@@ -875,28 +880,27 @@ useEffect(() => {
             onClick={handlePhoneOTPVerify}
             className="mt-2 px-4 py-1 rounded-md bg-green-600 text-white"
           >
-            Verify OTP
+            {t('verifyOtp')}
           </button>
         </>
       )}
 
       {phoneVerified && (
-        <p className="text-green-600 text-sm mt-2">Phone verified ✅</p>
+        <p className="text-green-600 text-sm mt-2">{t('profile.phoneVerified')}</p>
       )}
 
-      {/* Action Buttons */}
       <div className="flex justify-end gap-2 mt-4">
         <button
           onClick={() => setShowPhoneModal(false)}
           className="px-4 py-2 rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300"
         >
-          Cancel
+          {t('cancel')}
         </button>
         <button
           onClick={handleChangePhone}
           className="px-4 py-2 rounded-md text-white bg-black hover:bg-blue-700"
         >
-          Save
+          {t('save')}
         </button>
       </div>
     </div>

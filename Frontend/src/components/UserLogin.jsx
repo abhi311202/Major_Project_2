@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthProvider";
 import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next"; 
 
 const UserLogin = () => {
   const [authUser, setAuthUser] = useAuth();
@@ -14,6 +15,12 @@ const UserLogin = () => {
   const handleClick = () => {
     navigate("/UserSignUp"); // opens the new page
   };
+  
+const { t, i18n } = useTranslation();
+
+const changeLanguage = (lng) => {
+  i18n.changeLanguage(lng);
+};
 
   const {
     register,
@@ -30,13 +37,16 @@ const UserLogin = () => {
 
       // If login is successful, you get a token and user info in response.data
       if (response.status === 200) {
-        // toast.success('Login successful!');
-        toast.success("Login sucessful");
+        toast.success("Login successful");
         setAuthUser(response.data.user);
-        navigate("/UserHome"); // ✅ Redirect to home/dashboard
         localStorage.setItem("Users", JSON.stringify(response.data.user));
-        // console.log(response, "sans")
+        
+        navigate("/UserHome"); // navigate first
+        
+        // then reload page to make sure route refreshes
+        window.location.reload();
       }
+      
     } catch (error) {
       console.error("Login error:", error);
 
@@ -55,73 +65,74 @@ const UserLogin = () => {
       <Navbar />
 
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
-        <h2 className="title">User Login</h2>
+  <h2 className="title">{t("userLogin")}</h2>
 
-        <div className="form-group">
-          <label>User Name</label>
-          <div className="input-wrapper">
-            <svg height={20} width={20} viewBox="0 0 32 32" fill="currentColor">
-              <path d="..." />
-            </svg>
-            <input
-              type="text"
-              placeholder="Enter your Email"
-              {...register("username", { required: true })}
-            />
-          </div>
-        </div>
-        {errors.username && (
-          <span className="p-2 text-sm text-red-500">
-            This field is required
-          </span>
-        )}
+  <div className="form-group">
+    <label>{t("username")}</label>
+    <div className="input-wrapper">
+      <svg height={20} width={20} viewBox="0 0 32 32" fill="currentColor">
+        <path d="..." />
+      </svg>
+      <input
+        type="text"
+        placeholder={t("usernamePlaceholder")}
+        {...register("username", { required: true })}
+      />
+    </div>
+  </div>
+  {errors.username && (
+    <span className="p-2 text-sm text-red-500">
+      {t("required")}
+    </span>
+  )}
 
-        <div className="form-group">
-          <label>Password</label>
-          <div className="input-wrapper">
-            <svg height={20} width={20} viewBox="0 0 32 32" fill="currentColor">
-              <path d="..." />
-            </svg>
-            <input
-              type="password"
-              placeholder="Enter your Password"
-              {...register("password_hash", { required: true })}
-            />
-          </div>
-        </div>
-        {errors.password_hash && (
-          <span className="p-2 text-sm text-red-500">
-            This field is required
-          </span>
-        )}
+  <div className="form-group">
+    <label>{t("password")}</label>
+    <div className="input-wrapper">
+      <svg height={20} width={20} viewBox="0 0 32 32" fill="currentColor">
+        <path d="..." />
+      </svg>
+      <input
+        type="password"
+        placeholder={t("passwordPlaceholder")}
+        {...register("password_hash", { required: true })}
+      />
+    </div>
+  </div>
+  {errors.password_hash && (
+    <span className="p-2 text-sm text-red-500">
+      {t("required")}
+    </span>
+  )}
 
-        {/* <div className="form-extra">
-          <label>
-            <input type="checkbox" /> Remember me
-          </label>
-          <span className="link">Forgot password?</span>
-        </div> */}
+  {/* Optional Extras - you can localize these too if needed */}
+  {/* <div className="form-extra">
+    <label>
+      <input type="checkbox" /> {t("rememberMe")}
+    </label>
+    <span className="link">{t("forgotPassword")}</span>
+  </div> */}
 
-        <button type="submit" className="submit-btn">
-          Log In
-        </button>
+  <button type="submit" className="submit-btn">
+    {t("login2")}
+  </button>
 
-        <p className="text-center">
-          Don't have an account?{" "}
-          <span className="link" onClick={handleClick}>
-            Sign Up
-          </span>
-        </p>
+  <p className="text-center">
+    {t("noAccount")}{" "}
+    <span className="link" onClick={handleClick}>
+      {t("signup")}
+    </span>
+  </p>
 
-        <div className="divider">or</div>
+  <div className="divider">{t("or") || "or"}</div>
 
-        <button className="google-btn">
-          <svg width={20} viewBox="0 0 512 512">
-            <path d="..." />
-          </svg>
-          Continue with Google
-        </button>
-      </form>
+  <button className="google-btn">
+    <svg width={20} viewBox="0 0 512 512">
+      <path d="..." />
+    </svg>
+    {t("google")}
+  </button>
+</form>
     </Wrapper>
   );
 };

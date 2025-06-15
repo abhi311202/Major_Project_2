@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Globe, Moon, Sun, ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslation } from "react-i18next";
+import { Bell } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -125,11 +126,15 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Menu */}
-          <div className="navbar-center hidden lg:flex">
-            <ul className="menu menu-horizontal px-1 space-x-4 text-lg font-medium">
-              {navItems}
-            </ul>
-          </div>
+        {/* Desktop Menu - hide on admin routes */}
+          {!["/AdminHome",  "/EditProfile", "/EditProfile2", "/SuperAdminHome", "/EditProfile3", "/UserHome", "/SearchDocument", "/UserServices"].includes(location.pathname) && (
+            <div className="navbar-center hidden lg:flex">
+              <ul className="menu menu-horizontal px-1 space-x-4 text-lg font-medium">
+                {navItems}
+              </ul>
+            </div>
+          )}
+
 
           {/* Right Controls */}
           <div className="navbar-end flex items-center gap-4">
@@ -140,9 +145,9 @@ const Navbar = () => {
                 <ChevronDown size={20} />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => changeLanguage("en")}>English</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => changeLanguage("hi")}>Hindi</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => changeLanguage("bn")}>Bengali</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage("en")}>{t("english")}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage("hi")}>{t("hindi")}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage("bn")}>{t("bengali")}</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -157,13 +162,13 @@ const Navbar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => setTheme("light")}>
-                  Light
+                {t("light")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setTheme("dark")}>
-                  Dark
+                {t("dark")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setTheme("system")}>
-                  System
+                {t("system")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -171,7 +176,11 @@ const Navbar = () => {
             {/* Auth Buttons */}
 {authAdmin ? (
   <div className="flex items-center gap-2">
-       <DropdownMenu>
+    {/* Notification Button */}
+    <Button size="icon" variant="ghost" onClick={() => navigate("/notifications")}>
+        <Bell className="h-5 w-5" />
+      </Button>
+  <DropdownMenu>
     <DropdownMenuTrigger asChild>
     <Button size="sm">
       {t("db")}
@@ -190,7 +199,7 @@ const Navbar = () => {
   </div>
 ) : authUser ? (
   <div className="flex items-center gap-2">
-    <Button onClick={() => navigate("/Services")} size="sm">
+    <Button onClick={() => navigate("/UserServices")} size="sm">
       {t("Services")}
     </Button>
     

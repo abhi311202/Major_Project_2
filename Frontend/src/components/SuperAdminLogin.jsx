@@ -47,7 +47,7 @@ const SuperAdminLogin = () => {
           "SuperAdmin",
           JSON.stringify(response.data.SuperAdmin)
         );
-        navigate("/Home2", { replace: true});
+        navigate("/SuperAdminHome", { replace: true});
         window.location.reload();
       }
     } catch (error) {

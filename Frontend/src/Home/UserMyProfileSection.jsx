@@ -132,7 +132,7 @@ const isExpiringSoon = (expiryDate) => {
   {profileData.user_type === "super user" ? "Super User" : "User"} Profile
 </h1>
 
-      <p className="text-gray-500">View all your profile details here.</p>
+<p className="text-gray-500">{t("profileSubheading")}</p>
     </div>
 
     {/* Main layout: Left image + name | Right details */}
@@ -174,7 +174,7 @@ const isExpiringSoon = (expiryDate) => {
         className="w-40 h-40 rounded-full object-cover mb-4 border-4 border-[#2dd4bf]"
       />
       <h2 className="text-2xl font-semibold">{profileData.name}</h2>
-      <span className="text-emerald-500 text-sm mt-1">Premium User</span>
+
     </div>
   </div>
 
@@ -190,17 +190,18 @@ const isExpiringSoon = (expiryDate) => {
   {profileData.user_type === "super user" ? (
     <>
       <h3 className="text-xl font-semibold mb-4 text-yellow-700 flex items-center gap-2">
-        👑 Premium Plan
+        👑 {t("premiumPlan")}
+
       </h3>
       <div className="space-y-4 text-sm text-gray-700">
         <div className="flex justify-between">
-          <p className="text-gray-600">Purchase Date</p>
+          <p className="text-gray-600">{t("purchaseDate")}</p>
           <p className="font-medium">
             {profileData.validity_start_date?.split("T")[0] || "N/A"}
           </p>
         </div>
         <div className="flex justify-between">
-          <p className="text-gray-600">Expiry Date</p>
+          <p className="text-gray-600">{t("expiryDate")}</p>
           <p
             className={`font-medium ${
               isExpiringSoon(profileData.validity_end_date)
@@ -212,7 +213,7 @@ const isExpiringSoon = (expiryDate) => {
           </p>
         </div>
         <div className="flex justify-between">
-          <p className="text-gray-600">Order ID</p>
+          <p className="text-gray-600">{t("orderId")}</p>
           <p className="font-medium text-blue-600">
             {profileData.order_id || "N/A"}
           </p>
