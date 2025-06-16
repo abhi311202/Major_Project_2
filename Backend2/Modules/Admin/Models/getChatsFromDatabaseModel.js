@@ -7,6 +7,7 @@ export async function getChatsFromDatabase(admin_id) {
     c.*,
     s.name AS receiver_name,
     s.username AS receiver_username,
+    s.profile_picture_url AS receiver_profile_picture_url,
     s.is_active AS receiver_is_active
 FROM
     chat c
