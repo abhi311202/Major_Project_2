@@ -19,7 +19,8 @@ import DocumentDetails from "./User/DocumentDetails";
 import EditProfile2 from "./Admin/EditProfile2";
 import EditProfile3 from "./Admin/EditProfile3";
 import { useAuth1 } from "./context/AuthProvider1";
-import { Notifications } from "@mui/icons-material";
+import Notifications from "./Admin/Notifications";
+import UserNotifications from "./User/UserNotifications";
 
 const App = () => {
   const [authAdmin] = useAuth1();
@@ -257,6 +258,7 @@ const isUserLoggedIn = localStorage.getItem("Users") !== null;
   }
 />
 <Route path="/notifications" element={<Notifications />} />
+<Route path="/usernotifications" element={<UserNotifications />} />
 
 
 </Routes>

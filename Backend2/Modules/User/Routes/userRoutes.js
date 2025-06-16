@@ -20,6 +20,10 @@ import { changePhoneController } from "../Controllers/changePhoneController.js";
 import { changeUserPersonalDetailController } from "../Controllers/changeUserPersonalDetailController.js";
 import { removeProfilePhotoController } from "../Controllers/removeProfilePhotoController.js";
 import { changeProfilePhotoController } from "../Controllers/changeProfilePhotoController.js";
+import { getChats } from "../Controllers/getChatsController.js";
+import { newChat } from "../Controllers/createNewChatController.js";
+import { newMessage } from "../Controllers/sendNewMessageController.js";
+import { getChatById } from "../Controllers/getChatByIdController.js";
 
 router.post("/register", registerUser);
 router.post("/login", userLogin);
@@ -32,6 +36,10 @@ router.post("/change-personal-detail", changeUserPersonalDetailController);
 router.post("/remove-profile-photo", removeProfilePhotoController);
 router.post("/change-profile-photo", changeProfilePhotoController);
 
+router.post("/get-chats", getChats);
+router.post("/get-chat-by-id", getChatById);
+router.post("/new-chat", newChat);
+router.post("/send-message", newMessage);
 // router.post("/verify", userMiddleware, demo);
 
 export default router;

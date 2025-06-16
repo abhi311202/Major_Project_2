@@ -199,6 +199,9 @@ const Navbar = () => {
   </div>
 ) : authUser ? (
   <div className="flex items-center gap-2">
+     <Button size="icon" variant="ghost" onClick={() => navigate("/usernotifications")}>
+        <Bell className="h-5 w-5" />
+      </Button>
     <Button onClick={() => navigate("/UserServices")} size="sm">
       {t("Services")}
     </Button>

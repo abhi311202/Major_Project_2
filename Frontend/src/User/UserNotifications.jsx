@@ -2,7 +2,7 @@
     import React, { useEffect, useState } from "react";
     import axios from "axios";
 
-    const Notifications = () => {
+    const UserNotifications = () => {
     const [chats, setChats] = useState([]);
     const [messages, setMessages] = useState([]);
     const [selectedChat, setSelectedChat] = useState(null);
@@ -13,13 +13,15 @@
     useEffect(() => {
         const fetchChats = async () => {
         try {
-            const admin = JSON.parse(localStorage.getItem("Admin"));
-            const admin_id = admin?.id;
+            const user = JSON.parse(localStorage.getItem("Users"));
+            const user_id = 52;
+            
     
-            console.log("Admin Object from localStorage:", admin);
+            console.log("User Object from localStorage:", user);
+            console.log("hello",user_id);
     
-            const response = await axios.post("http://localhost:4001/Admin/get-chats", {
-            admin_id: admin_id,
+            const response = await axios.post("http://localhost:4001/User/get-chats", {
+                super_user_id: user_id,
             });
     
             console.log("API Response:", response.data);
@@ -39,18 +41,20 @@
     useEffect(() => {
         if (!selectedChat) return;
       
+        const user = JSON.parse(localStorage.getItem("Users"));
+      
         const interval = setInterval(async () => {
           try {
-            const response = await axios.post("http://localhost:4001/Admin/get-msg-by-chat-id", {
+            const response = await axios.post("http://localhost:4001/User/get-chat-by-id", {
               ucid: selectedChat.ucid,
             });
-            setMessages(response.data.messages); // 👈 Keep updating the messages
+            setMessages(response.data.messages); // Live update
           } catch (err) {
-            console.error("Polling error:", err);
+            console.error("Live polling failed:", err);
           }
-        }, 5000); // ⏱️ every 5 seconds
+        }, 5000); // poll every 5 seconds
       
-        return () => clearInterval(interval); // 🧹 cleanup on chat change
+        return () => clearInterval(interval); // clean up
       }, [selectedChat]);
       
     
@@ -67,7 +71,7 @@
         onClick={async () => {
             try {
               setSelectedChat(chat); // <--- FIX ADDED HERE
-              const response = await axios.post("http://localhost:4001/Admin/get-msg-by-chat-id", {
+              const response = await axios.post("http://localhost:4001/User/get-chat-by-id", {
                 ucid: chat.ucid,
               });
               console.log("Messages for UCID:", chat.ucid, response.data.messages);
@@ -80,7 +84,7 @@
     >
         <div className="font-semibold text-lg text-gray-800 truncate">{chat.ucid}</div>
         <div className="text-sm text-gray-600">
-        Superuser ID: {chat.party1_superuser_id}
+        Admin ID: {chat.party2_admin_id}
         </div>
         <div className="text-xs text-gray-400">
         Created: {new Date(chat.created_at).toLocaleString()}
@@ -104,12 +108,12 @@
     ) : (
       <ul className="space-y-3">
         {messages.map((msg, idx) => {
-          const admin = JSON.parse(localStorage.getItem("Admin"));
+          const user = JSON.parse(localStorage.getItem("Users"));
           return (
             <li
               key={idx}
               className={`p-3 rounded-lg w-fit max-w-[80%] ${
-                msg.sender_id === admin?.id
+                msg.sender_id === 52
                   ? "bg-blue-100 self-end ml-auto"
                   : "bg-gray-100 self-start mr-auto"
               }`}
@@ -140,32 +144,32 @@
   onClick={async () => {
     if (!newMessage.trim() || !selectedChat) return;
 
-    const admin = JSON.parse(localStorage.getItem("Admin"));
+    const user = JSON.parse(localStorage.getItem(" Users"));
 
     const payload = {
       ucid: selectedChat.ucid,
-      sender_id: admin.id,
-      reciever_id: selectedChat.party1_superuser_id,
+      sender_id: 52,
+      reciever_id: selectedChat.party2_admin_id,
       message_type: "text",
       message: newMessage,
     };
 
-    console.log("Sending to /Admin/send-message:", payload); // 👈 Logs exactly what is sent
+    console.log("Sending to /User/send-message:", payload); // 👈 Logs exactly what is sent
 
     try {
       const response = await axios.post(
-        "http://localhost:4001/Admin/send-message",
+        "http://localhost:4001/User/send-message",
         payload
       );
 
-      console.log("Response from /Admin/send-message:", response.data); // 👈 Optional: Log API response
+      console.log("Response from /User/send-message:", response.data); // 👈 Optional: Log API response
 
       // Add to UI immediately
       setMessages((prev) => [
         ...prev,
         {
           Message: newMessage,
-          sender_id: admin.id,
+          sender_id: 52,
           timestamp: new Date().toISOString(),
         },
       ]);
@@ -189,4 +193,4 @@
     );
     };
 
-    export default Notifications;
+    export default UserNotifications;

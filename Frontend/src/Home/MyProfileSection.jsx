@@ -15,6 +15,7 @@ const MyProfileSection = () => {
 
   const storedObjectString = localStorage.getItem("Admin");
   const myObject = JSON.parse(storedObjectString);
+  console.log(myObject)
 
   useEffect(() => {
     if (myObject?.id) {
