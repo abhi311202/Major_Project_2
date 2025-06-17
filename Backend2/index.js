@@ -72,14 +72,7 @@ import connectMongo from "./config/mongoClient.js";
 
 dotenv.config();
 const app = express();
-const port = process.env.PORT || 4000;
-
-// Simulate __dirname in ES module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Middleware
-app.use(cors());
+app.use(cors()); 
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));

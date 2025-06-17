@@ -7,7 +7,7 @@ const router = express.Router();
 //   registerUser,
 //   userLogin,
 //   logout,
-//   demo,
+//   demo, 
 // } from "../Controllers/userControllerSQL.js";
 
 import { registerUser } from "../Controllers/registerUser.js";
