@@ -76,6 +76,8 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+const port = process.env.PORT || 4001;
+
 
 // Serve static files (e.g., for React frontend)
 // ✅ Serve static files from React build folder

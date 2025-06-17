@@ -48,7 +48,7 @@
           } catch (err) {
             console.error("Polling error:", err);
           }
-        }, 5000); // ⏱️ every 5 seconds
+        }, 1000); // ⏱️ every 5 seconds
       
         return () => clearInterval(interval); // 🧹 cleanup on chat change
       }, [selectedChat]);
@@ -58,46 +58,88 @@
         <div className="flex h-screen w-full bg-white">
         {/* Left Chat List */}
         <div className="w-[30%] border-r p-4 overflow-y-auto">
-            <h2 className="text-lg font-semibold mb-4">Chats</h2>
-            <ul className="space-y-3">
-            {chats.map((chat, index) => (
-    <li
+  <h2 className="text-lg font-semibold mb-4">Chats</h2>
+  <ul className="space-y-3">
+    {chats.map((chat, index) => (
+      <li
         key={index}
-        className="p-4 rounded-lg border shadow hover:bg-gray-100 cursor-pointer transition-all"
+        className="p-3 rounded-lg border flex items-center gap-3 shadow hover:bg-gray-100 cursor-pointer transition-all"
         onClick={async () => {
-            try {
-              setSelectedChat(chat); // <--- FIX ADDED HERE
-              const response = await axios.post("http://localhost:4001/Admin/get-msg-by-chat-id", {
-                ucid: chat.ucid,
-              });
-              console.log("Messages for UCID:", chat.ucid, response.data.messages);
-              setMessages(response.data.messages);
-            } catch (err) {
-              console.error("Failed to fetch messages:", err);
-            }
-          }}
-          
-    >
-        <div className="font-semibold text-lg text-gray-800 truncate">{chat.ucid}</div>
-        <div className="text-sm text-gray-600">
-        Superuser ID: {chat.party1_superuser_id}
+          try {
+            setSelectedChat(chat);
+            const response = await axios.post("http://localhost:4001/Admin/get-msg-by-chat-id", {
+              ucid: chat.ucid,
+            });
+            setMessages(response.data.messages);
+          } catch (err) {
+            console.error("Failed to fetch messages:", err);
+          }
+        }}
+      >
+        {/* Profile Picture */}
+        <img
+          src={chat.receiver_profile_picture_url}
+          alt="Profile"
+          className="w-10 h-10 rounded-full object-cover border"
+        />
+
+        {/* Textual Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between items-center">
+            <p className="font-medium text-gray-800 truncate">
+              {chat.receiver_name}
+            </p>
+            <span
+              className={`w-2.5 h-2.5 rounded-full ${
+                chat.receiver_is_active ? "bg-green-500" : "bg-red-400"
+              }`}
+              title={chat.receiver_is_active ? "Online" : "Offline"}
+            ></span>
+          </div>
+          <p className="text-xs text-gray-500 truncate">
+            {new Date(chat.created_at).toLocaleString()}
+          </p>
         </div>
-        <div className="text-xs text-gray-400">
-        Created: {new Date(chat.created_at).toLocaleString()}
-        </div>
-    </li>
+      </li>
     ))}
+  </ul>
+</div>
 
-
-
-            </ul>
-        </div>
 
         {/* Right Chat View Placeholder */}
        {/* Right Chat View */}
+{/* Right Chat View */}
 <div className="w-[70%] p-6 flex flex-col relative overflow-y-auto">
-  <h3 className="text-xl text-gray-700 mb-4">Messages</h3>
+  {/* Header with profile image, name, and status */}
+  {selectedChat && (
+    <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center gap-3">
+        <img
+          src={selectedChat.receiver_profile_picture_url}
+          alt="Profile"
+          className="w-10 h-10 rounded-full object-cover border"
+        />
+        <div>
+          <p className="text-lg font-semibold text-gray-800">
+            {selectedChat.receiver_name}
+          </p>
+          <p className="text-sm text-gray-500">{selectedChat.receiver_username}</p>
+        </div>
+      </div>
 
+      <span
+        className={`text-sm px-3 py-1 rounded-full font-medium ${
+          selectedChat.receiver_is_active
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-600"
+        }`}
+      >
+        {selectedChat.receiver_is_active ? "Active" : "Inactive"}
+      </span>
+    </div>
+  )}
+
+  {/* Message history */}
   <div className="flex-1 overflow-y-auto mb-4">
     {messages.length === 0 ? (
       <p className="text-gray-500">Select a chat to view messages</p>
@@ -127,61 +169,65 @@
     )}
   </div>
 
-  {/* Input box and Send button aligned horizontally */}
+  {/* Input and Send */}
   <div className="flex gap-2 sticky bottom-0 bg-white py-2">
     <input
       type="text"
       value={newMessage}
       onChange={(e) => setNewMessage(e.target.value)}
       className="flex-grow border rounded px-4 py-2"
-      placeholder="Type your message..."
+      placeholder={
+        selectedChat?.receiver_is_active
+          ? "Type your message..."
+          : "User is inactive"
+      }
+      disabled={!selectedChat?.receiver_is_active}
     />
     <button
-  onClick={async () => {
-    if (!newMessage.trim() || !selectedChat) return;
+      onClick={async () => {
+        if (!newMessage.trim() || !selectedChat) return;
 
-    const admin = JSON.parse(localStorage.getItem("Admin"));
-
-    const payload = {
-      ucid: selectedChat.ucid,
-      sender_id: admin.id,
-      reciever_id: selectedChat.party1_superuser_id,
-      message_type: "text",
-      message: newMessage,
-    };
-
-    console.log("Sending to /Admin/send-message:", payload); // 👈 Logs exactly what is sent
-
-    try {
-      const response = await axios.post(
-        "http://localhost:4001/Admin/send-message",
-        payload
-      );
-
-      console.log("Response from /Admin/send-message:", response.data); // 👈 Optional: Log API response
-
-      // Add to UI immediately
-      setMessages((prev) => [
-        ...prev,
-        {
-          Message: newMessage,
+        const admin = JSON.parse(localStorage.getItem("Admin"));
+        const payload = {
+          ucid: selectedChat.ucid,
           sender_id: admin.id,
-          timestamp: new Date().toISOString(),
-        },
-      ]);
+          reciever_id: selectedChat.party1_superuser_id,
+          message_type: "text",
+          message: newMessage,
+        };
 
-      setNewMessage("");
-    } catch (err) {
-      console.error("Failed to send message:", err);
-    }
-  }}
-  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
->
-  Send
-</button>
+        try {
+          await axios.post(
+            "http://localhost:4001/Admin/send-message",
+            payload
+          );
 
+          setMessages((prev) => [
+            ...prev,
+            {
+              Message: newMessage,
+              sender_id: admin.id,
+              timestamp: new Date().toISOString(),
+            },
+          ]);
+
+          setNewMessage("");
+        } catch (err) {
+          console.error("Failed to send message:", err);
+        }
+      }}
+      disabled={!selectedChat?.receiver_is_active}
+      className={`px-4 py-2 rounded text-white transition ${
+        selectedChat?.receiver_is_active
+          ? "bg-blue-600 hover:bg-blue-700"
+          : "bg-gray-400 cursor-not-allowed"
+      }`}
+    >
+      Send
+    </button>
   </div>
 </div>
+
 
     
 </div>
