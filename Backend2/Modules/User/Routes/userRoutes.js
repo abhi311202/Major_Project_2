@@ -7,7 +7,7 @@ const router = express.Router();
 //   registerUser,
 //   userLogin,
 //   logout,
-//   demo, 
+//   demo,
 // } from "../Controllers/userControllerSQL.js";
 
 import { registerUser } from "../Controllers/registerUser.js";
@@ -24,6 +24,7 @@ import { getChats } from "../Controllers/getChatsController.js";
 import { newChat } from "../Controllers/createNewChatController.js";
 import { newMessage } from "../Controllers/sendNewMessageController.js";
 import { getChatById } from "../Controllers/getChatByIdController.js";
+import { getAdminsToChat } from "../Controllers/getAdminsToChatController.js";
 
 router.post("/register", registerUser);
 router.post("/login", userLogin);
@@ -40,6 +41,7 @@ router.post("/get-chats", getChats);
 router.post("/get-chat-by-id", getChatById);
 router.post("/new-chat", newChat);
 router.post("/send-message", newMessage);
+router.get("/get-admins-to-start-chat", getAdminsToChat);
 // router.post("/verify", userMiddleware, demo);
 
 export default router;
