@@ -37,7 +37,7 @@ router.get("/super-admin-requests", getSuperAdminRequests);
 router.post("/approve-super-admin-request", approveSuperAdminRequestController);
 router.post("/delete-super-admin-request", deleteSuperAdminRequest);
 router.post("/get-super-admin-details", getSuperAdminDetails);
-
+// router.post("/get-pending-admin-req-notification");
 //   router.post("/verify", userMiddleware, demo);
 
 export default router;
