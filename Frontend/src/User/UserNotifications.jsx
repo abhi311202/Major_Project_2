@@ -1,12 +1,16 @@
     // NotificationPage.jsx
     import React, { useEffect, useState } from "react";
     import axios from "axios";
+    import toast from "react-hot-toast";
 
     const UserNotifications = () => {
     const [chats, setChats] = useState([]);
     const [messages, setMessages] = useState([]);
     const [selectedChat, setSelectedChat] = useState(null);
     const [newMessage, setNewMessage] = useState("");
+    const [availableAdmins, setAvailableAdmins] = useState([]);
+const [showAdminModal, setShowAdminModal] = useState(false);
+
 
 
 
@@ -15,11 +19,11 @@
         try {
             const user = JSON.parse(localStorage.getItem("Users"));
             console.log("sans",user.id);
-            const user_id = 52;
+            
             
     
             console.log("User Object from localStorage:", user);
-            console.log("hello",user_id);
+            console.log("hello",user.id);
     
             const response = await axios.post("http://localhost:4001/User/get-chats", {
                 super_user_id: user.id,
@@ -53,7 +57,7 @@
           } catch (err) {
             console.error("Live polling failed:", err);
           }
-        }, 100000); // poll every 5 seconds
+        }, 2000); // poll every 5 seconds
       
         return () => clearInterval(interval); // clean up
       }, [selectedChat]);
@@ -66,20 +70,83 @@
         <div className="flex items-center justify-between mb-4">
   <h2 className="text-lg font-semibold">Chats</h2>
   <button
-    onClick={async () => {
-      try {
-        const response = await axios.get("http://localhost:4001/User/get-admins-to-start-chat");
-        console.log("Available admins to start chat:", response.data);
-      } catch (err) {
-        console.error("Failed to fetch admins:", err);
-      }
-    }}
-    className="text-blue-600 hover:text-blue-800 transition text-xl"
-    title="Start New Chat"
-  >
-    +
-  </button>
+  onClick={async () => {
+    try {
+      const response = await axios.get("http://localhost:4001/User/get-admins-to-start-chat");
+      console.log("Available admins to start chat:", response.data);
+      setAvailableAdmins(response.data.admins);
+      setShowAdminModal(true);
+    } catch (err) {
+      console.error("Failed to fetch admins:", err);
+    }
+  }}
+  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 transition-all duration-300"
+  title="Start New Chat"
+>
+  <span className="text-lg">New Chat</span>
+  <span className="text-xl font-bold">+</span>
+</button>
+
 </div>
+{showAdminModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md">
+      <h3 className="text-lg font-semibold mb-4">Start New Chat</h3>
+      <ul className="space-y-3 max-h-[300px] overflow-y-auto">
+        {availableAdmins.map((admin) => (
+          <li
+            key={admin.id}
+            onClick={async () => {
+              try {
+                const user = JSON.parse(localStorage.getItem("Users"));
+                const admin = JSON.parse(localStorage.getItem("Admin"));
+                const payload = {
+                  super_user_id: user.id,
+                  admin_id: admin.id,
+                };
+                const response = await axios.post("http://localhost:4001/User/new-chat", payload);
+                console.log("New chat created:", response.data);
+            
+                const newChat = response.data.chat;
+            
+                // Check if chat with the same UCID already exists
+                const alreadyExists = chats.some((chat) => chat.ucid === newChat.ucid);
+            
+                if (alreadyExists) {
+                  toast.success("Chat already exists with this admin.");
+                } else {
+                  setChats((prev) => [newChat, ...prev]);
+                }
+            
+                setShowAdminModal(false); // close modal
+              } catch (err) {
+                console.error("Failed to start new chat:", err);
+              }
+            }}
+            
+            className="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded"
+          >
+            <img
+              src={admin.profile_picture_url}
+              alt={admin.name}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <span className="text-gray-800">{admin.name}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-4 text-right">
+        <button
+          onClick={() => setShowAdminModal(false)}
+          className="text-sm text-gray-500 hover:underline"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
             <ul className="space-y-3">
             {chats.map((chat, index) => (
@@ -153,7 +220,7 @@
             <li
               key={idx}
               className={`p-3 rounded-lg w-fit max-w-[80%] ${
-                msg.sender_id === 52
+                msg.sender_id === user.id
                   ? "bg-blue-100 self-end ml-auto"
                   : "bg-gray-100 self-start mr-auto"
               }`}
@@ -184,7 +251,7 @@
   <button
     onClick={async () => {
       if (!newMessage.trim() || !selectedChat) return;
-
+      const user = JSON.parse(localStorage.getItem("Users"));
       const payload = {
         ucid: selectedChat.ucid,
         sender_id: user.id,

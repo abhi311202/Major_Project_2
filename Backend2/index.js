@@ -103,7 +103,6 @@ app.use("/SuperAdmin", superAdminRoutes);
 app.use("/Services", servicesRoutes);
 app.use("/Document", documentRoutes);
 app.use("/Payments", paymentRoutes);
-
-app.listen(port, () => {
+ app.listen(port, () => {
   console.log(`✅ Server is running on http://localhost:${port}`);
 });
