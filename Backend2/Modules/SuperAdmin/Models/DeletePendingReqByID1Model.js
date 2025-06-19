@@ -6,6 +6,6 @@ export const Delete_Pending_Req_By_ID1 = async (Pending_Request_id) => {
 
   const result = await client.query(query, [Pending_Request_id]);
 
-  console.log(result);
+  // console.log(result);
   return result.rowCount > 0 ? true : false;
 };

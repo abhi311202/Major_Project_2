@@ -40,4 +40,5 @@ router.post("/get-super-admin-details", getSuperAdminDetails);
 // router.post("/get-pending-admin-req-notification");
 //   router.post("/verify", userMiddleware, demo);
 
+
 export default router;
