@@ -7,7 +7,6 @@ import client from "../../../config/sqlDB.js";
 export const registerAdmin = async (req, res) => {
   console.log(req.body);
   try {
-    client.query("BEGIN");
     const admin_exist = await checkAdminExistsByEmail(req.body.email);
     const admin_exist_aadhar = await checkAdminExistsByAadhar(req.body.aadhar);
     const admin_exist_username = await checkAdminExistByUsername(
@@ -50,7 +49,7 @@ export const registerAdmin = async (req, res) => {
       }
     }
     // console.log("hello");
-
+    client.query("BEGIN");
     const admin = await createAdminReq(req.body);
     console.log(admin);
     const getSA = await mailSA_A(admin);
@@ -61,7 +60,6 @@ export const registerAdmin = async (req, res) => {
     // console.error(err);
     client.query("ROLLBACK");
     console.log(`Error in Controller: ${err}`);
-    res.status(500).json({ error: err.detail });
-    0;
+    return res.status(500).json({ error: err.detail, message: err.message });
   }
 };
