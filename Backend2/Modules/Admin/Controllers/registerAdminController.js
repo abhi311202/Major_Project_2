@@ -2,10 +2,12 @@ import { checkAdminExistByUsername } from "../Models/checkAdminExistByUsernameMo
 import { checkAdminExistsByEmail } from "../Models/checkAdminExistsByEmailModel.js";
 import { checkAdminExistsByAadhar } from "../Models/checkAdminExistsByAadharModel.js";
 import { createAdminReq } from "../Models/createAdminReqModel.js";
-
+import { mailSA_A } from "../Models/mailToSuperAdmin_AdminModel.js";
+import client from "../../../config/sqlDB.js";
 export const registerAdmin = async (req, res) => {
   console.log(req.body);
   try {
+    client.query("BEGIN");
     const admin_exist = await checkAdminExistsByEmail(req.body.email);
     const admin_exist_aadhar = await checkAdminExistsByAadhar(req.body.aadhar);
     const admin_exist_username = await checkAdminExistByUsername(
@@ -47,12 +49,17 @@ export const registerAdmin = async (req, res) => {
         });
       }
     }
-    console.log("hello");
+    // console.log("hello");
+
     const admin = await createAdminReq(req.body);
-    console.log("hello2");
-    res.status(201).json(admin);
+    console.log(admin);
+    const getSA = await mailSA_A(admin);
+    // console.log("hello2");
+    client.query("COMMIT");
+    return res.status(201).json(admin);
   } catch (err) {
     // console.error(err);
+    client.query("ROLLBACK");
     console.log(`Error in Controller: ${err}`);
     res.status(500).json({ error: err.detail });
     0;
