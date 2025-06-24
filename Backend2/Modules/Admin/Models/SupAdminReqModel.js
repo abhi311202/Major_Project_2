@@ -22,10 +22,21 @@ export const createSuperAdminRequest = async (adminId) => {
 export const checkSuperAdminRequest = async (adminId) => {
   try {
     // Check for existing pending request
-    const checkQuery = `SELECT 1 FROM pending_SA_req WHERE admin_id = $1 AND approved = FALSE AND is_delete = FALSE LIMIT 1;`;
+    const checkQuery = `SELECT 1 FROM pending_SA_req WHERE admin_id = $1 AND is_active = TRUE LIMIT 1;`;
     const checkResult = await client.query(checkQuery, [adminId]);
     return checkResult.rowCount == 0 ? true : false;
   } catch (error) {
+    throw error;
+  }
+};
+
+export const checkApprovedSuperAdminRequest = async (adminId) => {
+  try {
+    const checkQuery = `SELECT 1 FROM pending_SA_req WHERE admin_id = $1 AND is_active = FALSE AND approved = TRUE LIMIT 1;`;
+    const checkResult = await client.query(checkQuery, [adminId]);
+    return checkResult.rowCount == 0 ? true : false;
+  } catch (error) {
+    console.log(error);
     throw error;
   }
 };

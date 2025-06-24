@@ -22,7 +22,7 @@ const port = process.env.PORT || 4000;
 connectMongo();
 
 app.get("/", (req, res) => {
-  res.send("Hello Abi!");
+  res.send("Hello Abiiii!");
 });
 
 app.use("/User", userRoutes);

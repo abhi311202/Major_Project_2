@@ -41,4 +41,5 @@ router.post("/get-super-admin-details", getSuperAdminDetails);
 //   router.post("/verify", userMiddleware, demo);
 
 
+
 export default router;

@@ -1,6 +1,7 @@
 import {
   createSuperAdminRequest,
   checkSuperAdminRequest,
+  checkApprovedSuperAdminRequest,
 } from "../Models/SupAdminReqModel.js";
 import client from "../../../config/sqlDB.js";
 
@@ -10,14 +11,23 @@ export const applyForSuperAdmin = async (req, res) => {
     return res.status(400).json({ error: "adminId is required" });
   }
   try {
-    await client.query("BEGIN");
     const checkResult = await checkSuperAdminRequest(adminId);
     if (checkResult) {
-      const result = await createSuperAdminRequest(adminId);
-      await client.query("COMMIT");
-      res
-        .status(201)
-        .json({ message: "Super Aadmin Request submitted", request: result });
+      const checkResult1 = await checkApprovedSuperAdminRequest(adminId);
+      if (checkResult1) {
+        await client.query("BEGIN");
+        const result = await createSuperAdminRequest(adminId);
+        await client.query("COMMIT");
+        res
+          .status(201)
+          .json({ message: "Super Aadmin Request submitted", request: result });
+      } else {
+        await client.query("ROLLBACK");
+        res.status(403).json({
+          message:
+            "Super Admin request already approved. You are already a super admin",
+        });
+      }
     } else {
       await client.query("ROLLBACK");
       res.status(403).json({
