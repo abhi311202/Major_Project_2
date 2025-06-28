@@ -1,7 +1,6 @@
 import { superAdminRequestButtonStatusModel } from "../Models/superAdminRequestButtonStatusModel.js";
 
 export const superAdminRequestButtonStatusController = async (req, res) => {
-  console.log("superAdminRequestButtonStatusController");
   const { adminId } = req.body;
   if (!adminId) {
     return res.status(400).json({ error: "adminId is required" });
