@@ -5,6 +5,7 @@ import {
   putSuperAdminData,
   deactivateAdmin,
 } from "../Models/ApproveSupAdminReqModel.js";
+import { SuperAdminReqApproveMailToAdmin } from "../Models/SuperAdminReqApproveMailToAdminModel.js";
 import client from "../../../config/sqlDB.js";
 
 export const approveSuperAdminRequestController = async (req, res) => {
@@ -20,6 +21,7 @@ export const approveSuperAdminRequestController = async (req, res) => {
     const adminStatus = await deactivateAdmin(adminid);
     const requestStatus = await approveSuperAdminRequest(requestId);
     if (superAdminStatus && !adminStatus && requestStatus) {
+      await SuperAdminReqApproveMailToAdmin(adminid, superAdminId);
       client.query("COMMIT");
       return res.status(200).json({
         message: "Request approved successfully",
@@ -33,7 +35,7 @@ export const approveSuperAdminRequestController = async (req, res) => {
     client.query("ROLLBACK");
     res.status(500).json({
       message: "Request not approved, Please try Again",
-      error: error.message,
+      error: error.message || error,
     });
   }
 };
