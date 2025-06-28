@@ -4,6 +4,7 @@ import {
   checkApprovedSuperAdminRequest,
 } from "../Models/SupAdminReqModel.js";
 import client from "../../../config/sqlDB.js";
+import { sendEmailsTOSuperAdminsModel } from "../Models/sendEmailsTOSuperAdminsModel.js";
 
 export const applyForSuperAdmin = async (req, res) => {
   const { adminId } = req.body;
@@ -17,10 +18,17 @@ export const applyForSuperAdmin = async (req, res) => {
       if (checkResult1) {
         await client.query("BEGIN");
         const result = await createSuperAdminRequest(adminId);
-        await client.query("COMMIT");
-        res
-          .status(201)
-          .json({ message: "Super Aadmin Request submitted", request: result });
+        if (result.is_active) {
+          // send email to all Super Admins
+          await sendEmailsTOSuperAdminsModel(result.admin_id);
+          await client.query("COMMIT");
+          res.status(201).json({
+            message: "Super Aadmin Request submitted",
+            request: result,
+          });
+        } else {
+          throw new Error("Failed to submit Super Admin request");
+        }
       } else {
         await client.query("ROLLBACK");
         res.status(403).json({

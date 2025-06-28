@@ -18,6 +18,7 @@ router.post("/register", registerAdmin);
 router.post("/login", adminLogin);
 router.post("/logout", logout);
 router.post("/apply-super-admin", applyForSuperAdmin);
+router.post("/super-admin-request-button-status", superAdminRequestButtonStatusController);
 router.post("/get-admin-details", getAdminDetails);
 router.post("/change-personal-detail", changeAdminPersonalDetailController);
 router.post("/change-password", passwordChangeController);
