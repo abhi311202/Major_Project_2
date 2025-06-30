@@ -342,7 +342,7 @@ const onSubmit = async (data) => {
     navigate("/UserLogin");
   } catch (err) {
     console.error(err);
-    // toast.error("Registration failed!");
+    toast.error("Registration failed!");
   }
 };
 

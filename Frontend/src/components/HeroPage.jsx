@@ -29,7 +29,7 @@ function HeroPage() {
 
         <div className="mt-6">
           <button
-            onClick={() => navigate("/#services")}
+            onClick={() => navigate("/services")}
             className="px-8 py-3 rounded-full bg-gradient-to-r from-[#FF00CC] via-[#333399] to-[#00FFFF] text-white font-bold shadow-xl hover:brightness-110 transform hover:scale-105 transition-all  ease-in-out animate-pulse"
           >
             ✨ {t("es")}

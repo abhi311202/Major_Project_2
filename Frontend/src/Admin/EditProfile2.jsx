@@ -452,7 +452,7 @@ useEffect(() => {
 
 
     {/* Profile Image Section */}
-    <h2 className="text-xl font-semibold mb-4">My Profile</h2>
+    <h2 className="text-xl font-semibold mb-4">Edit My Profile</h2>
    <div className="flex items-center gap-4 mb-6">
   <img
     src={profileData.profile}

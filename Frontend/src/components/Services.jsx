@@ -1,7 +1,10 @@
 import React, { useRef } from "react";
 import { FiArrowLeft, FiArrowRight, FiArrowUpRight } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
-
+import { useAuth } from "../context/AuthProvider";
+import { useAuth1 } from "../context/AuthProvider1";
+import { useAuth2 } from "../context/AuthProvider2";
+import { toast } from "react-hot-toast";
 const services = [
   "summarization",
   "classification",
@@ -9,7 +12,8 @@ const services = [
   "entity",
   "metadata",
   "textvoice",
-  "langsupport"
+  "langsupport",
+  "ColpaliRAG"
 ];
 
 
@@ -19,6 +23,9 @@ export const Services = () => {
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
   };
+  const [authUser] = useAuth();
+  const [authAdmin] = useAuth1();
+  const [authAdmin2] = useAuth2();
   const scrollRef = useRef(null);
 
   const scroll = (direction) => {
@@ -45,7 +52,7 @@ export const Services = () => {
     {/* Card Slider */}
 <div
   ref={scrollRef}
-  className="flex gap-6 overflow-hidden scroll-smooth no-scrollbar px-4 md:px-8"
+  className="flex gap-6 overflow-hidden scroll-smooth no-scrollbar px-4 md:px-8 py-4"
 >
   {services.map((key, index) => (
     <div
@@ -53,10 +60,10 @@ export const Services = () => {
       className="relative group rounded-3xl transition-transform duration-300 hover:scale-105"
     >
       {/* Gradient border on hover */}
-      <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-blue-400 via-purple-300 to-indigo-400 opacity-0 group-hover:opacity-100 transition duration-300 z-0"></div>
+      <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition duration-300 z-0"></div>
 
       {/* Inner card */}
-      <div className="relative z-10 w-[350px] h-[350px] flex-shrink-0 bg-indigo text-indigo-900 rounded-3xl p-8 shadow-xl">
+      <div className="relative z-10 w-[350px] h-[350px] flex-shrink-0 bg-gradient-to-r from-violet-300 via-green-200 indigo to-red-200 transit rounded-3xl p-8 shadow-xl">
         <p className="uppercase text-sm font-medium tracking-wide mb-2 text-black">
           {t(`services.${key}.title`)}
         </p>
@@ -66,10 +73,20 @@ export const Services = () => {
         <p className="text-md md:text-lg mb-6 text-black">
           {t(`services.${key}.description`)}
         </p>
-        <button className="group flex items-center gap-2 bg-gradient-to-r from-indigo-700 to-purple-700 text-white px-5 py-2.5 rounded-xl transition-all duration-300 hover:from-pink-500 hover:via-purple-500 hover:to-indigo-500">
-          {t("learnMore") || "Learn More"}
-          <FiArrowUpRight className="opacity-0 group-hover:opacity-100 translate-x-1 transition duration-300" />
-        </button>
+        <button
+  onClick={() => {
+    if (!authUser && !authAdmin && !authAdmin2) {
+     toast.error("Please Login First");
+    } else {
+      
+    }
+  }}
+  className="group flex items-center gap-2 bg-gradient-to-r from-indigo-700 to-purple-700 text-white px-5 py-2.5 rounded-xl transition-all duration-300 hover:from-pink-500 hover:via-purple-500 hover:to-indigo-500"
+>
+  {t("learnMore") || "Learn More"}
+  <FiArrowUpRight className="opacity-0 group-hover:opacity-100 translate-x-1 transition duration-300" />
+</button>
+
       </div>
     </div>
   ))}

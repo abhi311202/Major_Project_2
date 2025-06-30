@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import MyProfileSection from "./MyProfileSection";
 import UploadNewDocument from "../Admin/UploadNewDocument";
 import UploadedDocument from "../Admin/UploadedDocument";
+import { AiOutlineFileDone } from "react-icons/ai"; // Ant Design icon
+import { MdQuestionAnswer } from "react-icons/md"; // ✅ Best Q&A-specific icon
 import {
   FiBarChart,
   FiChevronDown,
@@ -12,9 +14,12 @@ import {
   FiShoppingCart,
   FiTag,
   FiUsers,
+  FiMessageCircle
 } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import Notifications from "@/Admin/Notifications";
+import AdvanceRag from "@/Admin/AdvanceRag";
 
 export const AdminBody = () => {
   const { t, i18n } = useTranslation();
@@ -40,7 +45,12 @@ export const AdminBody = () => {
           <UploadNewDocument />
         ): selected === "UploadedDocument" ? (
           <UploadedDocument />
-        ) : (
+        ) :selected === "Message SuperUser" ? (
+          <Notifications />
+        ): selected === "Q&A" ? (
+          <AdvanceRag />
+        ):
+         (
           <ExampleContent selected={selected} />
         )}
       </div>
@@ -88,13 +98,40 @@ const Sidebar = ({ selected, setSelected }) => {
       label={t("uploadNew")}
     />
     <Option
-      Icon={FiUpload}
+      Icon={AiOutlineFileDone}
       title="UploadedDocument"
       selected={selected}
       setSelected={setSelected}
       open={open}
       notifs={3}
       label={t("uploadedDoc")}
+    />
+      <Option
+      Icon={FiMessageCircle}
+      title="Message SuperUser"
+      selected={selected}
+      setSelected={setSelected}
+      open={open}
+      notifs={3}
+      label="Message SuperUser"
+    />
+        <Option
+      Icon={MdQuestionAnswer}
+      title="Q&A"
+      selected={selected}
+      setSelected={setSelected}
+      open={open}
+      notifs={3}
+      label="Q&A"
+    />
+    <Option
+      Icon={MdQuestionAnswer}
+      title="Vision RAG"
+      selected={selected}
+      setSelected={setSelected}
+      open={open}
+      notifs={3}
+      label="Vision RAG"
     />
   </div>
 

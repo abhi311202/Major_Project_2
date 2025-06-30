@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import MyProfileSection2 from "./MyProfileSection2";
 import ManageAdmin from "./ManageAdmin";
 import ManageSuperAdmin from "./ManageSuperAdmin";
+import axios from "axios";
 import {
   FiBarChart,
   FiChevronDown,
@@ -17,43 +18,76 @@ import { motion } from "framer-motion";
 
 export const SuperAdminBody = () => {
   const [selected, setSelected] = useState("Dashboard");
+  const [admins, setAdmins] = useState([]);
+  
+  const [superAdminRequestCount, setSuperAdminRequestCount] = useState(0);  
+  const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
 
+  const fetchAdmins = async () => {
+    try {
+      const res = await axios.get(`${baseURL}/SuperAdmin/AdminRequest`);
+      if (res.data.success) {
+        setAdmins(res.data.data); // Save the admin requests
+      }
+    } catch (err) {
+      console.error("Error fetching admin requests:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdmins();
+  }, []);
+  const fetchSuperAdminRequestCount = async () => {
+    try {
+      const res = await axios.get(`${baseURL}/SuperAdmin/super-admin-requests`);
+      if (res.data.success) {
+        setSuperAdminRequestCount(res.data.data.length); // 👈 Set count
+      }
+    } catch (err) {
+      console.error("Error fetching super admin requests:", err);
+    }
+  };
+  
+  useEffect(() => {
+    fetchSuperAdminRequestCount();
+  }, []);
 
   return (
-    <div
-      className="flex h-screen bg-white overflow-hidden"
+    <div className="flex h-screen bg-white overflow-hidden"
       style={{
         background:
           "linear-gradient(135deg, rgb(220, 155, 122), rgb(207, 225, 238), rgb(202, 169, 226))",
-      }}
->
-      <Sidebar selected={selected} setSelected={setSelected} />
-      
-      {/* Right Side Content */}
-     <div className="flex-1 overflow-auto p-6">
-  {selected === "Dashboard" ? (
-    <MyProfileSection2 />
-  ) : selected === "Manage Admin" ? (
-    <ManageAdmin />
-  ) : selected === "Manage SuperAdmin" ? (
-    <ManageSuperAdmin />
-  ) : (
-    <ExampleContent selected={selected} />
-  )}
-</div>
+      }}
+    >
+     <Sidebar
+  selected={selected}
+  setSelected={setSelected}
+  superAdminRequestCount={superAdminRequestCount}
+  adminRequestCount={admins.length}
+/>
 
+
+
+      <div className="flex-1 overflow-auto p-6">
+        {selected === "Dashboard" ? (
+          <MyProfileSection2 />
+        ) : selected === "Manage Admin" ? (
+          <ManageAdmin />
+        ) : selected === "Manage SuperAdmin" ? (
+          <ManageSuperAdmin />
+        ) : (
+          <ExampleContent selected={selected} />
+        )}
+      </div>
     </div>
   );
 };
 
 
-const Sidebar = ({ selected, setSelected }) => {
-  const [open, setOpen] = useState(true);
- 
 
-  useEffect(() => {
-    console.log(selected);
-  }, [selected]);
+const Sidebar = ({ selected, setSelected, superAdminRequestCount,adminRequestCount }) => {
+  const [open, setOpen] = useState(true);
+
 
   return (
     <motion.nav
@@ -63,8 +97,6 @@ const Sidebar = ({ selected, setSelected }) => {
         width: open ? "300px" : "fit-content",
       }}
     >
-      {/* <TitleSection open={open} /> */}
-
       <div className="space-y-1">
         <Option
           Icon={FiHome}
@@ -79,24 +111,24 @@ const Sidebar = ({ selected, setSelected }) => {
           selected={selected}
           setSelected={setSelected}
           open={open}
-          notifs={3}
+          notifs={adminRequestCount > 0 ? adminRequestCount : null}
         />
-
         <Option
-          Icon={FiUsers}
-          title="Manage SuperAdmin"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-          notifs={3}
-        />
-       
+        Icon={FiUsers}
+        title="Manage SuperAdmin"
+        selected={selected}
+        setSelected={setSelected}
+        open={open}
+        notifs={superAdminRequestCount} // 👈 Here
+      />
+
       </div>
 
       <ToggleClose open={open} setOpen={setOpen} />
     </motion.nav>
   );
 };
+
 
 const Option = ({ Icon, title, selected, setSelected, open, notifs }) => {
   return (
@@ -126,11 +158,16 @@ const Option = ({ Icon, title, selected, setSelected, open, notifs }) => {
           {title}
         </motion.span>
       )}
+      {notifs > 0 && open && (
+        <span className="absolute top-1 right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+          {notifs}
+        </span>
+      )}
 
-      
     </motion.button>
   );
 };
+
 
 const TitleSection = ({ open }) => {
   return (

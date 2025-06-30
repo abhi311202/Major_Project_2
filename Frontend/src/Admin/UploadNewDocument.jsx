@@ -13,11 +13,9 @@ import { Upload } from "@aws-sdk/lib-storage";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 import workerUrl from "pdfjs-dist/legacy/build/pdf.worker.min?url";
 
+
 // Tell PDF.js where to find the worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
-
-
-
 
 
 function UploadNewDocument() {
@@ -68,6 +66,8 @@ function UploadNewDocument() {
   const [hashHex, setHashHex] = useState('');
   const [profileData, setProfileData] = useState({});
   const [fileName, setFileName] = useState("");
+  const [pageContents, setPageContents] = useState([]); // Array of strings, one per page
+  const [currentPageIndex, setCurrentPageIndex] = useState(0); // Currently visible page
 
 
 
@@ -748,28 +748,29 @@ console.log("hllllooo new "+PdfUrl)
     setHashHex(hashHexValue);
     console.log('SHA-256 Hash:', hashHexValue);
   
-    // 2. Extract content based on file type
     if (selected.type === "application/pdf") {
       try {
         const typedArray = new Uint8Array(arrayBuffer);
         const pdf = await pdfjsLib.getDocument(typedArray).promise;
-  
-        let fullText = "";
+    
+        const allPages = [];
+    
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const textContent = await page.getTextContent();
           const pageText = textContent.items.map(item => item.str).join(" ");
-          fullText += pageText + "\n\n";
+          allPages.push(pageText);
         }
-  
-        setDocumentContent(fullText);
-        setContent(fullText);
-        setValue("content", fullText);
+    
+        setPageContents(allPages); // Store all pages
+        setDocumentContent(allPages.join("\n\n")); // Optionally, full content
+        setContent(allPages.join("\n\n"));
+        setValue("content", allPages.join("\n\n")); // Hidden field storing all for form submit
       } catch (err) {
         console.error("PDF parsing error:", err);
       }
-  
-    } else {
+    }
+     else {
       const reader = new FileReader();
       reader.onload = () => {
         const content = reader.result;
@@ -808,7 +809,7 @@ return (
   <input
     id="file-upload"
     type="file"
-    accept=".txt,.pdf,.docx"
+    accept=".pdf"
     onChange={handleFileChange}
     disabled={isInScope}
     className="hidden"
@@ -847,7 +848,7 @@ return (
             </label>
             <input
               type="text"
-              className="w-full p-2 rounded-md border border-gray-300 dark:bg-black dark:border-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+              className="w-full p-4 rounded-md border border-gray-300 dark:bg-black dark:border-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               placeholder="Enter document title"
               {...register("title", { required: true })}
             />
@@ -863,7 +864,7 @@ return (
             </label>
             <input
               type="text"
-              className="w-full p-2 rounded-md border border-gray-300 dark:bg-black dark:border-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+              className="w-full p-4 rounded-md border border-gray-300 dark:bg-black dark:border-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               placeholder="Enter serial number"
               {...register("serialnum", { required: true })}
             />
@@ -903,7 +904,7 @@ return (
     <textarea
     value={caseno}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border p-4 rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setCaseno(e.target.value);
         setValue("caseno", e.target.value);
@@ -919,7 +920,7 @@ return (
     <textarea
     value={casetype}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md p-4 resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setCasetype(e.target.value);
         setValue("casetype", e.target.value);
@@ -935,7 +936,7 @@ return (
     <textarea
     value={casestatus}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md p-4 resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setCasestatus(e.target.value);
         setValue("casestatus", e.target.value);
@@ -952,7 +953,7 @@ return (
     type="date"
     value={filingdate}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md p-4 resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setFilingdate(e.target.value);
         setValue("filingdate", e.target.value);
@@ -969,7 +970,7 @@ return (
     type="date"
     value={judgmentdate}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md p-4 resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setJudgmentdate(e.target.value);
         setValue("judgmentdate", e.target.value);
@@ -985,7 +986,7 @@ return (
     <textarea
     value={courtno}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md p-4 resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setCourtno(e.target.value);
         setValue("courtno", e.target.value);
@@ -1001,7 +1002,7 @@ return (
     <textarea
     value={courtname}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md p-4 resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setCourtname(e.target.value);
         setValue("courtname", e.target.value);
@@ -1017,7 +1018,7 @@ return (
     <textarea
     value={bench}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md p-4 resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setBench(e.target.value);
         setValue("bench", e.target.value);
@@ -1033,7 +1034,7 @@ return (
     <textarea
     value={petitioner}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md resize-none p-4 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setPetitioner(e.target.value);
         setValue("petitioner", e.target.value);
@@ -1049,7 +1050,7 @@ return (
     <textarea
     value={respondent}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md resize-none p-4 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setRespondent(e.target.value);
         setValue("respondent", e.target.value);
@@ -1065,7 +1066,7 @@ return (
     <textarea
     value={advofpetitioner}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md resize-none p-4 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setAdvofpetitioner(e.target.value);
         setValue("advofpetitioner", e.target.value);
@@ -1081,7 +1082,7 @@ return (
     <textarea
     value={advofrespondent}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md resize-none p-4 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setAdvofrespondent(e.target.value);
         setValue("advofrespondent", e.target.value);
@@ -1097,7 +1098,7 @@ return (
     <textarea
     value={prevcasecitation}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md resize-none p-4 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setPrevcasecitation(e.target.value);
         setValue("prevcasecitation", e.target.value);
@@ -1113,7 +1114,7 @@ return (
     <textarea
     value={penaltydetail}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md resize-none p-4 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setPenaltydetail(e.target.value);
         setValue("penaltydetail", e.target.value);
@@ -1129,7 +1130,7 @@ return (
     <textarea
     value={headnote}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md p-4 resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setHeadnote(e.target.value);
         setValue("headnote", e.target.value);
@@ -1175,7 +1176,7 @@ return (
     <textarea
     value={judgementauthor}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border p-4 rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setJudgementauthor(e.target.value);
         setValue("judgementauthor", e.target.value);
@@ -1191,7 +1192,7 @@ return (
     <textarea
     value={judgementtype}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md p-4 resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setJudgementtype(e.target.value);
         setValue("judgementtype", e.target.value);
@@ -1207,7 +1208,7 @@ return (
     <textarea
     value={langofjudgement}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border p-4 rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setLangofjudgement(e.target.value);
         setValue("langofjudgement", e.target.value);
@@ -1223,7 +1224,7 @@ return (
     <textarea
     value={dateofhearing}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md p-4 resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setDateofhearing(e.target.value);
         setValue("dateofhearing", e.target.value);
@@ -1239,7 +1240,7 @@ return (
     <textarea
     value={dateoforderpro}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md p-4 resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setDateoforderpro(e.target.value);
         setValue("dateoforderpro", e.target.value);
@@ -1255,7 +1256,7 @@ return (
     <textarea
     value={benchcomposition}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md p-4 resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setBenchcomposition(e.target.value);
         setValue("benchcomposition", e.target.value);
@@ -1271,7 +1272,7 @@ return (
     <textarea
     value={referredacts}
       rows="2"
-      className="w-full border rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+      className="w-full border rounded-md p-4 resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       onChange={(e) => {
         setReferredacts(e.target.value);
         setValue("referredacts", e.target.value);
@@ -1459,24 +1460,70 @@ return (
          
 
                     {/* Content */}
-<div>
-            <label className="block text-gray-600 dark:text-white font-medium mb-1">
-              Document Content:
-            </label>
-            <textarea
-              rows="10"
-              value={content}
-              onChange={(e) => {
-                setContent(e.target.value);
-                setValue("content", e.target.value);
-              }}
-              {...register("content", { required: true })}
-              className="w-full p-3 border rounded-md resize-none dark:bg-black dark:border-gray-600 dark:text-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-            />
-            {errors.content && (
-              <span className="text-sm text-red-500">This field is required</span>
-            )}
-          </div>
+                    <div>
+  <label className="block text-gray-600 dark:text-white font-medium mb-1">
+    Document Content (Page {currentPageIndex + 1} of {pageContents.length})
+  </label>
+
+  {pageContents.length > 0 ? (
+    <>
+      {/* Fixed height + scrollbar for content box */}
+      <div className="w-full h-64 p-4 border rounded-md overflow-y-auto dark:bg-gray-900 dark:text-white whitespace-pre-wrap">
+        {pageContents[currentPageIndex]}
+      </div>
+
+      {/* Pagination Controls Styled Like Image */}
+      <div className="flex items-center justify-center gap-4 mt-4">
+        <button
+          onClick={() => setCurrentPageIndex(prev => Math.max(prev - 1, 0))}
+          disabled={currentPageIndex === 0}
+          className={`w-10 h-10 flex items-center justify-center border rounded ${
+            currentPageIndex === 0
+              ? "text-black-400 border-black-400 cursor-not-allowed"
+              : "text-black-700 border-black-700 hover:bg-black-50"
+          }`}
+        >
+          <span className="text-xl">&lt;</span>
+        </button>
+
+        <span className="text-lg text-gray-800 dark:text-white">
+          {currentPageIndex + 1} of {pageContents.length}
+        </span>
+
+        <button
+          onClick={() =>
+            setCurrentPageIndex(prev => Math.min(prev + 1, pageContents.length - 1))
+          }
+          disabled={currentPageIndex === pageContents.length - 1}
+          className={`w-10 h-10 flex items-center justify-center border rounded ${
+            currentPageIndex === pageContents.length - 1
+              ? "text-black-400 border-black-400 cursor-not-allowed"
+              : "text-black-700 border-black-700 hover:bg-black-50"
+          }`}
+        >
+          <span className="text-xl">&gt;</span>
+        </button>
+      </div>
+    </>
+  ) : (
+    <textarea
+      rows="10"
+      value={content}
+      onChange={(e) => {
+        setContent(e.target.value);
+        setValue("content", e.target.value);
+      }}
+      {...register("content", { required: true })}
+      className="w-full p-4 border rounded-md resize-none dark:bg-black dark:border-gray-600 dark:text-white"
+    />
+  )}
+
+  {errors.content && (
+    <span className="text-sm text-red-500">This field is required</span>
+  )}
+</div>
+
+
 
           {/* Submit + Reset */}
           <div className="flex justify-between">

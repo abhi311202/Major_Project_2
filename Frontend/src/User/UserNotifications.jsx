@@ -4,12 +4,65 @@
     import toast from "react-hot-toast";
 
     const UserNotifications = () => {
+    const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
     const [chats, setChats] = useState([]);
     const [messages, setMessages] = useState([]);
     const [selectedChat, setSelectedChat] = useState(null);
     const [newMessage, setNewMessage] = useState("");
     const [availableAdmins, setAvailableAdmins] = useState([]);
-const [showAdminModal, setShowAdminModal] = useState(false);
+    const [showAdminModal, setShowAdminModal] = useState(false);
+
+    const [profileData, setProfileData] = useState({});
+    const [superAdminStatus, setSuperAdminStatus] = useState("not_requested");
+  
+    const storedObjectString = localStorage.getItem("Users");
+   
+    const myObject = JSON.parse(storedObjectString);
+    console.log(myObject);
+    
+    useEffect(() => {
+      const fetchProfileData = async () => {
+        try {
+          const storedObjectString = localStorage.getItem("Users");
+          const myObject = JSON.parse(storedObjectString);
+    
+          if (!myObject?.id) return console.error("User ID not found in localStorage");
+    
+          const payload = { id: myObject.id };
+          const res = await axios.post(`${baseURL}/User/get-profile-data`, payload);
+    
+          console.log("✅ Profile Data Response from Backend333:", res.data);
+    
+          // ✅ Access only the 'data' inside res.data
+          const profile = res.data.data;
+    
+          setProfileData({
+            userId: profile.id,
+            profile: profile.profile_picture_url,
+            name: profile.name,
+            username: profile.username,
+            email: profile.email,
+            phone: profile.phone,
+            dob: profile.dob,
+            gender: profile.gender,
+            aadhaar: profile.aadhar,
+            profession: profile.profession,
+            organisation: profile.organization,
+            created_at: profile.created_at,
+            validity_start_date: profile.validity_start_date,
+            validity_end_date: profile.validity_end_date,
+            user_type: profile.user_type,
+            order_id: profile.order_id,
+  
+          });
+    
+        } catch (error) {
+          console.error("❌ Error fetching profile data:", error);
+        }
+      };
+    
+      fetchProfileData();
+    }, []);
 
 
 
@@ -64,6 +117,8 @@ const [showAdminModal, setShowAdminModal] = useState(false);
       
     
     return (
+      <>
+      {profileData.user_type === "super user" ? (
         <div className="flex h-screen w-full bg-white">
         {/* Left Chat List */}
         <div className="w-[30%] border-r p-4 overflow-y-auto">
@@ -295,6 +350,21 @@ const [showAdminModal, setShowAdminModal] = useState(false);
 
     
 </div>
+) : (  <div className="h-screen w-full flex items-center justify-center bg-gradient-to-br from-white to-gray-100 dark:from-gray-900 dark:to-black transition">
+  <div className="w-[90%] max-w-lg bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-2xl text-center flex flex-col items-center justify-center gap-6 animate-fade-in">
+    <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
+      Premium Access Required
+    </h2>
+    <p className="text-gray-600 dark:text-gray-300 text-md px-4">
+      You need to upgrade to Super User to access chat features and premium document tools.
+    </p>
+    <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold transition">
+      Upgrade to Premium
+    </button>
+  </div>
+</div>
+)}
+</>
         
     );
     };

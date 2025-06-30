@@ -124,7 +124,7 @@ const changeLanguage = (lng) => {
     </span>
   </p>
 
-  <div className="divider">{t("or") || "or"}</div>
+  {/* <div className="divider">{t("or") || "or"}</div> */}
 
   <button className="google-btn">
     <svg width={20} viewBox="0 0 512 512">

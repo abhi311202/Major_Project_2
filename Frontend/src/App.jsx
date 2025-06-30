@@ -21,6 +21,7 @@ import EditProfile3 from "./Admin/EditProfile3";
 import { useAuth1 } from "./context/AuthProvider1";
 import Notifications from "./Admin/Notifications";
 import UserNotifications from "./User/UserNotifications";
+import AdminDocumentDetails from "./Admin/AdminDocumentDetails";
 
 const App = () => {
   const [authAdmin] = useAuth1();
@@ -240,6 +241,15 @@ const isUserLoggedIn = localStorage.getItem("Users") !== null;
   element={
     isUserLoggedIn && !isAdminLoggedIn && !isSuperAdminLoggedIn
       ? <DocumentDetails />
+      : <Navigate to="/" replace />
+  }
+/>
+
+<Route
+  path="/document-details2/:id"
+  element={
+    !isUserLoggedIn && isAdminLoggedIn && !isSuperAdminLoggedIn
+      ? <AdminDocumentDetails />
       : <Navigate to="/" replace />
   }
 />

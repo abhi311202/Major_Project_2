@@ -497,7 +497,7 @@ useEffect(() => {
     <Navbar />
     <div className="w-full max-w-screen-lg mx-auto p-6 bg-white rounded-xl shadow-md text-gray-800">
   {/* Profile Image Section */}
-  <h2 className="text-xl font-semibold mb-4">{t("profile.title")}</h2>
+  <h2 className="text-xl font-semibold mb-4">Edit My Profile</h2>
 
   <div className="flex items-center gap-4 mb-6">
     <img

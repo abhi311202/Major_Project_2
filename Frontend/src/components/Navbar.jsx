@@ -145,9 +145,9 @@ const Navbar = () => {
                 <ChevronDown size={20} />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => changeLanguage("en")}>{t("english")}</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => changeLanguage("hi")}>{t("hindi")}</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => changeLanguage("bn")}>{t("bengali")}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage("en")}>English</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage("hi")}>Hindi</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage("bn")}>Bengali</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -202,9 +202,7 @@ const Navbar = () => {
      <Button size="icon" variant="ghost" onClick={() => navigate("/usernotifications")}>
         <Bell className="h-5 w-5" />
       </Button>
-    <Button onClick={() => navigate("/UserServices")} size="sm">
-      {t("Services")}
-    </Button>
+  
     
     <DropdownMenu>
     <DropdownMenuTrigger asChild>

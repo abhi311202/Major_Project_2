@@ -5,22 +5,28 @@ import toast, { Toaster } from "react-hot-toast";
 const ManageAdmin = () => {
   const [admins, setAdmins] = useState([]);
   const [removedId, setRemovedId] = useState(null); 
+  const [note, setNote] = useState(null);
+
   // To track which card is being removed
   const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   const fetchAdmins = async () => {
     try {
       const res = await axios.get(`${baseURL}/SuperAdmin/AdminRequest`);
+      console.log("helo", res);
+  
+      // Always set the note, even if admins are empty
+      setNote(res.data?.note || "");
+  
       if (res.data.success) {
-        // console.log(res.data.data,"Abh");
-        setAdmins(res.data.data);
-        console.log(admins);
-
+        setAdmins(res.data?.data || []);
       }
     } catch (err) {
       console.error("Error fetching admin requests:", err);
+      setNote("⚠️ Failed to fetch admin requests.");
     }
   };
+  
   
   useEffect(() => {
     fetchAdmins(); // now it still works inside useEffect
@@ -104,6 +110,13 @@ const ManageAdmin = () => {
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold text-gray-800 mb-2">Manage Admin</h1>
+      {note && (
+  <div className="mb-4 inline-block rounded-xl bg-gradient-to-r from-yellow-300 via-pink-200 to-purple-200 px-4 py-2 text-sm text-gray-800 shadow-md border border-purple-300">
+    {note}
+  </div>
+)}
+
+
       
 
       <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">

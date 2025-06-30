@@ -1,6 +1,13 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../context/AuthProvider";
+import { useAuth1 } from "../context/AuthProvider1";
+import { useAuth2 } from "../context/AuthProvider2";
+import { toast } from "react-hot-toast";
 const Search = () => {
+  const [authUser] = useAuth();
+  const [authAdmin] = useAuth1();
+  const [authAdmin2] = useAuth2();
   const { t, i18n } = useTranslation();
   
   const changeLanguage = (lng) => {
@@ -38,29 +45,39 @@ const Search = () => {
                 </p>
               </div>
 
-              <button className="w-full flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:shadow-xl relative overflow-hidden group">
-                {/* Glow hover effect */}
-                <span className="absolute inset-0 bg-white opacity-10 group-hover:opacity-20 transition duration-500 rounded-full"></span>
+              <button
+  onClick={() => {
+    if (!authUser && !authAdmin && !authAdmin2) {
+      toast.error("Please Login First");
+    } else {
+      // Add your logic here
+    }
+  }}
+  className="w-full flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:shadow-xl relative overflow-hidden group"
+>
+  {/* Glow hover effect */}
+  <span className="absolute inset-0 bg-white opacity-10 group-hover:opacity-20 transition duration-500 rounded-full"></span>
 
-                {/* Animated Icon */}
-                <span className="hidden md:inline">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 animate-spin group-hover:animate-none"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M9 2a7 7 0 105.472 12.606l3.326 3.327a1 1 0 001.414-1.414l-3.327-3.326A7 7 0 009 2zM4 9a5 5 0 1110 0A5 5 0 014 9z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </span>
+  {/* Animated Icon */}
+  <span className="hidden md:inline">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-5 w-5 animate-spin group-hover:animate-none"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+    >
+      <path
+        fillRule="evenodd"
+        d="M9 2a7 7 0 105.472 12.606l3.326 3.327a1 1 0 001.414-1.414l-3.327-3.326A7 7 0 009 2zM4 9a5 5 0 1110 0A5 5 0 014 9z"
+        clipRule="evenodd"
+      />
+    </svg>
+  </span>
 
-                {/* Button Text */}
-                <span>{t("sd")}</span>
-              </button>
+  {/* Button Text */}
+  <span>{t("sd")}</span>
+</button>
+
             </div>
           </div>
         </div>

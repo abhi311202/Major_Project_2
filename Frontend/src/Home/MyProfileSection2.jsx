@@ -84,7 +84,7 @@ const MyProfileSection2 = () => {
   return (
     <div className="p-6 w-full">
       {/* Top Row Cards */}
-      <div className="grid grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-4 gap-4 mb-8">
       <div
           className={`bg-white p-4 rounded-xl shadow text-center ${gradientHover}`}
         >
@@ -98,15 +98,11 @@ const MyProfileSection2 = () => {
           className={`bg-white p-4 rounded-xl shadow text-center ${gradientHover}`}
         >
           <div className="text-xl font-bold text-black">15</div>
-          <div className="text-sm text-black mt-1">Total Admin</div>
+          <div className="text-sm text-black mt-1">Incoming Requests
+          for Admin</div>
         </div>
 
-        <div
-          className={`bg-white p-4 rounded-xl shadow text-center ${gradientHover}`}
-        >
-          <div className="text-xl font-bold text-black">120</div>
-          <div className="text-sm text-black mt-1">Total Users</div>
-        </div>
+        
   <div className={`bg-white p-4 rounded-xl shadow text-center ${gradientHover}`}>
         <div className="text-xl font-bold mb-4 flex items-center justify-center gap-2">
           Threshold <Pencil size={18} onClick={() => setShowModal(true)} />

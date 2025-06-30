@@ -5,7 +5,7 @@
     "team": "Team",
     "about": "About",
     "userLogin": "User Login",
-    "login": "Login",
+    "login": "Admin Login",
     "dashboard": "Dashboard",
     "welcomelegalai":"Transform legal workflows with AI-driven solutions that automate the summarization and classification of legal documents, enhancingaccuracy and efficiency.",
     "wt":"Welcome to",
@@ -51,6 +51,11 @@
       "title": "Language Support",
       "heading": "Language Translation.",
       "description": "Translate legal content across multiple languages."
+    },
+    "ColpaliRAG": {
+      "title": "Vision RAG",
+      "heading": "Advanced RAG Using Colpali.",
+      "description": "Smart RAG-Based Document Solution via Colpali System."
     }
   },
   "learnMore": "Learn More",
@@ -122,7 +127,7 @@
   "eypn": "Enter Phone Number",
   "eyp": "Enter Your Password",
   "dob": "Date of Birth",
-  "r": "Register",
+  "r": "User Register",
   "sal":"Super Admin Login",
   "logout":"Logout",
   "db":"Dashboard",
@@ -263,7 +268,7 @@
   "changePhone": "Change Phone No",
   "servicesPageTitle": "Services",
   "viewService": "View service",
-  "services": {
+  "services1": {
     "ragSingleDoc": {
       "title": "RAG on Specific Doc",
       "category": "Service",

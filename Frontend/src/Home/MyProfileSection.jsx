@@ -115,7 +115,7 @@ const MyProfileSection = () => {
       </div>
 
       {/* Top Cards */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-2 gap-4 mb-8">
         <div className={`bg-white p-4 rounded-xl dark:bg-black dark:text-white shadow text-center ${gradientHover}`}>
           <div className="text-xl font-bold text-black dark:text-white">
           {myObject.created_at?.split("T")[0]}
@@ -127,10 +127,7 @@ const MyProfileSection = () => {
           <div className="text-xl font-bold text-black dark:text-white">15</div>
           <div className="text-sm text-black mt-1 dark:text-white">{t("Doc Uploaded")}</div>
         </div>
-        <div className={`bg-white p-4 rounded-xl shadow text-center dark:bg-black dark:text-white ${gradientHover}`}>
-          <div className="text-xl font-bold text-black dark:text-white">5</div>
-          <div className="text-sm text-black mt-1 dark:text-white">{t("Rating")}</div>
-        </div>
+        
       </div>
 
       {/* Profile Fields */}
@@ -157,12 +154,7 @@ const MyProfileSection = () => {
 
       {/* Buttons */}
       <div className="flex flex-wrap gap-4 pl-4 mt-4">
-        <button className="bg-black text-white font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-300 hover:bg-gradient-to-r hover:from-green-400 hover:via-blue-500 hover:to-purple-600">
-          {t("Change Password")}
-        </button>
-        <button className="bg-black text-white font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-300 hover:bg-gradient-to-r hover:from-green-400 hover:via-blue-500 hover:to-purple-600">
-          {t("Edit Profile")}
-        </button>
+        
         <button
           className="bg-black text-white font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-300 hover:bg-gradient-to-r hover:from-green-400 hover:via-blue-500 hover:to-purple-600"
           onClick={handleSuperAdminRequest}

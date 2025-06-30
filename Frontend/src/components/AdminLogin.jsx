@@ -62,14 +62,14 @@ const UserLogin = () => {
         <h2 className="title">{t("al")}</h2>
 
         <div className="form-group">
-        <label>{t("username")}</label>
+        <label>UserName/Email</label>
           <div className="input-wrapper">
             <svg height={20} width={20} viewBox="0 0 32 32" fill="currentColor">
               <path d="..." />
             </svg>
             <input
             type="text"
-            placeholder={t("usernamePlaceholder")}
+            placeholder="Enter UserName/Email"
             {...register("username", { required: true })}
           />
           </div>

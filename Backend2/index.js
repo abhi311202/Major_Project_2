@@ -85,18 +85,9 @@ const port = process.env.PORT || 4001;
 
 // // ✅ Catch-all for SPA client-side routing
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../Frontend/dist/index.html"));
+  res.send("Hello Abiiii!");
 });
 
-
-// DB connection
-connectMongo();
-
-// API Routes
-// app.get("/", (req, res) => {
-//   res.send("Hello Abi!");
-// });
-  
 app.use("/User", userRoutes);
 app.use("/Admin", adminRoutes);
 app.use("/SuperAdmin", superAdminRoutes);

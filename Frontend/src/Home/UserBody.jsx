@@ -11,10 +11,16 @@ import {
   FiShoppingCart,
   FiTag,
   FiUsers,
+  FiSearch,
+  FiMessageCircle
 } from "react-icons/fi";
+import { MdQuestionAnswer } from "react-icons/md"; // ✅ Best Q&A-specific icon
+
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import UserMyProfileSection from "./UserMyProfileSection";
+import SearchDocument from "@/User/SearchDocument";
+import UserNotifications from "@/User/UserNotifications";
 
 export const UserBody = () => {
   const { t, i18n } = useTranslation();
@@ -36,10 +42,10 @@ export const UserBody = () => {
       <div className="flex-1 overflow-auto p-6 dark:bg-black">
         {selected === "Dashboard" ? (
           <UserMyProfileSection />
-        ): selected === "UploadNewDocument" ? (
-          <UploadNewDocument />
-        ): selected === "UploadedDocument" ? (
-          <UploadedDocument />
+        ): selected === "Search Document" ? (
+          <SearchDocument />
+        ): selected === "Message Admin" ? (
+          <UserNotifications />
         ) : (
           <ExampleContent selected={selected} />
         )}
@@ -58,7 +64,68 @@ const Sidebar = ({ selected, setSelected }) => {
     console.log(selected);
   }, [selected]);
 
- 
+  return (
+   <motion.nav
+  layout
+  className="sticky top-0 h-screen shrink-0 border-r border-slate-300 bg-white p-2 
+             dark:bg-[#1e1e2f] dark:border-slate-700 dark:text-white"
+  style={{
+    width: open ? "300px" : "fit-content",
+  }}
+>
+  {/* <TitleSection open={open} /> */}
+
+  <div className="space-y-1">
+    <Option
+      Icon={FiHome}
+      title="Dashboard"
+      selected={selected}
+      setSelected={setSelected}
+      open={open}
+      label={t("db")}
+    />
+    <Option
+      Icon={FiSearch}
+      title="Search Document"
+      selected={selected}
+      setSelected={setSelected}
+      open={open}
+      notifs={3}
+      label="Search Document"
+    />
+    <Option
+      Icon={FiMessageCircle}
+      title="Message Admin"
+      selected={selected}
+      setSelected={setSelected}
+      open={open}
+      notifs={3}
+      label="Message Admin"
+    />
+    <Option
+      Icon={MdQuestionAnswer}
+      title="Q&A"
+      selected={selected}
+      setSelected={setSelected}
+      open={open}
+      notifs={3}
+      label="Q&A"
+    />
+    <Option
+      Icon={MdQuestionAnswer}
+      title="Vision RAG"
+      selected={selected}
+      setSelected={setSelected}
+      open={open}
+      notifs={3}
+      label="Vision RAG"
+    />
+  </div>
+
+  <ToggleClose open={open} setOpen={setOpen} />
+</motion.nav>
+
+  );
 };
 
 const Option = ({ Icon, title, label, selected, setSelected, open, notifs }) => {

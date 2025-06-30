@@ -7,6 +7,7 @@ const ManageSuperAdmin = () => {
   const [removedId, setRemovedId] = useState(null); // To track which card is being removed
   const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
 
+
   const fetchAdmins = async () => {
     try {
       const res = await axios.get(`${baseURL}/SuperAdmin/super-admin-requests`);
@@ -26,34 +27,43 @@ const ManageSuperAdmin = () => {
   }, []);
   
 
- const handleApprove = async (admin) => {
-  const superAdmin = JSON.parse(localStorage.getItem("SuperAdmin"));
+  const handleApprove = async (admin) => {
+    const superAdmin = JSON.parse(localStorage.getItem("SuperAdmin"));
+   
+    console.log("dsaw",admin.id);
 
- console.log("Sending approval payload:", {
-    requestId: admin.id,              // ✅ this should match the backend DB
-    superAdminId: superAdmin?.id
-  });
-
-  try {
-    const res = await axios.post(`${baseURL}/SuperAdmin/approve-super-admin-request`, {
+    if (!admin?.id || !superAdmin?.id) {
+      toast.error("Missing admin or super admin ID");
+      return;
+    }
+  
+    console.log("Approving super admin:", {
       requestId: admin.id,
       superAdminId: superAdmin.id,
     });
-
-    toast.success(res.data.message);
-        // 2. Send welcome email
-    await axios.post(`${baseURL}/Services/send-welcome-email`, {
-      email: admin.email,
-      username: admin.username,
-      type: "WelcomeSuperAdminEmail"
-    });
-
-    toast.success("Welcome email sent!");
-  } catch (err) {
-    console.error("Approval error:", err.response?.data || err.message);
-    toast.error("Failed to approve or send welcome email");
-  }
-};
+  
+    try {
+      const res = await axios.post(`${baseURL}/SuperAdmin/approve-super-admin-request`, {
+        requestId: admin.id,
+        superAdminId: superAdmin.id,
+      });
+  
+      toast.success(res.data.message);
+  
+      await axios.post(`${baseURL}/Services/send-welcome-email`, {
+        email: admin.email,
+        username: admin.username
+      });
+  
+      toast.success("Welcome email sent!");
+  
+      fetchAdmins(); // Refresh
+    } catch (err) {
+      console.error("Approval error:", err.response?.data || err.message);
+      toast.error(err.response?.data?.message || "Approval failed");
+    }
+  };
+  
 
 
 
