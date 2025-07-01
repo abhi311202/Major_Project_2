@@ -9,6 +9,7 @@ import { getDocumentsByOwnerIdController } from "../Controllers/getDocumentByOwn
 import { deleteDocumentByIdController } from "../Controllers/deleteDocumentByIdController.js";
 import { uploadDocS3PdfController } from "../Controllers/uploadDocS3PdfController.js";
 import { deleteS3DocPdfController } from "../Controllers/deleteS3DocPdfController.js";
+import { duplicateDocCheckController } from "../Controllers/duplicateDocCheckController.js";
 
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -22,6 +23,7 @@ router.get("/get-documents", getDocumentController);
 router.post("/get-document-by-id", getDocumentByIdController);
 router.post("/get-document-by-owner-id", getDocumentsByOwnerIdController);
 router.post("/delete-document-by-id", deleteDocumentByIdController);
+router.post("/duplicate-doc-check", duplicateDocCheckController);
 
 // pdf-doc upload to S3
 router.post("/upload-doc-pdf", upload.single("file"), uploadDocS3PdfController);
