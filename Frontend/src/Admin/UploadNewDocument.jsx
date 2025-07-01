@@ -743,12 +743,16 @@ console.log("hllllooo new "+PdfUrl)
   
     const arrayBuffer = await selected.arrayBuffer();
   
-    // 🔐 SHA-256 hash
+    // SHA-256 hash
     const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHexValue = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     setHashHex(hashHexValue);
     console.log('SHA-256 Hash:', hashHexValue);
+  
+    // 👇 Move finalDoc to outer scope
+    let finalDoc = null;
+    let allTexts = [];
   
     if (selected.type === "application/pdf") {
       try {
@@ -765,7 +769,7 @@ console.log("hllllooo new "+PdfUrl)
           const wordCount = pageText.split(/\s+/).filter(Boolean).length;
           const charCount = pageText.length;
           const sentenceCount = (pageText.match(/[.!?]+/g) || []).length;
-          const tokenCount = wordCount; // Adjust if using NLP tokenizers
+          const tokenCount = wordCount;
   
           pages.push({
             page_number: i,
@@ -777,8 +781,8 @@ console.log("hllllooo new "+PdfUrl)
           });
         }
   
-        const finalDoc = {
-          doc_id: 12345, // You can generate this dynamically
+        finalDoc = {
+          doc_id: 12345,
           doc_name: selected.name,
           metadata: {},
           entities: {},
@@ -787,20 +791,18 @@ console.log("hllllooo new "+PdfUrl)
   
         console.log("📄 Extracted Document JSON:", finalDoc);
         setExtractedJson(finalDoc);
-        
   
-        // 👇 For your pagination view
-        const allTexts = pages.map(p => p.text || "[Blank Page]");
-        setPageContents(allTexts); // page-wise for pagination
-        setDocumentContent(allTexts.join("\n\n")); // full content
-        setContent(allTexts.join("\n\n")); // For hidden form field or search
-        setValue("content", allTexts.join("\n\n")); // Sync with form
+        allTexts = pages.map(p => p.text || "[Blank Page]");
+        const combinedText = allTexts.join("\n\n");
+        setPageContents(allTexts);
+        setDocumentContent(combinedText);
+        setContent(combinedText);
+        setValue("content", combinedText);
   
       } catch (err) {
         console.error("❌ PDF parsing error:", err);
       }
     } else {
-      // 📝 For plain text file fallback
       const reader = new FileReader();
       reader.onload = () => {
         const content = reader.result;
@@ -811,32 +813,34 @@ console.log("hllllooo new "+PdfUrl)
       reader.readAsText(selected);
     }
   
-    // 🧠 Call the Scope Validation API after parsing
-  try {
-    const response = await axios.post(
-      "http://localhost:4001/AI-Services/document-scope-validation",
-      finalDoc, // ✅ Send full doc structure
-      {
-        headers: {
-          "Content-Type": "application/json"
-        }
+    // ✅ Now finalDoc is available here
+    if (finalDoc) {
+      try {
+        const response = await axios.post(
+          "http://localhost:4001/AI-Services/document-scope-validation",
+          finalDoc,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+    
+        console.log("📥 Scope Validation API Success:", response.data);
+    
+        const simulatedResponseValue = response.data?.value ?? 0;
+        setResponseValue(simulatedResponseValue);
+        setIsInScope(expectedValue !== null && simulatedResponseValue >= expectedValue);
+    
+      } catch (apiError) {
+        console.error("❌ Scope Validation API Error:", apiError);
       }
-    );
+    }
     
-    console.log("📥 Scope Validation Response:", response.data);
-    
-    // Adjust this based on your actual response format
-    const simulatedResponseValue = response.data?.value || 0;
-    setResponseValue(simulatedResponseValue);
-    setIsInScope(expectedValue !== null && simulatedResponseValue >= expectedValue);
-    
-
-  } catch (apiError) {
-    console.error("❌ Scope Validation API Error:", apiError);
-  }
   
     setLoading(false);
   };
+  
   
   
 
