@@ -2,7 +2,6 @@ import client from "../../../config/sqlDB.js";
 import nodemailer from "nodemailer";
 import { Super_Admin_Request_Email } from "../../../Services/Src/Super_Admin_Request_Email.js";
 export const sendEmailsTOSuperAdminsModel = async (admin_id) => {
-  // console.log(requestDetails);
   try {
     const allSA = await client.query(
       "SELECT email FROM super_admin WHERE is_active = TRUE AND is_delete = FALSE"
@@ -32,6 +31,7 @@ const sendEmail = async (emails, requestDetails) => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    tls: { rejectUnauthorized: process.env.EMAIL_TSL },
   });
   const mailOptions = {
     from: process.env.EMAIL_USER,
