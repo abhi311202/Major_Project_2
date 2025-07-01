@@ -21,6 +21,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 function UploadNewDocument() {
   const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
   const [selectedFileName, setSelectedFileName] = useState('');
+  const [extractedJson, setExtractedJson] = useState(null);
 
   const editor = useRef(null);
   const [content, setContent] = useState("");
@@ -68,7 +69,7 @@ function UploadNewDocument() {
   const [fileName, setFileName] = useState("");
   const [pageContents, setPageContents] = useState([]); // Array of strings, one per page
   const [currentPageIndex, setCurrentPageIndex] = useState(0); // Currently visible page
-
+ 
 
 
 
@@ -740,8 +741,9 @@ console.log("hllllooo new "+PdfUrl)
     setLoading(true);
     setSelectedFileName(selected.name);
   
-    // 1. Generate SHA-256 hash
     const arrayBuffer = await selected.arrayBuffer();
+  
+    // 🔐 SHA-256 hash
     const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHexValue = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
@@ -752,25 +754,53 @@ console.log("hllllooo new "+PdfUrl)
       try {
         const typedArray = new Uint8Array(arrayBuffer);
         const pdf = await pdfjsLib.getDocument(typedArray).promise;
-    
-        const allPages = [];
-    
+  
+        const pages = [];
+  
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const textContent = await page.getTextContent();
-          const pageText = textContent.items.map(item => item.str).join(" ");
-          allPages.push(pageText);
+          const pageText = textContent.items.map(item => item.str).join(" ").trim();
+  
+          const wordCount = pageText.split(/\s+/).filter(Boolean).length;
+          const charCount = pageText.length;
+          const sentenceCount = (pageText.match(/[.!?]+/g) || []).length;
+          const tokenCount = wordCount; // Adjust if using NLP tokenizers
+  
+          pages.push({
+            page_number: i,
+            page_char_count: charCount,
+            page_token_count: tokenCount,
+            page_word_count: wordCount,
+            page_sentence_count_raw: sentenceCount,
+            text: pageText
+          });
         }
-    
-        setPageContents(allPages); // Store all pages
-        setDocumentContent(allPages.join("\n\n")); // Optionally, full content
-        setContent(allPages.join("\n\n"));
-        setValue("content", allPages.join("\n\n")); // Hidden field storing all for form submit
+  
+        const finalDoc = {
+          doc_id: 12345, // You can generate this dynamically
+          doc_name: selected.name,
+          metadata: {},
+          entities: {},
+          pages
+        };
+  
+        console.log("📄 Extracted Document JSON:", finalDoc);
+        setExtractedJson(finalDoc);
+        
+  
+        // 👇 For your pagination view
+        const allTexts = pages.map(p => p.text || "[Blank Page]");
+        setPageContents(allTexts); // page-wise for pagination
+        setDocumentContent(allTexts.join("\n\n")); // full content
+        setContent(allTexts.join("\n\n")); // For hidden form field or search
+        setValue("content", allTexts.join("\n\n")); // Sync with form
+  
       } catch (err) {
-        console.error("PDF parsing error:", err);
+        console.error("❌ PDF parsing error:", err);
       }
-    }
-     else {
+    } else {
+      // 📝 For plain text file fallback
       const reader = new FileReader();
       reader.onload = () => {
         const content = reader.result;
@@ -781,12 +811,33 @@ console.log("hllllooo new "+PdfUrl)
       reader.readAsText(selected);
     }
   
-    const simulatedResponseValue = 75;
+    // 🧠 Call the Scope Validation API after parsing
+  try {
+    const response = await axios.post(
+      "http://localhost:4001/AI-Services/document-scope-validation",
+      finalDoc, // ✅ Send full doc structure
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    
+    console.log("📥 Scope Validation Response:", response.data);
+    
+    // Adjust this based on your actual response format
+    const simulatedResponseValue = response.data?.value || 0;
     setResponseValue(simulatedResponseValue);
     setIsInScope(expectedValue !== null && simulatedResponseValue >= expectedValue);
+    
+
+  } catch (apiError) {
+    console.error("❌ Scope Validation API Error:", apiError);
+  }
   
     setLoading(false);
   };
+  
   
 
   
@@ -1461,62 +1512,84 @@ return (
 
                     {/* Content */}
                     <div>
-  <label className="block text-gray-600 dark:text-white font-medium mb-1">
-    Document Content (Page {currentPageIndex + 1} of {pageContents.length})
-  </label>
+                    <label className="block text-gray-600 dark:text-white font-medium mb-1">
+  Document Content {pageContents.length > 0 && `(Page ${currentPageIndex + 1} of ${pageContents.length})`}
+</label>
 
-  {pageContents.length > 0 ? (
-    <>
-      {/* Fixed height + scrollbar for content box */}
-      <div className="w-full h-64 p-4 border rounded-md overflow-y-auto dark:bg-gray-900 dark:text-white whitespace-pre-wrap">
-        {pageContents[currentPageIndex]}
-      </div>
+{pageContents.length > 0 ? (
+  <>
+    {/* Page Content Display (with scrollbar) */}
+    <div className="w-full h-64 p-4 border rounded-md overflow-y-auto dark:bg-gray-900 dark:text-white whitespace-pre-wrap">
+      {pageContents[currentPageIndex] || "[No text on this page]"}
+    </div>
 
-      {/* Pagination Controls Styled Like Image */}
-      <div className="flex items-center justify-center gap-4 mt-4">
-        <button
-          onClick={() => setCurrentPageIndex(prev => Math.max(prev - 1, 0))}
-          disabled={currentPageIndex === 0}
-          className={`w-10 h-10 flex items-center justify-center border rounded ${
-            currentPageIndex === 0
-              ? "text-black-400 border-black-400 cursor-not-allowed"
-              : "text-black-700 border-black-700 hover:bg-black-50"
-          }`}
-        >
-          <span className="text-xl">&lt;</span>
-        </button>
+    {/* Pagination Controls */}
+    <div className="flex items-center justify-center gap-4 mt-4">
+      <button
+        onClick={() => setCurrentPageIndex(prev => Math.max(prev - 1, 0))}
+        disabled={currentPageIndex === 0}
+        className={`w-10 h-10 flex items-center justify-center border rounded ${
+          currentPageIndex === 0
+            ? "text-black-400 border-black-400 cursor-not-allowed"
+            : "text-black-700 border-black-700 hover:bg-black-50"
+        }`}
+      >
+        <span className="text-xl">&lt;</span>
+      </button>
 
-        <span className="text-lg text-gray-800 dark:text-white">
-          {currentPageIndex + 1} of {pageContents.length}
-        </span>
+      <span className="text-lg text-gray-800 dark:text-white">
+        {currentPageIndex + 1} of {pageContents.length}
+      </span>
 
-        <button
-          onClick={() =>
-            setCurrentPageIndex(prev => Math.min(prev + 1, pageContents.length - 1))
-          }
-          disabled={currentPageIndex === pageContents.length - 1}
-          className={`w-10 h-10 flex items-center justify-center border rounded ${
-            currentPageIndex === pageContents.length - 1
-              ? "text-black-400 border-black-400 cursor-not-allowed"
-              : "text-black-700 border-black-700 hover:bg-black-50"
-          }`}
-        >
-          <span className="text-xl">&gt;</span>
-        </button>
-      </div>
-    </>
-  ) : (
-    <textarea
-      rows="10"
-      value={content}
-      onChange={(e) => {
-        setContent(e.target.value);
-        setValue("content", e.target.value);
+      <button
+        onClick={() => setCurrentPageIndex(prev => Math.min(prev + 1, pageContents.length - 1))}
+        disabled={currentPageIndex === pageContents.length - 1}
+        className={`w-10 h-10 flex items-center justify-center border rounded ${
+          currentPageIndex === pageContents.length - 1
+            ? "text-black-400 border-black-400 cursor-not-allowed"
+            : "text-black-700 border-black-700 hover:bg-black-50"
+        }`}
+      >
+        <span className="text-xl">&gt;</span>
+      </button>
+    </div>
+    {extractedJson && (
+  <div className="flex justify-center mt-4">
+    <button
+      onClick={() => {
+        const blob = new Blob([JSON.stringify(extractedJson, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${extractedJson.doc_name.replace(/\.[^/.]+$/, "")}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
       }}
-      {...register("content", { required: true })}
-      className="w-full p-4 border rounded-md resize-none dark:bg-black dark:border-gray-600 dark:text-white"
-    />
-  )}
+      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+    >
+      ⬇️ Download JSON
+    </button>
+  </div>
+)}
+
+  </>
+) : (
+  // Fallback for non-PDF or empty document
+  <textarea
+    rows="10"
+    value={content}
+    onChange={(e) => {
+      setContent(e.target.value);
+      setValue("content", e.target.value);
+    }}
+    {...register("content", { required: true })}
+    className="w-full p-4 border rounded-md resize-none dark:bg-black dark:border-gray-600 dark:text-white"
+    placeholder="Enter document content here..."
+  />
+)}
+
 
   {errors.content && (
     <span className="text-sm text-red-500">This field is required</span>

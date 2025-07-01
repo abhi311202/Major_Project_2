@@ -34,6 +34,7 @@ const sendEmail = async (Admin, SuperAdmin) => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    tls: { rejectUnauthorized: process.env.EMAIL_TSL },
   });
   const mailOptions = {
     from: process.env.EMAIL_USER,

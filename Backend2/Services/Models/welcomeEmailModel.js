@@ -38,6 +38,7 @@ export const sendWelcomeEmail = async (email, username, type) => {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+      tls: { rejectUnauthorized: process.env.EMAIL_TSL },
     });
 
     const mailOptions = {

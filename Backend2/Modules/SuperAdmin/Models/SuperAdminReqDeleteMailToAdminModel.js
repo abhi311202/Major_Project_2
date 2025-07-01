@@ -1,21 +1,26 @@
 import client from "../../../config/sqlDB.js";
 import nodemailer from "nodemailer";
 import moment from "moment";
-import { Admin_Request_Reject_Email } from "../../../Services/Src/Admin_Request_Reject_Email.js";
-export const reqDeletionMailToAdminApplicant = async (Pending_Request_id) => {
+import { Super_Admin_Request_Reject_Email } from "../../../Services/Src/Super_Admin_Request_Reject_Email.js";
+
+export const SuperAdminReqDeleteMailToAdmin = async (adminId, requestId) => {
   try {
+    const A = await client.query("SELECT name,email from admin WHERE id=$1", [
+      adminId,
+    ]);
+
     const pendingReq = await client.query(
-      "SELECT name,email,created_at from pending_admin_req WHERE id=$1",
-      [Pending_Request_id]
+      "SELECT created_at from pending_sa_req WHERE id=$1",
+      [requestId]
     );
-    await sendEmail(pendingReq.rows[0]);
+    await sendEmail(A.rows[0], pendingReq.rows[0]);
   } catch (error) {
     console.log(error);
     throw error;
   }
 };
 
-const sendEmail = async (pendingRequest) => {
+const sendEmail = async (Admin, pendingRequest) => {
   // ...same as before...
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -27,11 +32,11 @@ const sendEmail = async (pendingRequest) => {
   });
   const mailOptions = {
     from: process.env.EMAIL_USER,
-    to: pendingRequest.email,
-    subject: "Admin Request Rejected",
+    to: Admin.email,
+    subject: "Super Admin Request Rejected",
     // text: ``,
-    html: Admin_Request_Reject_Email.replace(/{{name}}/g, pendingRequest.name)
-      .replace(/{{email}}/g, pendingRequest.email)
+    html: Super_Admin_Request_Reject_Email.replace(/{{name}}/g, Admin.name)
+      .replace(/{{email}}/g, Admin.email)
       .replace(
         /{{application_date}}/g,
         moment(pendingRequest.created_at).format("DD MMM YYYY, hh:mm A")
