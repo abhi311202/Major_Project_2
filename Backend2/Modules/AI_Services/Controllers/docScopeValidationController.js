@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export const docScopeValidation = async (req, res) => {
-  const { doc_id, doc_name, metadata, entities, pages } = req.body;
-  if (!doc_id && !doc_name && !metadata && !entities && !pages) {
+  const { doc_id, doc_name, metadata, entities, repetition, pages } = req.body;
+  if (!doc_id && !doc_name && !metadata && !entities && !repetition && !pages) {
     // all fields are required
     return res.status(400).json({
       error: "All fields are required!",
