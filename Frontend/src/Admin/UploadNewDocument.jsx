@@ -241,87 +241,87 @@ function UploadNewDocument() {
 
 
   // Stimulate classification process
-  const handleClassify = async () => {
-    console.log("Quick Classify");
-    setLoading1(true); // Set loading to true when request starts
-    setClassification(null); // Clear previous classification
-    setClassificationReason(null); // Clear previous reason
-    setClassificationError(null); // Clear previous error
+  // const handleClassify = async () => {
+  //   console.log("Quick Classify");
+  //   setLoading1(true); // Set loading to true when request starts
+  //   setClassification(null); // Clear previous classification
+  //   setClassificationReason(null); // Clear previous reason
+  //   setClassificationError(null); // Clear previous error
 
-    let pages = [];
+  //   let pages = [];
 
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(file);
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.readAsArrayBuffer(file);
 
-      reader.onload = async function () {
-        const pdfData = new Uint8Array(reader.result);
+  //     reader.onload = async function () {
+  //       const pdfData = new Uint8Array(reader.result);
 
-        // try {
-        //   const pdf = await getDocument({
-        //     data: pdfData,
-        //     standardFontDataUrl: "node_modules/pdfjs-dist/standard_fonts/",
-        //   }).promise;
+  //       // try {
+  //       //   const pdf = await getDocument({
+  //       //     data: pdfData,
+  //       //     standardFontDataUrl: "node_modules/pdfjs-dist/standard_fonts/",
+  //       //   }).promise;
 
-        //   for (let i = 1; i <= pdf.numPages; i++) {
-        //     const page = await pdf.getPage(i);
-        //     const textContent = await page.getTextContent();
-        //     const text = textContent.items.map((item) => item.str).join(" ");
+  //       //   for (let i = 1; i <= pdf.numPages; i++) {
+  //       //     const page = await pdf.getPage(i);
+  //       //     const textContent = await page.getTextContent();
+  //       //     const text = textContent.items.map((item) => item.str).join(" ");
 
-        //     pages.push({
-        //       page_number: i,
-        //       page_char_count: text.length,
-        //       page_token_count: text.length / 4,
-        //       page_word_count: text.split(" ").length,
-        //       page_sentence_count_raw: text.split(".").length,
-        //       text: cleanString(text),
-        //     });
-        //   }
+  //       //     pages.push({
+  //       //       page_number: i,
+  //       //       page_char_count: text.length,
+  //       //       page_token_count: text.length / 4,
+  //       //       page_word_count: text.split(" ").length,
+  //       //       page_sentence_count_raw: text.split(".").length,
+  //       //       text: cleanString(text),
+  //       //     });
+  //       //   }
 
-        //   const jsonData1 = {
-        //     doc_id: 12345, // You might want to generate a unique ID
-        //     doc_name: file.name,
-        //     metadata: {},
-        //     pages: pages,
-        //   };
+  //       //   const jsonData1 = {
+  //       //     doc_id: 12345, // You might want to generate a unique ID
+  //       //     doc_name: file.name,
+  //       //     metadata: {},
+  //       //     pages: pages,
+  //       //   };
 
-        //   // Send data to the classification API
-        //   // const response = await axios.post(
-        //   //   "http://52.66.174.249:8000/classify",
-        //   //   jsonData1
-        //   // );
+  //       //   // Send data to the classification API
+  //       //   // const response = await axios.post(
+  //       //   //   "http://52.66.174.249:8000/classify",
+  //       //   //   jsonData1
+  //       //   // );
 
-        //   // console.log(JSON.stringify(response.data.classification));
+  //       //   // console.log(JSON.stringify(response.data.classification));
 
-        //   // const classificationvalue = "• " + response.data.classification.category.join("<br/>• ");
-        //   // console.log(classificationvalue);
+  //       //   // const classificationvalue = "• " + response.data.classification.category.join("<br/>• ");
+  //       //   // console.log(classificationvalue);
 
-        //   // Update state with classification results
+  //       //   // Update state with classification results
 
-        //   setClassification(
-        //     // markdownToPlainText(JSON.stringify(response.data.classification.category))
-        //     // classificationvalue
-        //     response.data.classification.category.join("\n")
-        //   );
-        //   setClassificationReason(
-        //     markdownToPlainText(
-        //       JSON.stringify(response.data.classification.reason)
-        //     )
-        //   );
-        // } catch (err) {
-        //   console.error("Error during classification:", err);
-        //   setClassificationError(
-        //     "Failed to classify the document. Please try again."
-        //   );
-        // } finally {
-        //   setLoading1(false); // Unset loading state
-        // }
-      };
-    } else {
-      setClassificationError("Please upload a file before classification.");
-      setLoading1(false);
-    }
-  };
+  //       //   setClassification(
+  //       //     // markdownToPlainText(JSON.stringify(response.data.classification.category))
+  //       //     // classificationvalue
+  //       //     response.data.classification.category.join("\n")
+  //       //   );
+  //       //   setClassificationReason(
+  //       //     markdownToPlainText(
+  //       //       JSON.stringify(response.data.classification.reason)
+  //       //     )
+  //       //   );
+  //       // } catch (err) {
+  //       //   console.error("Error during classification:", err);
+  //       //   setClassificationError(
+  //       //     "Failed to classify the document. Please try again."
+  //       //   );
+  //       // } finally {
+  //       //   setLoading1(false); // Unset loading state
+  //       // }
+  //     };
+  //   } else {
+  //     setClassificationError("Please upload a file before classification.");
+  //     setLoading1(false);
+  //   }
+  // };
 
   // const handleEntitymeta = async () => {
   //   console.log("Meta and Entity extraction");
@@ -943,7 +943,64 @@ console.log("hllllooo new "+PdfUrl)
   };
   
 
+  const handleSummarizaton = async () => {
+    if (!extractedJson) {
+      console.warn("⚠️ No extracted JSON found");
+      return;
+    }
+  
+    try {
+      const res = await axios.post(
+        "http://localhost:4001/AI-Services/summarization",
+        extractedJson,
+        { headers: { "Content-Type": "application/json" } }
+      );
+  
+      console.log("📥 Summarization API Response:", res.data);
+  
+      const summaryText = res.data?.data?.summarization;
 
+      console.log("📝 Summary Text:", summaryText);
+      setSummary(summaryText);
+      setValue("summary", summaryText);
+    } catch (error) {
+      console.error("❌ Error fetching data:", error);
+    }
+  };
+
+  const handleClassify = async () => {
+    if (!extractedJson) {
+      console.warn("⚠️ No extracted JSON found");
+      return;
+    }
+  
+    try {
+      const res = await axios.post(
+        "http://localhost:4001/AI-Services/classification",
+        extractedJson,
+        { headers: { "Content-Type": "application/json" } }
+      );
+  
+      console.log("📥 Classification API Response:", res.data);
+  
+      const categoryText = res.data?.threshold?.classification?.category?.[0] || "";
+      const reasonText = res.data?.threshold?.classification?.reason || "";
+      
+      console.log("📝 Classification Category:", categoryText);
+      console.log("📝 Classification Reason:", reasonText);
+      
+      setClassification(categoryText);
+      setClassificationReason(reasonText);
+      setValue("Class", categoryText);
+      setValue("ClassificationReason", reasonText);
+      
+  
+    } catch (error) {
+      console.error("❌ Error fetching classification:", error);
+    }
+  };
+  
+  
 return (
 <div className="flex min-h-screen max-h-max overflow-hidden ">
   <div className="flex flex-col items-center justify-start w-full p-4">
@@ -1550,7 +1607,7 @@ return (
 
           <div className="mt-6 flex flex-wrap gap-4">
   <button
-    onClick={handleShowResult}
+    onClick={handleClassify}
     className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
   >
     Show Result
@@ -1572,18 +1629,19 @@ return (
               Summary:
             </label>
             <div className="relative">
-              <textarea
-                rows="10"
-                defaultValue={summary}
-                onChange={(e) => {
-                  setSummary(e.target.value);
-                  setValue("summary", e.target.value);
-                }}
-                {...(loading ? {} : register("summary", { required: true }))}
-                className={`w-full p-3 border rounded-md resize-none dark:bg-black dark:border-gray-600 dark:text-white dark:bg-gray-800 dark:border-gray-700 dark:text-white${
-                  summarizationError ? "border-red-500" : ""
-                }`}
-              />
+            <textarea
+  rows="10"
+  value={summary} // controlled input instead of defaultValue
+  onChange={(e) => {
+    setSummary(e.target.value);
+    setValue("summary", e.target.value);
+  }}
+  {...(loading ? {} : register("summary", { required: true }))}
+  className={`w-full p-3 border rounded-md resize-none dark:bg-black dark:border-gray-600 dark:text-white dark:bg-gray-800 dark:border-gray-700 dark:text-white${
+    summarizationError ? "border-red-500" : ""
+  }`}
+/>
+
               {loading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-black/80">
                   <span className="text-2xl font-bold text-gray-600 dark:text-gray-300 animate-pulse">
@@ -1605,10 +1663,10 @@ return (
           </div>
           <div className="mt-6 flex flex-wrap gap-4">
           <button
-  onClick={handleEntityMetadataExtraction}
+  onClick={ handleSummarizaton}
   className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
 >
-  Show Result 2
+  Show Result
 </button>
 
   <button
