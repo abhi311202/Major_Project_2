@@ -790,6 +790,10 @@ console.log("hllllooo new "+PdfUrl)
         };
   
         console.log("📄 Extracted Document JSON:", finalDoc);
+        const sizeInBytes = JSON.stringify(finalDoc).length; // length in characters
+        const sizeInMB = sizeInBytes / (1024 * 1024); // convert bytes to MB
+        console.log(`Size of finalDoc: ${sizeInMB.toFixed(2)} MB`);
+        
         setExtractedJson(finalDoc);
   
         allTexts = pages.map(p => p.text || "[Blank Page]");
@@ -828,8 +832,10 @@ console.log("hllllooo new "+PdfUrl)
     
         console.log("📥 Scope Validation API Success:", response.data);
     
-        const simulatedResponseValue = response.data?.value ?? 0;
+        const simulatedResponseValue = response.data?.threshold ?? 0;
         setResponseValue(simulatedResponseValue);
+        console.log("fdffdggdfgd",expectedValue);
+        console.log("fdfsdfjsdfjdshjfsdjhfgd",simulatedResponseValue);
         setIsInScope(expectedValue !== null && simulatedResponseValue >= expectedValue);
     
       } catch (apiError) {
@@ -842,16 +848,124 @@ console.log("hllllooo new "+PdfUrl)
   };
   
   
+  const handleEntityMetadataExtraction = async () => {
+    if (!extractedJson) {
+      console.warn("⚠️ No extracted JSON found");
+      return;
+    }
+  
+    try {
+      const res = await axios.post(
+        "http://localhost:4001/AI-Services/entity-metadata-extraction",
+        extractedJson,
+        { headers: { "Content-Type": "application/json" } }
+      );
+  
+      // ✅ Get response safely
+      const responseData = res.data.data;
+      const entities = responseData.entities || {};
+      const metadata = responseData.metadata || {};
+  
+      // ✅ Log entities
+      console.log("📥 Raw API Response:", res.data);
+      console.log("📌 Entity Keys:", Object.keys(entities));
+      Object.keys(entities).forEach(key => {
+        console.log(`✅ Extracted entity → Key: "${key}", Value: "${entities[key]}"`);
+      });
+  
+      // ✅ Example fuzzy matching for entity key
+      const judgementKey = Object.keys(entities).find(key => key.toLowerCase().includes("judgement") && key.includes("DATE"));
+      console.log("🗓️ Fuzzy-matched Judgement Date Key:", judgementKey);
+      console.log("🗓️ Judgement Date:", entities[judgementKey]);
+  
+      // ✅ Log metadata
+      console.log("📌 Metadata Keys:", Object.keys(metadata));
+      Object.keys(metadata).forEach(key => {
+        console.log(`📑 Extracted metadata → Key: "${key}", Value: "${metadata[key]}"`);
+      });
+  
+      // ✅ Fuzzy match for LANGUAGE_OF_JUDGEMENT
+      const langKey = Object.keys(metadata).find(key => key.toLowerCase().includes("language"));
+      console.log("🌐 Matched Language Key:", langKey);
+      console.log("🌐 Language Value:", metadata[langKey]);
+  
+      // ✅ Map entity fields
+      const entityFields = {
+        "CASE_NO.": ["caseno", setCaseno],
+        "CASE_TYPE": ["casetype", setCasetype],
+        "CASE_STATUS": ["casestatus", setCasestatus],
+        "FILING _DATE": ["filingdate", setFilingdate],
+        "JUDGEMENT _DATE": ["judgmentdate", setJudgmentdate],
+        "COURT_NO.": ["courtno", setCourtno],
+        "COURT_NAME": ["courtname", setCourtname],
+        "BENCH": ["bench", setBench],
+        "PETITIONER:": ["petitioner", setPetitioner],
+        "RESPONDENT": ["respondent", setRespondent],
+        "ADV._OF_PETITIONER": ["advofpetitioner", setAdvofpetitioner],
+        "ADV._OF_RESPONDENT": ["advofrespondent", setAdvofrespondent],
+        "PREVIOUS_CASE_CITATION": ["prevcasecitation", setPrevcasecitation],
+        "PENALTY_DETAIL": ["penaltydetail", setPenaltydetail],
+        "HEAD_NOTE": ["headnote", setHeadnote],
+      };
+  
+      for (const key in entityFields) {
+        const [fieldName, setter] = entityFields[key];
+        const value = entities[key] || "";
+        console.log(`📦 Setting entity [${fieldName}] from key "${key}" → "${value}"`);
+        setter(value);
+        setValue(fieldName, value);
+      }
+  
+      // ✅ Map metadata fields
+      const metadataFields = {
+        "JUDGEMENT_AUTHOR": ["judgementauthor", setJudgementauthor],
+        "JUDGEMENT_TYPE": ["judgementtype", setJudgementtype],
+        "LANGUAGE_OF_JUDGEMENT": ["langofjudgement", setLangofjudgement],
+        "DATE_OF_HEARING": ["dateofhearing", setDateofhearing],
+        "DATE_OF_ORDER PRONOUNCEMENT": ["dateoforderpro", setDateoforderpro],
+        "BENCH_COMPOSITION": ["benchcomposition", setBenchcomposition],
+        "REFERRED ACTS": ["referredacts", setReferredacts],
+      };
+  
+      for (const key in metadataFields) {
+        const [fieldName, setter] = metadataFields[key];
+        const value = metadata[key] || "";
+        console.log(`📦 Setting metadata [${fieldName}] from key "${key}" → "${value}"`);
+        setter(value);
+        setValue(fieldName, value);
+      }
+  
+      console.log("✅ All fields populated.");
+    } catch (error) {
+      console.error("❌ Error fetching data:", error);
+    }
+  };
   
 
-  
-  
-  
 
 return (
 <div className="flex min-h-screen max-h-max overflow-hidden ">
   <div className="flex flex-col items-center justify-start w-full p-4">
-    
+  {extractedJson && (
+  <div className="flex justify-center mt-4">
+    <button
+      onClick={() => {
+        const blob = new Blob([JSON.stringify(extractedJson, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${extractedJson.doc_name.replace(/\.[^/.]+$/, "")}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }}
+      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+    >
+      ⬇️ Download JSON
+    </button>
+  </div>
+)}
     {/* File Chooser Always on Top */}
     <div className="w-full ml-[950px]">
   <label
@@ -1194,12 +1308,12 @@ return (
   </div>
 </div>
 <div className="mt-6 flex flex-wrap gap-4">
-  <button
-    onClick={handleShowResult}
-    className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
-  >
-    Show Result
-  </button>
+<button
+  onClick={handleEntityMetadataExtraction}
+  className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
+>
+  Show Result 1
+</button>
 
   <button
     onClick={handleClear_Keyentity}
@@ -1210,13 +1324,6 @@ return (
 </div>
 
 </div>
-
-
-
-
-
-
-
 
 {/* Meta Data */}
 
@@ -1496,12 +1603,12 @@ return (
             )}
           </div>
           <div className="mt-6 flex flex-wrap gap-4">
-  <button
-    onClick={handleShowResult}
-    className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
-  >
-    Show Result
-  </button>
+          <button
+  onClick={handleEntityMetadataExtraction}
+  className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
+>
+  Show Result 2
+</button>
 
   <button
     // onClick={handleClear}

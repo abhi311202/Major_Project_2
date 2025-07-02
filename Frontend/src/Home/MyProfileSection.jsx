@@ -64,7 +64,43 @@ const MyProfileSection = () => {
     }
   };
 
+ 
+
+  const getSuperAdminButtonText = () => {
+    if (superAdminStatus === "loading") return "Checking...";
+    if (superAdminStatus === "requested") return "Already Requested For SuperAdmin";
+    return "Request Super Admin Access";
+  };
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const res = await axios.post(`${baseURL}/Admin/super-admin-request-button-status`, {
+          adminId: profileData.adminId,
+        });
+
+        // if status is false → already requested
+        if (res.data.status === false) {
+          setSuperAdminStatus("requested");
+        } else {
+          setSuperAdminStatus("not_requested");
+        }
+      } catch (error) {
+        console.error("❌ Failed to fetch status:", error);
+        toast.error("Could not check request status.");
+        setSuperAdminStatus("not_requested");
+      }
+    };
+
+    checkStatus();
+  }, [baseURL, profileData.adminId]);
+
   const handleSuperAdminRequest = async () => {
+    if (superAdminStatus === "requested") {
+      toast.error("Request already exists in pending queue.");
+      return;
+    }
+
     try {
       const response = await axios.post(`${baseURL}/Admin/apply-super-admin`, {
         adminId: profileData.adminId,
@@ -72,28 +108,21 @@ const MyProfileSection = () => {
 
       if (response.status === 201) {
         setSuperAdminStatus("requested");
+        toast.success("Super Admin request sent.");
       }
     } catch (error) {
-      if (error.response && error.response.status === 403) {
+      if (error.response?.status === 403) {
         setSuperAdminStatus("requested");
-        alert("Request already exists in pending queue.");
+        toast.error("Request already exists in pending queue.");
       } else {
-        console.error("Failed to request super admin:", error);
-        alert("Something went wrong! Try again later.");
+        console.error("❌ Failed to request super admin:", error);
+        toast.error("Something went wrong! Try again later.");
       }
     }
   };
+  
 
-  const getSuperAdminButtonText = () => {
-    switch (superAdminStatus) {
-      case "approved":
-        return t("You are SuperAdmin");
-      case "requested":
-        return t("Requested for SuperAdmin");
-      default:
-        return t("Request For SuperAdmin");
-    }
-  };
+
 
   const gradientHover =
     "hover:bg-gradient-to-r hover:from-pink-500 hover:via-purple-500 hover:to-blue-500 hover:text-white transition-all duration-300";
