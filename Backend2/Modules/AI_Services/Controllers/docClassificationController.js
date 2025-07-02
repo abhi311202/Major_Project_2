@@ -9,11 +9,14 @@ export const docClassification = async (req, res) => {
     });
   }
   try {
-    // const response = await axios.post("https://api.example.com/endpoint",req.body);
+    const response = await axios.post(
+      "http://13.200.48.15:5000/classify",
+      req.body
+    );
     // console.log(response.data);
     return res.status(200).json({
       message: "Document Classification Successful!",
-      threshold: doc_Classification_Output,
+      data: response.data,
     });
   } catch (error) {
     console.log(error);
