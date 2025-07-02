@@ -786,6 +786,7 @@ console.log("hllllooo new "+PdfUrl)
           doc_name: selected.name,
           metadata: {},
           entities: {},
+          repetition: 5,
           pages
         };
   
