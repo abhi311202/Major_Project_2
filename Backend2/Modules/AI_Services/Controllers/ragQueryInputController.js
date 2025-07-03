@@ -18,7 +18,7 @@ export const ragQueryInput = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Query in Rag Successful!",
-      data: RAG_Query_Output,
+      data: response.data,
     });
   } catch (error) {
     console.log(error);
