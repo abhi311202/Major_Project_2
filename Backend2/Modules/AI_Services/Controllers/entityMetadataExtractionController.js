@@ -11,7 +11,7 @@ export const entityMetadataExtraction = async (req, res) => {
 
   try {
     const response = await axios.post(
-      "http://13.200.48.15:7000/entity-metadata",
+      `http://${process.env.EXTRACTION}/extraction`,
       req.body
     );
     // console.log(response.data);

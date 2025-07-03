@@ -9,10 +9,11 @@ export const ragQueryInput = async (req, res) => {
     });
   }
   try {
-    // const response = await axios.post(
-    //   "http://13.200.48.15:4000/summarize",
-    //   req.body
-    // );
+    console.log(`http://${process.env.RAG}/query`);
+    const response = await axios.post(
+      `http://${process.env.RAG}/query`,
+      req.body
+    );
     // console.log(response.data);
     return res.status(200).json({
       success: true,
