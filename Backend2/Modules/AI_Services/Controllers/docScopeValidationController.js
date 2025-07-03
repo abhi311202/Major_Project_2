@@ -9,6 +9,7 @@ export const docScopeValidation = async (req, res) => {
     });
   }
   try {
+    console.log(`http://${process.env.SCOPE_VALIDATION}/validation`);
     const response = await axios.post(
       `http://${process.env.SCOPE_VALIDATION}/validation`,
       req.body

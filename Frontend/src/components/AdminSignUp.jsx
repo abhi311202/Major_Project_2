@@ -6,9 +6,18 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { useCallback } from "react";
+import debounce from "lodash/debounce"; 
+
+
 
 const AdminSignUp = () => {
   const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
+  const [usernameAvailable, setUsernameAvailable] = useState(null); // null | true | false
+const [checkingUsername, setCheckingUsername] = useState(false);
+const [emailAvailable, setEmailAvailable] = useState(null); // null | true | false
+const [checkingEmail, setCheckingEmail] = useState(false);
+
   const [profilePic, setProfilePic] = useState(null);
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [preview, setPreview] = useState(null);
@@ -23,15 +32,12 @@ const AdminSignUp = () => {
   const [enteredPhoneOTP, setEnteredPhoneOTP] = useState("");
   const [emailVerified, setEmailVerified] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
+
+
   let fileK, url, imgK, imgUrl;
   
-  useEffect(() => {
-    if (emailVerified && phoneVerified) {
-      onSubmit(formDataCache);
-      setShowOTPModal(false);
-      toast.success("Both OTPs Verified!");
-    }
-  }, [emailVerified, phoneVerified]);
+
+  
   
 
   const handleImageChange = (e) => {
@@ -93,49 +99,49 @@ const AdminSignUp = () => {
     }
   };
 
-  // Verify Email OTP
-const handleEmailOTPVerify = async () => {
-  try {
-    const response = await verifyEmailOTP(emailForVerification, enteredOTP);
-    if (response.data.message === "Email verified successfully") {
-      setEmailVerified(true);
-      toast.success("Email OTP Verified");
+  const handleEmailOTPVerify = async () => {
+    try {
+      const response = await verifyEmailOTP(emailForVerification, enteredOTP);
+      if (response.data.message === "Email verified successfully") {
+        setEmailVerified(true);
+        toast.success("Email OTP Verified");
+      } else {
+        toast.error("Email OTP verification failed");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error verifying Email OTP");
+    }
+  };
+  
+  const handlePhoneOTPVerify = async () => {
+    try {
+      const response = await verifyPhoneOTP(phoneForVerification, enteredPhoneOTP);
+      if (response.data.message === "Phone verified successfully") {
+        setPhoneVerified(true);
+        toast.success("Phone OTP Verified");
+      } else {
+        toast.error("Phone OTP verification failed");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error verifying Phone OTP");
+    }
+  };
 
-      if (phoneVerified) {
-        await onSubmit(formDataCache); // Auto-submit if phone already verified
+  
+  useEffect(() => {
+    const trySubmit = async () => {
+      if (emailVerified && phoneVerified) {
+        await onSubmit(formDataCache);
         setShowOTPModal(false);
         toast.success("Both OTPs Verified! Submitted");
       }
-    } else {
-      toast.error("Email OTP verification failed");
-    }
-  } catch (error) {
-    console.error(error);
-    toast.error("Error verifying Email OTP");
-  }
-};
-
-// Verify Phone OTP
-const handlePhoneOTPVerify = async () => {
-  try {
-    const response = await verifyPhoneOTP(phoneForVerification, enteredPhoneOTP);
-    if (response.data.message === "Phone verified successfully") {
-      setPhoneVerified(true);
-      toast.success("Phone OTP Verified");
-
-      if (emailVerified) {
-        await onSubmit(formDataCache); // Auto-submit if email already verified
-        setShowOTPModal(false);
-        toast.success("Both OTPs Verified! Submitted");
-      }
-    } else {
-      toast.error("Phone OTP verification failed");
-    }
-  } catch (error) {
-    console.error(error);
-    toast.error("Error verifying Phone OTP");
-  }
-};
+    };
+  
+    trySubmit();
+  }, [emailVerified, phoneVerified]); // ⬅️ watches both
+  
 
 
   // Initial submit (call OTP modal)
@@ -191,6 +197,15 @@ const verifyPhoneOTP = async (phone, otp) => {
 
 
 const onSubmit = async (data) => {
+  const originalDate = data.dob;
+
+  // If needed: Convert to DD-MM-YYYY for display or logs
+  const [year, month, day] = originalDate.split("-");
+  const formattedDate = `${day}-${month}-${year}`;
+
+  console.log("👀 Original date (YYYY-MM-DD):", originalDate);
+  console.log("📅 Formatted date (DD-MM-YYYY):", formattedDate);
+
   try {
     // Upload image to server
     const imageUploadSuccess = await uploadImage(profilePic);
@@ -206,21 +221,22 @@ const onSubmit = async (data) => {
       name: data.name,
       email: data.email,
       phone: data.phone,
-      dob: data.dob,
+      dob: originalDate,
       gender: data.gender,
       aadhar: data.aadhaar,
       profession: data.profession,
       organization: data.organisation,
-      password_hash: data.password,
-      type: "WelcomeAdminEmail",
+      password_hash: data.password
     };
+    console.log("👀 Admin info:", adminInfo);
 
     await axios.post(`${baseURL}/Admin/register`, adminInfo);
     toast.success("Admin Signup successful!");
     navigate("/AdminLogin");
   } catch (err) {
     console.error(err);
-    // toast.error("Admin registration failed!");
+    toast.error("Admin registration failed!");
+    
   }
 };
 const uploadImage = async (file) => {
@@ -242,6 +258,58 @@ const uploadImage = async (file) => {
     return false;
   }
 };
+
+const checkUsernameAvailability = useCallback(
+  debounce(async (username) => {
+    if (!username) {
+      setUsernameAvailable(null);
+      return;
+    }
+
+    try {
+      setCheckingUsername(true);
+      const res = await axios.post(`${baseURL}/Services/check-username-availability`, {
+        username,
+      });
+
+      // if available: false => show tick ✔️ (taken)
+      // if available: true  => show cross ❌ (available)
+      console.log("Username check result:", res.data);
+      setUsernameAvailable(res.data.available);
+    } catch (error) {
+      console.error("Username check failed:", error);
+      setUsernameAvailable(null);
+    } finally {
+      setCheckingUsername(false);
+    }
+  }, 500),
+  []
+);
+const checkEmailAvailability = useCallback(
+  debounce(async (email) => {
+    if (!email) {
+      setEmailAvailable(null);
+      return;
+    }
+
+    try {
+      setCheckingEmail(true);
+      const res = await axios.post(`${baseURL}/Services/check-email-availability`, {
+        email,
+      });
+
+      setEmailAvailable(res.data.available); // true → available ❌, false → already used ✔️
+    } catch (error) {
+      console.error("Email check failed:", error);
+      setEmailAvailable(null);
+    } finally {
+      setCheckingEmail(false);
+    }
+  }, 500),
+  []
+);
+
+
 
 
   return (
@@ -294,44 +362,69 @@ const uploadImage = async (file) => {
           </div>
 
           <div className="form-group">
-            <label>{t("un")}</label>
-            <div className="input-wrapper">
-              <input
-                type="text"
-                placeholder={t("eyun")}
-                {...register("username", { required: true })}
-              />
-              {errors.username && (
-                <span className="p-2 text-sm text-red-500">
-                  {t("required")}
-                </span>
-              )}
-            </div>
-          </div>
+  <label>{t("un")}</label>
+  <div className="input-wrapper relative">
+    <input
+      type="text"
+      placeholder={t("eyun")}
+      {...register("username", { required: true })}
+      onChange={(e) => {
+        const value = e.target.value;
+        checkUsernameAvailability(value); // call API as user types
+      }}
+    />
+    {errors.username && (
+      <span className="p-2 text-sm text-red-500">{t("required")}</span>
+    )}
+    {usernameAvailable !== null && (
+      <div className="absolute top-full mt-1 left-0 text-sm flex items-center gap-2">
+        {usernameAvailable ? (
+          <span className="text-green-600">✔️ Username is available</span>
+        ) : (
+          <span className="text-red-600">❌ Username is already taken</span>
+        )}
+      </div>
+    )}
+    {checkingUsername && (
+      <div className="absolute top-full mt-1 left-0 text-xs text-blue-600">
+        Checking username...
+      </div>
+    )}
+  </div>
+</div>
+
 
           <div className="form-group">
             <label>{t("email")}</label>
-            <div className="input-wrapper">
-              <input
-                type="email"
-                placeholder={t("email")}
-                {...register("email", {
-                  required: "Email is required",
-                  pattern: {
-                    value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/,
-                    message: "Email must be in lowercase only",
-                  },
-                  validate: (value) =>
-                    value === value.toLowerCase() ||
-                    "Email must be in lowercase only",
-                })}
-              />
-              {errors.email && (
-                <span className="p-2 text-sm text-red-500">
-                  {errors.email.message}
-                </span>
-              )}
-            </div>
+            <div className="input-wrapper relative">
+    <input
+      type="text"
+      placeholder={t("eyue")}
+      {...register("email", { required: true })}
+      onChange={(e) => {
+        const value = e.target.value;
+        checkEmailAvailability(value); // call API as user types
+      }}
+    />
+    {errors.email && (
+      <span className="p-2 text-sm text-red-500">{t("required")}</span>
+    )}
+    {emailAvailable !== null && (
+      <div className="absolute top-full mt-1 left-0 text-sm flex items-center gap-2">
+        {emailAvailable ? (
+          <span className="text-green-600">✔️ Email is available</span>
+        ) : (
+          <span className="text-red-600">❌ Email is already taken</span>
+        )}
+      </div>
+    )}
+    {checkingEmail && (
+      <div className="absolute top-full mt-1 left-0 text-xs text-blue-600">
+        Checking Email...
+      </div>
+    )}
+  </div>
+
       
 
           </div>
@@ -451,16 +544,17 @@ const uploadImage = async (file) => {
           </div>
 
           <div className="form-group">
-            <label>{t("dob")}</label>
-            <div className="input-wrapper">
-              <input type="date" {...register("dob", { required: true })} />
-              {errors.dob && (
-                <span className="p-2 text-sm text-red-500">
-                  {t("required")}
-                </span>
-              )}
-            </div>
-          </div>
+  <label>{t("dob")}</label>
+  <div className="input-wrapper">
+    <input type="date" {...register("dob", { required: true })} />
+    {errors.dob && (
+      <span className="p-2 text-sm text-red-500">
+        {t("required")}
+      </span>
+    )}
+  </div>
+</div>
+
 
           <div className="form-group ml-64">
             <label style={{ visibility: "hidden" }}>Submit</label>

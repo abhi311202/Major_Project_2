@@ -46,11 +46,7 @@ const ManageAdmin = () => {
   
       toast.success(res.data.message);
   
-      // Now send welcome email
-      await axios.post(`${baseURL}/Services/send-welcome-email`, {
-        email: approvedAdmin.email,
-        username: approvedAdmin.name,
-      });
+   
   
       toast.success("Welcome email sent!");
   

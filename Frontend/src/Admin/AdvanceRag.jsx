@@ -1,7 +1,11 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { getDocument , GlobalWorkerOptions } from 'pdfjs-dist';
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 
 const AdvanceRag = () => {
@@ -17,6 +21,69 @@ const AdvanceRag = () => {
   const [waitingForResponse, setWaitingForResponse] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState(""); // State to store delete message
   const [uploadError, setUploadError] = useState(""); // State to show error when vector upload count is 0
+
+  const [documents, setDocuments2] = useState([]);
+  const [classification, setClassification] = useState("");
+  const [entitymeta, setEntitymeta] = useState("");
+  const [caseno, setCaseno] = useState("");
+  const [casetype, setCasetype] = useState("");
+  const [filingdate, setFilingdate] = useState("");
+  const [casestatus, setCasestatus] = useState("");
+  const [judgmentdate, setJudgmentdate] = useState("");
+  const [courtname, setCourtname] = useState("");
+  const [bench, setBench] = useState("");
+  const [petitioner, setPetitioner] = useState("");
+  const [respondent, setRespondent] = useState("");
+  const [advofpetitioner, setAdvofpetitioner] = useState("");
+  const [advofrespondent, setAdvofrespondent] = useState("");
+  const [prevcasecitation, setPrevcasecitation] = useState("");
+  const [penaltydetail, setPenaltydetail] = useState("");
+  const [headnote, setHeadnote] = useState("");
+  const [courtno, setCourtno] = useState("");
+  const [judgementauthor, setJudgementauthor] = useState("");
+  const [judgementtype, setJudgementtype] = useState("");
+  const [langofjudgement, setLangofjudgement] = useState("");
+  const [dateofhearing, setDateofhearing] = useState("");
+  const [dateoforderpro, setDateoforderpro] = useState("");
+  const [benchcomposition, setBenchcomposition] = useState("");
+  const [referredacts, setReferredacts] = useState("");
+  const [classificationReason, setClassificationReason] = useState("");
+  const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ Vite env variable
+  const navigate = useNavigate();
+  const [uploadedDocuments, setDocuments] = useState([]);
+  const [filteredDocuments, setFilteredDocuments] = useState([]);
+//   const [startDate, setStartDate] = useState("");
+//   const [endDate, setEndDate] = useState("");
+  const [selectedDocument, setSelectedDocument] = useState(""); // State to track the selected document
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [showEditDetailsModal, setShowEditDetailsModal] = useState(false);
+//   const [selectedClassType, setSelectedClassType] = useState("All");
+  const [classError, setClassError] = useState("");
+  const [showEditDetailsModal, setShowEditDetailsModal] = useState(false);
+  const [courtName, setCourtName] = useState('');
+const [judgementAuthor, setJudgementAuthor] = useState('');
+const [advOfRespondent, setAdvOfRespondent] = useState('');
+const [advOfPetitioner, setAdvOfPetitioner] = useState('');
+
+
+const [caseStatus, setCaseStatus] = useState('');
+const [filingDateFrom, setFilingDateFrom] = useState('');
+const [filingDateTo, setFilingDateTo] = useState('');
+const [judgementDateFrom, setJudgementDateFrom] = useState('');
+const [judgementDateTo, setJudgementDateTo] = useState('');
+const [orderDateFrom, setOrderDateFrom] = useState('');
+const [orderDateTo, setOrderDateTo] = useState('');
+const [hearingDateFrom, setHearingDateFrom] = useState('');
+const [hearingDateTo, setHearingDateTo] = useState('');
+const [uploadDateFrom, setUploadDateFrom] = useState('');
+const [uploadDateTo, setUploadDateTo] = useState('');
+const [judgementType, setJudgementType] = useState('');
+const [languageOfJudgement, setLanguageOfJudgement] = useState('');
+
+const [title, setTitle]=useState('');
+const [titleInput, setTitleInput] = useState('');
+const [sortOrder, setSortOrder] = React.useState('asc'); // or 'desc'
+  //  const [document, setDocument] = useState(null);
   useEffect(() => {
     // Simulating fetching vector count from backend
     setTimeout(() => {
@@ -27,6 +94,11 @@ const AdvanceRag = () => {
   const handleDragOver = (e) => {
     e.preventDefault();
     setDragActive(true);
+  };
+   const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
   };
 
   const handleDragLeave = () => setDragActive(false);
@@ -291,171 +363,1121 @@ const Clearchat = () =>{
     
   };
   return (
-    <div className="flex min-h-screen max-h-max bg-white dark:bg-[#222] overflow-hidden">
-      <div className="flex-1 p-6 py-4">
-        <h1 className="text-3xl font-semibold text-gray-800 mb-4 dark:text-white">
-          Document Q&A
-        </h1>
+<>
+<div className="flex min-h-screen dark:bg-[#222]">
+    <aside className="w-64 sticky top-20 h-fit bg-white p-4 rounded-lg shadow-md space-y-6">
+    <h3 className="text-lg font-semibold mb-4">Meta Data Filters</h3>
+    
+ 
 
-        <div
-          className={`mb-4 border-4 border-dashed rounded-lg p-6 text-center transition-colors 
-           ${dragActive ? "border-blue-600 bg-blue-50" : "border-gray-300"} 
-           ${loading || chatOpen ? "opacity-50 cursor-not-allowed" : ""}`}
-              style={{ width: "100%", height: "300px", pointerEvents: loading || chatOpen ? "none" : "auto" }} // Disable interaction when loading
-              onDragOver={loading || chatOpen ? null : handleDragOver}
-              onDragLeave={loading || chatOpen ? null : handleDragLeave}
-              onDrop={loading ||chatOpen ? null : handleDrop}
-        >
-          <input
-            id="fileUpload"
-            type="file"
-            
-            className="hidden dark:text-white"
-           onChange={loading || chatOpen ? null : handleFileUpload} // Disable file selection
-           disabled={loading || chatOpen} // Disable input field
-          />
-          <label htmlFor="fileUpload" className="block h-full">
-              <p className="text-lg text-gray-700 font-medium mb-12 dark:text-white">
-              {loading ? "Processing..." : chatOpen ? "Chat open, file upload is disabled." :"Drag & drop a document (pdf format) here, or "} 
-              {!loading && !chatOpen && <span className="text-blue-600 underline">browse</span>}
-            </p>
-              {/* <FontAwesomeIcon icon={faArrowUpFromBracket} /> */}
-              <i className="fa-solid fa-file fa-7x"></i>
-              {file && !loading && (
-              <p className="mt-3 text-gray-600 text-sm sm:text-base max-w-xs sm:max-w-sm mx-auto overflow-hidden text-ellipsis whitespace-nowrap border border-gray-100 p-2 rounded-md dark:text-white">
-                Uploaded: <strong>{file.name}</strong> ({(file.size / 1024).toFixed(2)} KB)
-              </p>
-            )}
-            </label>
-        </div>
+    
 
-        <button
-           className={`bg-blue-600 text-white font-medium px-5 py-3 rounded-md hover:bg-blue-700 transition duration-300 ${
-            loading || chatOpen ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
-          }`}
-          onClick={handleIngestDocument}
-          disabled={loading || chatOpen} // Disable button when loading
-            
-        >
-          {loading ? "Ingesting..." : "Ingest Document"}
-        </button>
+    <div className="mb-4">
+  <label className="block font-medium mb-1">{t("judgementAuthor")}</label>
+  <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Metadata?.Judgement_author?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={judgementAuthor}
+    onInputChange={(event, newValue) => setJudgementAuthor(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder={t("enterAuthorName")}
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+  />
+</div>
+<div className="mb-4">
+  <label className="block font-medium mb-1">{t("judgementType")}</label>
+  <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Metadata?.Judgement_type?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={judgementType}
+    onInputChange={(event, newValue) => setJudgementType(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder={t("enterJudgementType")}
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+  />
+</div>
+<div className="mb-4">
+  <label className="block font-medium mb-1">{t("languageOfJudgement")}</label>
+  <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Metadata?.Language_of_Judgement?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={languageOfJudgement}
+    onInputChange={(event, newValue) => setLanguageOfJudgement(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder={t("enterLanguage")}
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+  />
+</div>
+<div className="mb-4">
+  <label className="block font-medium mb-1">Bench Composition</label>
+  <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Metadata?.Bench_Composition?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={benchcomposition}
+    onInputChange={(event, newValue) => setBenchcomposition(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder="Bench Composition"
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+  />
+</div>
 
-        {/* Show upload error message if document is not uploaded in vector store */}
-        {uploadError && (
-          <div className="mt-4 p-3 bg-red-100 text-red-700 border border-red-400 rounded-md text-center">
-            <h1 className="text-2xl font-semibold text-red-700 mb-4">{uploadError}</h1>
+<div className="mb-4">
+  <label className="block font-medium mb-1">Referred Acts</label>
+  <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Metadata?.Referred_acts?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={referredacts}
+    onInputChange={(event, newValue) => setReferredacts(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder="Refrred Acts"
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+  />
+</div>
+  {/* Judgement Date Range */}
+
+
+
+
+
+
+
+<div className="mb-4">
+  <label className="block font-medium mb-1">{t("orderPronounceFrom")}</label>
+  <input
+    type="date"
+    value={orderDateFrom}
+    onChange={e => setOrderDateFrom(e.target.value)}
+    className="w-full border rounded px-2 py-1"
+  />
+</div>
+
+
+<div className="mb-4">
+  <label className="block font-medium mb-1">{t("orderPronounceTo")}</label>
+   <input
+    type="date"
+    value={orderDateTo}
+    onChange={e => setOrderDateTo(e.target.value)}
+    className="w-full border rounded px-2 py-1"
+  />
+</div>
+
+
+
+<div className="mb-4">
+  <label className="block font-medium mb-1">{t("hearingDateFrom")}</label>
+   <input
+    type="date"
+    value={hearingDateFrom}
+    onChange={e => setHearingDateFrom(e.target.value)}
+    className="w-full border rounded px-2 py-1"
+  />
+</div>
+
+<div className="mb-4">
+  <label className="block font-medium mb-1">{t("hearingDateTo")}</label>
+  <input
+    type="date"
+    value={hearingDateTo}
+    onChange={e => setHearingDateTo(e.target.value)}
+    className="w-full border rounded px-2 py-1"
+  />
+</div>
+
+    </aside>
+    <main className="flex-1 p-4 sm:p-6 order-2">
+    <div className="flex-1 p-6 pb-2 overflow-y-auto">
+      <h1 className="text-3xl font-semibold text-gray-800 mb-4 dark:text-white">
+        Document Q&A
+      </h1>
+  
+      {/* Loading / Error / Upload Info */}
+      {/* You can insert any loading or error components here */}
+  
+      {/* Chat Messages */}
+      <div className="mb-4 p-4 bg-gray-100 dark:bg-white border rounded h-80 overflow-y-auto">
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={`mb-2 p-2 rounded max-w-[80%] ${
+              msg.type === "user"
+                ? "bg-blue-500 text-white self-end ml-auto"
+                : "bg-gray-200 text-gray-800 self-start"
+            }`}
+          >
+            <div className="text-[15px] whitespace-pre-line">{msg.text}</div>
+          </div>
+        ))}
+        {waitingForResponse && (
+          <div className="p-2 my-1 rounded bg-gray-300 text-gray-700">
+            Searching...
           </div>
         )}
-
-
-
-                    {/* Display Ingest or Loading Indicator */}
-              {loading && (
-              <div className="mt-8 p-6 bg-white shadow-lg rounded-lg text-center dark:bg-black">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4 dark:text-white">
-                  Processing...
-                </h2>
-                <p className="text-gray-600 dark:text-white">Please wait while the document is being Ingest.</p>
-              </div>
-        )}
-        
-         {/* Display Error Message if Fetch Fails */}
-          {!loading && Error && (
-            <div className="mt-8 p-6 bg-red-100 shadow-lg rounded-lg text-center border border-red-500">
-              <h2 className="text-2xl font-semibold text-red-700 mb-4">
-                Error
-              </h2>
-              <p className="text-red-600">{Error}</p>
-            </div>
-        )}
-        
-        {deleteMessage &&(
-            <div className="mt-8 p-6 bg-green-100 shadow-lg rounded-lg text-center border border-green-500">
-              <h2 className="text-2xl font-semibold text-green-700 mb-4">
-                {ingestOutput.index_name} 
-              </h2>
-              <p className="text-green-600">{deleteMessage}</p>
-            </div>
-        )}
-
-{!loading && !Error && chatOpen && (
-  <div className="mt-4 sm:mt-8 p-4 sm:p-6 bg-black border border-gray-800 shadow-lg rounded-lg text-center sm:text-left dark:bg-white w-full mx-auto"
->
-    {/* <div className="bg-blue-600 text-white p-4 font-semibold flex justify-between items-center rounded-t-lg">
-      <span>Chatbot</span>
-      <button onClick={handleEndChat} className="text-white font-bold">X</button>
-    </div> */}
-
-    <div className="p-4 h-80 sm:h-80 overflow-y-auto flex flex-col">
-      {messages.map((msg, index) => (
-        <div
-          key={index}
-          className={`p-2 my-1 rounded-lg max-w-[80%] ${
-            msg.type === "user" ? "bg-blue-500 text-white self-end ml-auto" : "bg-gray-200 text-gray-800 self-start p-3"
-          }`}
-        >
-            {/* {msg.text
-              .replace(/\s+/g, " ") // Remove extra spaces between words
-              .split("\n") // Split into lines
-              .map((line, index) =>
-                line.trim() === "" ? null : ( // Ignore empty lines
-                  <p key={index} className="text-[15px] leading-normal text-left">{line}</p>
-                )
-              )} */}
-          <div className="text-[15px] leading-normal text-left whitespace-pre-line">
-              {msg.text}
-          </div>
-          
-                  </div>
-      ))}
-              
-              {waitingForResponse && (
-                <div className="p-2 my-1 rounded-lg max-w-[80%] bg-gray-600 text-white self-start p-3">
-                  
-                  <span>Searching...</span>
-                </div>
-              )}
+      </div>
     </div>
-
-    <div className="p-2 border-t flex items-center gap-2 flex-wrap"
+  
+    {/* Chat Input Section */}
+    <div
+      className="p-3 border-t flex items-center gap-2 bg-white dark:bg-black"
+      onDrop={(e) => {
+        e.preventDefault();
+        const droppedFile = e.dataTransfer.files[0];
+        if (droppedFile && droppedFile.type === "application/pdf") {
+          setFile(droppedFile);
+          toast.success(`File "${droppedFile.name}" selected`);
+        } else {
+          toast.error("Only PDF files are allowed");
+        }
+      }}
+      onDragOver={(e) => e.preventDefault()}
     >
+      {/* Input Box */}
       <input
         type="text"
+        className="flex-1 px-3 py-2 border rounded dark:text-black"
+        placeholder="Ask a question..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="flex-1 p-2 border rounded-lg dark:text-black w-full sm:w-auto"
-
-        placeholder="Ask a question..."
-        disabled={waitingForResponse} // Prevent input while processing
+        disabled={waitingForResponse}
       />
+  
+      {/* Chat Action Buttons */}
       <button
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg w-full sm:w-auto"
-
         onClick={handleSendQuery}
+        className="bg-blue-600 text-white px-3 py-2 rounded"
+        disabled={waitingForResponse}
       >
-        Send
+        ➤
       </button>
-              
       <button
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg w-full sm:w-auto"
         onClick={handleEndChat}
+        className="bg-red-500 text-white px-3 py-2 rounded"
       >
         End
       </button>
       <button
-        className="bg-blue-500 text-white px-4 py-2 rounded-lg w-full sm:w-auto"
         onClick={Clearchat}
+        className="bg-yellow-500 text-white px-3 py-2 rounded"
       >
-        Clear Chat
-      </button>        
-              
-      
+        Clear All
+      </button>
     </div>
-  </div>
-)}
+    </main>
 
-      </div>
+    <aside className="w-full md:w-64 bg-white p-4 rounded-lg shadow-md order-1 md:order-none">
+    <h3 className="text-lg font-semibold mb-4">Key Entity Filters</h3>
+
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("classification")}</label>
+    <select
+    value={classification}
+    onChange={(e) => setClassification(e.target.value)}
+    className="w-full border rounded px-2 py-1"
+    >
+    <option value="">{t("all")}</option>
+    <option value="Civil Case">{t("civilCase")}</option>
+    <option value="Criminal Case">{t("criminalCase")}</option>
+    <option value="Criminal Case">Constiutional</option>
+    </select>
     </div>
+
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("caseNo")}</label>
+    <Autocomplete
+    freeSolo
+    options={[
+    ...new Set(
+      documents
+        .map(doc => doc.Key_Entities?.Case_no?.trim())
+        .filter(Boolean)
+    )
+    ]}
+    value={caseno}
+    onInputChange={(event, newValue) => setCaseno(newValue)}
+    size="small" // 👈 shrinks outer autocomplete
+    slotProps={{
+    popper: {
+      modifiers: [
+        {
+          name: 'offset',
+          options: {
+            offset: [0, 4],
+          },
+        },
+      ],
+    },
+    paper: {
+      sx: {
+        fontSize: '12px',     // 👈 smaller font for dropdown items
+        maxHeight: '150px',   // 👈 optional: smaller dropdown height
+        paddingY: '4px',
+      },
+    },
+    }}
+    renderInput={(params) => (
+    <TextField
+      {...params}
+      placeholder={t("enterCaseNo")}
+      variant="outlined"
+      className="w-full"
+      size="small"
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          fontSize: '12px',
+          padding: '2px',
+          '@media (min-width: 640px)': {
+            fontSize: '13px',
+            padding: '4px',
+          },
+        },
+        '& .MuiInputBase-input': {
+          padding: '6px 8px',
+        },
+      }}
+    />
+    )}
+    />
+    </div>
+
+
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("courtNo")}</label>
+    <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Key_Entities?.Court_no?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={courtno}
+    onInputChange={(event, newValue) => setCourtno(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder={t("enterCourtNo")}
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+    />
+    </div>
+    {/* Court Name */}
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("courtName")}</label>
+    <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Key_Entities?.Court_name?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={courtName}
+    onInputChange={(event, newValue) => setCourtName(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder={t("enterCourtName")}
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+    />
+    </div>
+
+    {/* Add more filters based on Metadata, Key_Entities etc. */}
+
+
+    {/* Judgement Date Range */}
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("judgementDateFrom")}</label>
+    <input
+    type="date"
+    value={judgementDateFrom}
+    onChange={e => setJudgementDateFrom(e.target.value)}
+    className="w-full border rounded px-2 py-1"
+    />
+    </div>
+
+    {/* Filing Date To */}
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("judgementDateTo")}</label>
+    <input
+    type="date"
+    value={judgementDateTo}
+    onChange={e => setJudgementDateTo(e.target.value)}
+    className="w-full border rounded px-2 py-1"
+    />
+    </div>
+
+
+    <div className="mb-4">
+    <label className="block font-medium mb-1">Petitioner</label>
+    <Autocomplete
+    freeSolo
+    options={[
+    ...new Set(
+      documents
+        .map(doc => doc.Key_Entities?.Petitioner?.trim())
+        .filter(Boolean)
+    )
+    ]}
+    value={petitioner}
+    onInputChange={(event, newValue) => setPetitioner(newValue)}
+    size="small" // 👈 shrinks outer autocomplete
+    slotProps={{
+    popper: {
+      modifiers: [
+        {
+          name: 'offset',
+          options: {
+            offset: [0, 4],
+          },
+        },
+      ],
+    },
+    paper: {
+      sx: {
+        fontSize: '12px',     // 👈 smaller font for dropdown items
+        maxHeight: '150px',   // 👈 optional: smaller dropdown height
+        paddingY: '4px',
+      },
+    },
+    }}
+    renderInput={(params) => (
+    <TextField
+      {...params}
+      placeholder="Enter Petitioner"
+      variant="outlined"
+      className="w-full"
+      size="small"
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          fontSize: '12px',
+          padding: '2px',
+          '@media (min-width: 640px)': {
+            fontSize: '13px',
+            padding: '4px',
+          },
+        },
+        '& .MuiInputBase-input': {
+          padding: '6px 8px',
+        },
+      }}
+    />
+    )}
+    />
+
+    </div>
+
+
+    <div className="mb-4">
+    <label className="block font-medium mb-1">Respondent</label>
+    <Autocomplete
+    freeSolo
+    options={[
+    ...new Set(
+      documents
+        .map(doc => doc.Key_Entities?.Respondent?.trim())
+        .filter(Boolean)
+    )
+    ]}
+    value={respondent}
+    onInputChange={(event, newValue) => setRespondent(newValue)}
+    size="small" // 👈 shrinks outer autocomplete
+    slotProps={{
+    popper: {
+      modifiers: [
+        {
+          name: 'offset',
+          options: {
+            offset: [0, 4],
+          },
+        },
+      ],
+    },
+    paper: {
+      sx: {
+        fontSize: '12px',     // 👈 smaller font for dropdown items
+        maxHeight: '150px',   // 👈 optional: smaller dropdown height
+        paddingY: '4px',
+      },
+    },
+    }}
+    renderInput={(params) => (
+    <TextField
+      {...params}
+      placeholder="Respondent"
+      variant="outlined"
+      className="w-full"
+      size="small"
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          fontSize: '12px',
+          padding: '2px',
+          '@media (min-width: 640px)': {
+            fontSize: '13px',
+            padding: '4px',
+          },
+        },
+        '& .MuiInputBase-input': {
+          padding: '6px 8px',
+        },
+      }}
+    />
+    )}
+    />
+    </div>
+
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("advOfPetitioner")}</label>
+    <Autocomplete
+    freeSolo
+    options={[
+    ...new Set(
+      documents
+        .map(doc => doc.Key_Entities?.Adv_of_petitioner?.trim())
+        .filter(Boolean)
+    )
+    ]}
+    value={advOfPetitioner}
+    onInputChange={(event, newValue) => setAdvOfPetitioner(newValue)}
+    size="small" // 👈 shrinks outer autocomplete
+    slotProps={{
+    popper: {
+      modifiers: [
+        {
+          name: 'offset',
+          options: {
+            offset: [0, 4],
+          },
+        },
+      ],
+    },
+    paper: {
+      sx: {
+        fontSize: '12px',     // 👈 smaller font for dropdown items
+        maxHeight: '150px',   // 👈 optional: smaller dropdown height
+        paddingY: '4px',
+      },
+    },
+    }}
+    renderInput={(params) => (
+    <TextField
+      {...params}
+      placeholder={t("enterAdv")}
+      variant="outlined"
+      className="w-full"
+      size="small"
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          fontSize: '12px',
+          padding: '2px',
+          '@media (min-width: 640px)': {
+            fontSize: '13px',
+            padding: '4px',
+          },
+        },
+        '& .MuiInputBase-input': {
+          padding: '6px 8px',
+        },
+      }}
+    />
+    )}
+    />
+
+    </div>
+
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("advOfRespondent")}</label>
+    <Autocomplete
+    freeSolo
+    options={[
+    ...new Set(
+      documents
+        .map(doc => doc.Key_Entities?.Adv_of_respondent?.trim())
+        .filter(Boolean)
+    )
+    ]}
+    value={advOfRespondent}
+    onInputChange={(event, newValue) => setAdvOfRespondent(newValue)}
+    size="small" // 👈 shrinks outer autocomplete
+    slotProps={{
+    popper: {
+      modifiers: [
+        {
+          name: 'offset',
+          options: {
+            offset: [0, 4],
+          },
+        },
+      ],
+    },
+    paper: {
+      sx: {
+        fontSize: '12px',     // 👈 smaller font for dropdown items
+        maxHeight: '150px',   // 👈 optional: smaller dropdown height
+        paddingY: '4px',
+      },
+    },
+    }}
+    renderInput={(params) => (
+    <TextField
+      {...params}
+      placeholder={t("enterAdv")}
+      variant="outlined"
+      className="w-full"
+      size="small"
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          fontSize: '12px',
+          padding: '2px',
+          '@media (min-width: 640px)': {
+            fontSize: '13px',
+            padding: '4px',
+          },
+        },
+        '& .MuiInputBase-input': {
+          padding: '6px 8px',
+        },
+      }}
+    />
+    )}
+    />
+    </div>
+
+    {/* Bench */}
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("bench")}</label>
+    <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Key_Entities?.Bench?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={bench}
+    onInputChange={(event, newValue) => setBench(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder={t("enterBench")}
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+    />
+    </div>
+
+    {/* Case Status */}
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("caseStatus")}</label>
+    <select
+    value={caseStatus}
+    onChange={e => setCaseStatus(e.target.value)}
+    className="w-full border rounded px-2 py-1"
+    >
+    <option value="">{t("caseStatusAll")}</option>
+    <option value="open">{t("caseStatusOpen")}</option>
+    <option value="closed">{t("caseStatusClosed")}</option>
+    <option value="pending">{t("caseStatusPending")}</option>
+    </select>
+    </div>
+
+    {/* Filing Date From */}
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("filingDateFrom")}</label>
+    <input
+    type="date"
+    value={filingDateFrom}
+    onChange={e => setFilingDateFrom(e.target.value)}
+    className="w-full border rounded px-2 py-1"
+    />
+    </div>
+
+    {/* Filing Date To */}
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("filingDateTo")}</label>
+    <input
+    type="date"
+    value={filingDateTo}
+    onChange={e => setFilingDateTo(e.target.value)}
+    className="w-full border rounded px-2 py-1"
+    />
+    </div>
+
+    <div className="mb-4">
+    <label className="block font-medium mb-1">Previous Case Citation</label>
+    <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Key_Entities?.Previous_case_citation?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={prevcasecitation}
+    onInputChange={(event, newValue) => setPrevcasecitation(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder="Enter Previous Case Citation"
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+    />
+    </div>
+
+    <div className="mb-4">
+    <label className="block font-medium mb-1">Penalty Details</label>
+    <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Key_Entities?.Penalty_detail?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={penaltydetail}
+    onInputChange={(event, newValue) => setPenaltydetail(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder="Enter Penality Details"
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+    />
+    </div>
+
+    <div className="mb-4">
+    <label className="block font-medium mb-1">Head Note</label>
+    <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Key_Entities?.Head_note?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={headnote}
+    onInputChange={(event, newValue) => setHeadnote(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder="Enter Head Note"
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+    />
+    </div>
+    {/* 🔹 Normal Filters Section */}
+    <div className="mt-6 border-t pt-4">
+    <h4 className="text-md font-semibold mb-3">Normal Filters</h4>
+
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("uploadDateFrom")}</label>
+    <input
+      type="date"
+      value={uploadDateFrom}
+      onChange={(e) => setUploadDateFrom(e.target.value)}
+      className="w-full border rounded px-2 py-1"
+    />
+    </div>
+
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("uploadDateTo")}</label>
+    <input
+      type="date"
+      value={uploadDateTo}
+      onChange={(e) => setUploadDateTo(e.target.value)}
+      className="w-full border rounded px-2 py-1"
+    />
+    </div>
+
+    <div className="mb-4">
+    <label className="block font-medium mb-1">{t("sortBy")}</label>
+    <select
+      value={sortOrder}
+      onChange={(e) => setSortOrder(e.target.value)}
+      className="w-full border rounded px-2 py-1"
+    >
+      <option value="">{t("selectSortOrder")}</option>
+      <option value="A-Z">{t("sortAZ")}</option>
+      <option value="Z-A">{t("sortZA")}</option>
+    </select>
+    </div>
+    </div>
+
+
+    </aside>
+
+</div>
+</>
+  
   );
 };
 

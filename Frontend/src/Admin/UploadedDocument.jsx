@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 function UploadedDocument() {
+  const [document, setDocument] = useState([]);
   const [content, setContent] = useState("");
   const [file, setFile] = useState(null);
   const [filePreview, setFilePreview] = useState("");
@@ -52,6 +53,7 @@ function UploadedDocument() {
   const navigate = useNavigate();
   const [uploadedDocuments, setDocuments] = useState([]);
   const [filteredDocuments, setFilteredDocuments] = useState([]);
+  
 //   const [startDate, setStartDate] = useState("");
 //   const [endDate, setEndDate] = useState("");
   const [selectedDocument, setSelectedDocument] = useState(""); // State to track the selected document
@@ -64,6 +66,7 @@ function UploadedDocument() {
 const [judgementAuthor, setJudgementAuthor] = useState('');
 const [advOfRespondent, setAdvOfRespondent] = useState('');
 const [advOfPetitioner, setAdvOfPetitioner] = useState('');
+const [uploadedDocument, setUploadedDocuments] = useState([]);
 
 
 const [caseStatus, setCaseStatus] = useState('');
@@ -158,6 +161,226 @@ const renderEditDetailsModal = () => {
       toast.error("Error updating document.");
     }
   };
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const res = await axios.get(`${baseURL}/Document/get-documents`);
+        console.log("Documents response:", res.data);
+
+        if (res.data && res.data.documents) {
+          setDocuments2(res.data.documents);
+          setFilteredDocuments(res.data.documents);
+        }
+      } catch (err) {
+        console.error(err.response || err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDocuments();
+  }, []);
+
+  useEffect(() => {
+  let filtered = [...documents];
+
+  
+
+  // Classification
+  if (classification) {
+    filtered = filtered.filter(doc =>
+      doc.MongoDB?.Classification === classification
+    );
+  }
+
+if (advOfPetitioner.trim()) {
+  filtered = filtered.filter(doc =>
+    doc.Key_Entities?.Adv_of_petitioner?.toLowerCase().trim().includes(advOfPetitioner.toLowerCase().trim())
+  );
+}
+
+
+
+if (advOfRespondent.trim()) {
+  filtered = filtered.filter(doc =>
+    doc.Key_Entities?.Adv_of_respondent?.toLowerCase().includes(advOfRespondent.toLowerCase())
+  );
+}
+
+
+  // Bench
+  if (bench.trim()) {
+    filtered = filtered.filter(doc =>
+      doc.Key_Entities?.Bench?.toLowerCase().includes(bench.toLowerCase())
+    );
+  }
+
+    if (caseno.trim()) {
+    filtered = filtered.filter(doc =>
+      doc.Key_Entities?.Case_no?.toLowerCase().includes(caseno.toLowerCase())
+    );
+  }
+
+    if (courtno.trim()) {
+    filtered = filtered.filter(doc =>
+      doc.Key_Entities?.Court_no?.toLowerCase().includes(courtno.toLowerCase())
+    );
+  }
+
+  // Case Status
+  if (caseStatus) {
+    filtered = filtered.filter(doc =>
+      doc.Key_Entities?.Case_Status?.toLowerCase() === caseStatus.toLowerCase()
+    );
+  }
+    if (courtName.trim()) {
+    filtered = filtered.filter(doc =>
+      doc.Key_Entities?.Court_name?.toLowerCase().includes(courtName.toLowerCase())
+    );
+  }
+
+  // Filing Date Range
+  if (filingDateFrom) {
+    filtered = filtered.filter(doc =>
+      new Date(doc.Key_Entities?.Filing_date) >= new Date(filingDateFrom)
+    );
+  }
+
+  if (filingDateTo) {
+    filtered = filtered.filter(doc =>
+      new Date(doc.Key_Entities?.Filing_date) <= new Date(filingDateTo)
+    );
+  }
+
+    if (judgementDateFrom) {
+    filtered = filtered.filter(doc =>
+      new Date(doc.Key_Entities?.Judgement_date) >= new Date(judgementDateFrom)
+    );
+  }
+
+  if (judgementDateTo) {
+    filtered = filtered.filter(doc =>
+      new Date(doc.Key_Entities?.Judgement_date) <= new Date(judgementDateTo)
+    );
+  }
+//////
+
+ if (uploadDateFrom) {
+    filtered = filtered.filter(doc =>
+      new Date(doc.Doc?.created_at) >= new Date(uploadDateFrom)
+    );
+  }
+
+  if (uploadDateTo) {
+    filtered = filtered.filter(doc =>
+      new Date(doc.Doc?.created_at) <= new Date(uploadDateTo)
+    );
+  }
+      if (orderDateFrom) {
+    filtered = filtered.filter(doc =>
+      new Date(doc.Metadata?.Date_of_order_pronouncement) >= new Date(orderDateFrom)
+    );
+  }
+
+  if (orderDateTo) {
+    filtered = filtered.filter(doc =>
+      new Date(doc.Metadata?.Date_of_order_pronouncement) <= new Date(orderDateTo)
+    );
+  }
+
+      if (hearingDateFrom) {
+    filtered = filtered.filter(doc =>
+      new Date(doc.Metadata?.Date_of_hearing) >= new Date(hearingDateFrom)
+    );
+  }
+
+  if (hearingDateTo) {
+    filtered = filtered.filter(doc =>
+      new Date(doc.Metadata?.Date_of_hearing) <= new Date(hearingDateTo)
+    );
+  }
+
+  // Judgement Type
+  if (judgementType.trim()) {
+    filtered = filtered.filter(doc =>
+      doc.Metadata?.Judgement_type?.toLowerCase().includes(judgementType.toLowerCase())
+    );
+  }
+
+  // Language of Judgement
+  if (languageOfJudgement.trim()) {
+    filtered = filtered.filter(doc =>
+      doc.Metadata?.Language_of_Judgement?.toLowerCase().includes(languageOfJudgement.toLowerCase())
+    );
+  }
+    if (judgementAuthor.trim()) {
+    filtered = filtered.filter(doc =>
+      doc.Metadata?.Judgement_author?.toLowerCase().includes(judgementAuthor.toLowerCase())
+    );
+  }
+
+   if (caseno.trim()) {
+    filtered = filtered.filter(doc =>
+      doc.Key_Entities?.Case_no?.toLowerCase().includes(caseno.toLowerCase())
+    );
+  }
+
+   if (courtno.trim()) {
+    filtered = filtered.filter(doc =>
+      doc.Key_Entities?.Court_no?.toLowerCase().includes(courtno.toLowerCase())
+    );
+  }
+  if (title.trim()) {
+    filtered = filtered.filter(doc =>
+      doc.MongoDB?.Doc_Title?.toLowerCase().includes(title.toLowerCase())
+    );
+  }
+
+  setFilteredDocuments(filtered);
+  if (sortBy) {
+  filtered.sort((a, b) => {
+    switch (sortBy) {
+      case 'date-asc':
+        return new Date(a.MongoDB?.created_at || a.Doc?.created_at) - new Date(b.MongoDB?.created_at || b.Doc?.created_at);
+      case 'date-desc':
+        return new Date(b.MongoDB?.created_at || b.Doc?.created_at) - new Date(a.MongoDB?.created_at || a.Doc?.created_at);
+      case 'name-desc':
+        return (b.MongoDB?.Doc_Title || '').localeCompare(a.MongoDB?.Doc_Title || '');
+      case 'name-asc':
+      default:
+        return (a.MongoDB?.Doc_Title || '').localeCompare(b.MongoDB?.Doc_Title || '');
+    }
+  });
+}
+
+}, [
+  classification,
+  advOfPetitioner,
+  advOfRespondent,
+  courtName,
+  bench,
+  caseno,
+  courtno,
+  caseStatus,
+  filingDateFrom,
+  judgementAuthor,
+  filingDateTo,
+  judgementType,
+  languageOfJudgement,
+  judgementDateFrom,
+  judgementDateTo,
+  orderDateFrom,
+  orderDateTo,
+  hearingDateFrom,
+  hearingDateTo,
+  uploadDateFrom,
+  uploadDateTo,
+  title,
+  sortBy ,
+  documents
+]);
+
+
 
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-[999]">
@@ -328,6 +551,7 @@ const renderEditDetailsModal = () => {
         const response = await axios.get(`${baseURL}/Document/get-documents`);
   
         console.log("📦 Full API Response:", response.data); // ✅ Log full response
+        console.log("📦 Documents length", response.data.documents.length); // ✅ Log documents array
   
         if (response.data && Array.isArray(response.data.documents)) {
           setDocuments(response.data.documents);
@@ -340,6 +564,52 @@ const renderEditDetailsModal = () => {
       }
     };
   
+    fetchDocuments();
+  }, []);
+
+  const handleDelete = async (doc) => {
+    const documentId = doc?.Doc?.doc_id;
+  
+    if (!documentId) {
+      console.error("❌ doc_id not found!");
+      return;
+    }
+  
+    try {
+      const response = await axios.post(
+        "http://localhost:4001/Document/delete-document-by-id",
+        { document_id: documentId }
+      );
+  
+      console.log("🗑️ Delete successful:", response.data);
+      toast.success("Document deleted successfully!");
+  
+      // Remove from UI
+      setUploadedDocuments((prev) =>
+        prev.filter((d) => d.Doc.doc_id !== documentId)
+      );
+    } catch (error) {
+      console.error("❌ Failed to delete document:", error);
+    }
+  };
+  
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const res = await axios.get(`${baseURL}/Document/get-documents`);
+        console.log("Documents response:", res.data);
+
+        if (res.data && res.data.documents) {
+          setDocuments(res.data.documents);
+          setFilteredDocuments(res.data.documents);
+        }
+      } catch (err) {
+        console.error(err.response || err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchDocuments();
   }, []);
   
@@ -601,8 +871,488 @@ if (response.data && Array.isArray(response.data.documents)) {
     <>
        <div className="flex min-h-screen dark:bg-[#222]">
   
-  <aside className="w-64 sticky top-20 h-fit bg-white p-4 rounded-lg shadow-md">
-    <h3 className="text-lg font-semibold mb-4">{t("filters")}</h3>
+       <aside className="w-64 sticky top-20 h-fit bg-white p-4 rounded-lg shadow-md space-y-6">
+    <h3 className="text-lg font-semibold mb-4">Meta Data Filters</h3>
+    
+ 
+
+    
+
+    <div className="mb-4">
+  <label className="block font-medium mb-1">{t("judgementAuthor")}</label>
+  <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Metadata?.Judgement_author?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={judgementAuthor}
+    onInputChange={(event, newValue) => setJudgementAuthor(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder={t("enterAuthorName")}
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+  />
+</div>
+<div className="mb-4">
+  <label className="block font-medium mb-1">{t("judgementType")}</label>
+  <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Metadata?.Judgement_type?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={judgementType}
+    onInputChange={(event, newValue) => setJudgementType(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder={t("enterJudgementType")}
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+  />
+</div>
+<div className="mb-4">
+  <label className="block font-medium mb-1">{t("languageOfJudgement")}</label>
+  <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Metadata?.Language_of_Judgement?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={languageOfJudgement}
+    onInputChange={(event, newValue) => setLanguageOfJudgement(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder={t("enterLanguage")}
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+  />
+</div>
+<div className="mb-4">
+  <label className="block font-medium mb-1">Bench Composition</label>
+  <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Metadata?.Bench_Composition?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={benchcomposition}
+    onInputChange={(event, newValue) => setBenchcomposition(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder="Bench Composition"
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+  />
+</div>
+
+<div className="mb-4">
+  <label className="block font-medium mb-1">Referred Acts</label>
+  <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Metadata?.Referred_acts?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={referredacts}
+    onInputChange={(event, newValue) => setReferredacts(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder="Refrred Acts"
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+  />
+</div>
+  {/* Judgement Date Range */}
+
+
+
+
+
+
+
+<div className="mb-4">
+  <label className="block font-medium mb-1">{t("orderPronounceFrom")}</label>
+  <input
+    type="date"
+    value={orderDateFrom}
+    onChange={e => setOrderDateFrom(e.target.value)}
+    className="w-full border rounded px-2 py-1"
+  />
+</div>
+
+
+<div className="mb-4">
+  <label className="block font-medium mb-1">{t("orderPronounceTo")}</label>
+   <input
+    type="date"
+    value={orderDateTo}
+    onChange={e => setOrderDateTo(e.target.value)}
+    className="w-full border rounded px-2 py-1"
+  />
+</div>
+
+
+
+<div className="mb-4">
+  <label className="block font-medium mb-1">{t("hearingDateFrom")}</label>
+   <input
+    type="date"
+    value={hearingDateFrom}
+    onChange={e => setHearingDateFrom(e.target.value)}
+    className="w-full border rounded px-2 py-1"
+  />
+</div>
+
+<div className="mb-4">
+  <label className="block font-medium mb-1">{t("hearingDateTo")}</label>
+  <input
+    type="date"
+    value={hearingDateTo}
+    onChange={e => setHearingDateTo(e.target.value)}
+    className="w-full border rounded px-2 py-1"
+  />
+</div>
+
+  </aside>
+
+
+
+
+  <main className="flex-1 p-4 sm:p-6">
+  <h1 className="text-4xl font-bold text-center w-full text-gray-800">
+     {t("searchDocumentAdvanced")}
+</h1>
+
+  <div className="mb-4 flex items-center gap-2">
+  <div className="flex-1">
+    <Autocomplete
+  freeSolo
+  options={[
+    ...new Set(
+      documents
+        .map(doc => doc.MongoDB?.Doc_Title?.trim())
+        .filter(Boolean)
+    )
+  ]}
+  value={titleInput}
+  onInputChange={(event, newValue) => setTitleInput(newValue)}
+  size="small"
+  slotProps={{
+    popper: {
+      modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+    },
+    paper: {
+      sx: {
+        fontSize: '12px',
+        maxHeight: '150px',
+        paddingY: '4px',
+      },
+    },
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      placeholder={t("enterDocumentTitle")}
+      variant="outlined"
+      className="w-full"
+      size="small"
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          fontSize: '12px',
+          padding: '2px',
+          '@media (min-width: 640px)': {
+            fontSize: '13px',
+            padding: '4px',
+          },
+        },
+        '& .MuiInputBase-input': {
+          padding: '6px 8px',
+        },
+      }}
+    />
+  )}
+/>
+
+
+
+  </div>
+  <button
+    onClick={() => setTitle(titleInput)}
+    className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 text-sm"
+  >
+    🔍
+  </button>
+</div>
+
+    {filteredDocuments.length > 0 ? (
+      <div className="grid grid-cols-1 sm:grid-cols-1 gap-4 ">
+{filteredDocuments.map((doc) => {
+  const metadata = doc.Metadata || {};
+  const mongo = doc.MongoDB || {};
+  const docInfo = doc.Doc || {};
+  return (
+    <div
+  key={docInfo.doc_id}
+  className="relative bg-white shadow-lg rounded-xl p-4 w-full max-w-4xl mx-auto border dark:bg-gray-800 dark:border-gray-700 mb-4"
+>
+  {/* Top-right action buttons */}
+  <div className="absolute top-2 right-2 flex gap-2 z-10">
+    <button
+      className="bg-gray-300 dark:bg-gray-800 text-gray-700 dark:text-white p-1 sm:p-2 rounded-md hover:bg-gray-400 dark:hover:bg-gray-700 transition flex items-center justify-center w-6 sm:w-8 h-6 sm:h-8"
+      onClick={() => {
+        setSelectedDocument(doc);
+        setShowEditDetailsModal(true);
+      }}
+    >
+      <Pencil className="w-3 sm:w-4 h-3 sm:h-4" />
+    </button>
+
+    <button
+      onClick={() => handleDelete(doc)}
+      className="bg-gray-300 dark:bg-gray-800 text-gray-700 dark:text-white p-1 sm:p-2 rounded-md hover:bg-gray-400 dark:hover:bg-gray-700 transition flex items-center justify-center w-6 sm:w-8 h-6 sm:h-8"
+    >
+      <Trash2 className="w-3 sm:w-4 h-3 sm:h-4" />
+    </button>
+
+    {/* Uploaded doc download */}
+    <div className="relative group">
+      <button
+        onClick={() => handleDownloadPDF(doc)}
+        className="bg-gray-300 dark:bg-gray-800 text-gray-700 dark:text-white p-2 rounded-md hover:bg-gray-400 dark:hover:bg-gray-700 transition flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8"
+      >
+        <Download className="w-3 sm:w-4 h-3 sm:h-4" />
+      </button>
+      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition">
+        Uploaded doc
+      </span>
+    </div>
+
+    {/* Original doc download */}
+    <div className="relative group">
+      <button
+        onClick={() => orignalPDF(doc)}
+        className="bg-gray-300 dark:bg-gray-800 text-gray-700 dark:text-white p-2 rounded-md hover:bg-gray-400 dark:hover:bg-gray-700 transition flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8"
+      >
+        <Download className="w-3 sm:w-4 h-3 sm:h-4" />
+      </button>
+      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition">
+        Original doc
+      </span>
+    </div>
+  </div>
+
+    <div className="mb-4">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+        {mongo.Doc_Title || metadata.title || "Untitled"}
+      </h3>
+      <p className="text-sm text-gray-600 dark:text-gray-300">
+        <strong>Upload date:</strong>{" "}
+        {new Date(docInfo.created_at).toLocaleDateString() || "No date"}
+      </p>
+      <p className="text-sm text-gray-600 dark:text-gray-300">
+        <strong>Class:</strong>{" "}
+        {mongo.Classification || metadata.Class || "Unclassified"}
+      </p>
+      <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+        <strong>Summary:</strong> {mongo.Summary || metadata.summary || "No summary"}
+      </p>
+      <p className="text-sm text-gray-600 dark:text-gray-300">
+        <strong>Case No:</strong> {doc.Key_Entities?.Case_no || "Not available"}
+      </p>
+    </div>
+    
+
+    <div className="flex justify-start">
+    <button
+      onClick={() => handleViewMore(doc)}
+      className="bg-blue-600 text-white text-sm px-3 py-1.5 rounded-md hover:bg-blue-700 transition"
+    >
+     {t("viewMore")}
+    </button>
+    
+  </div>
+  
+  </div>
+  );
+})}
+
+
+      </div>
+    ) : (
+      <div className="text-center text-gray-500 dark:text-white">
+        No document available
+      </div>
+    )}
+      </main>
+      <aside className="w-full md:w-64 bg-white p-4 rounded-lg shadow-md order-1 md:order-none">
+    <h3 className="text-lg font-semibold mb-4">Key Entity Filters</h3>
     
     <div className="mb-4">
   <label className="block font-medium mb-1">{t("classification")}</label>
@@ -614,10 +1364,119 @@ if (response.data && Array.isArray(response.data.documents)) {
     <option value="">{t("all")}</option>
     <option value="Civil Case">{t("civilCase")}</option>
     <option value="Criminal Case">{t("criminalCase")}</option>
+    <option value="Criminal Case">Constiutional</option>
   </select>
 </div>
 
-    
+<div className="mb-4">
+  <label className="block font-medium mb-1">{t("caseNo")}</label>
+   <Autocomplete
+  freeSolo
+  options={[
+    ...new Set(
+      documents
+        .map(doc => doc.Key_Entities?.Case_no?.trim())
+        .filter(Boolean)
+    )
+  ]}
+  value={caseno}
+  onInputChange={(event, newValue) => setCaseno(newValue)}
+  size="small" // 👈 shrinks outer autocomplete
+  slotProps={{
+    popper: {
+      modifiers: [
+        {
+          name: 'offset',
+          options: {
+            offset: [0, 4],
+          },
+        },
+      ],
+    },
+    paper: {
+      sx: {
+        fontSize: '12px',     // 👈 smaller font for dropdown items
+        maxHeight: '150px',   // 👈 optional: smaller dropdown height
+        paddingY: '4px',
+      },
+    },
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      placeholder={t("enterCaseNo")}
+      variant="outlined"
+      className="w-full"
+      size="small"
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          fontSize: '12px',
+          padding: '2px',
+          '@media (min-width: 640px)': {
+            fontSize: '13px',
+            padding: '4px',
+          },
+        },
+        '& .MuiInputBase-input': {
+          padding: '6px 8px',
+        },
+      }}
+    />
+  )}
+/>
+</div>
+
+
+<div className="mb-4">
+  <label className="block font-medium mb-1">{t("courtNo")}</label>
+  <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Key_Entities?.Court_no?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={courtno}
+    onInputChange={(event, newValue) => setCourtno(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder={t("enterCourtNo")}
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+  />
+</div>
 {/* Court Name */}
 <div className="mb-4">
   <label className="block font-medium mb-1">{t("courtName")}</label>
@@ -672,58 +1531,6 @@ if (response.data && Array.isArray(response.data.documents)) {
 
     {/* Add more filters based on Metadata, Key_Entities etc. */}
 
-    {/* Judgement Author filter */}
- {/* Judgement Author */}
-<div className="mb-4">
-  <label className="block font-medium mb-1">{t("judgementAuthor")}</label>
-  <Autocomplete
-    freeSolo
-    options={[
-      ...new Set(
-        documents
-          .map(doc => doc.Metadata?.Judgement_author?.trim())
-          .filter(Boolean)
-      )
-    ]}
-    value={judgementAuthor}
-    onInputChange={(event, newValue) => setJudgementAuthor(newValue)}
-    size="small"
-    slotProps={{
-      popper: {
-        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
-      },
-      paper: {
-        sx: {
-          fontSize: '12px',
-          maxHeight: '150px',
-          paddingY: '4px',
-        },
-      },
-    }}
-    renderInput={(params) => (
-      <TextField
-        {...params}
-        placeholder={t("enterAuthorName")}
-        variant="outlined"
-        className="w-full"
-        size="small"
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            fontSize: '12px',
-            padding: '2px',
-            '@media (min-width: 640px)': {
-              fontSize: '13px',
-              padding: '4px',
-            },
-          },
-          '& .MuiInputBase-input': {
-            padding: '6px 8px',
-          },
-        }}
-      />
-    )}
-  />
-</div>
 
   {/* Judgement Date Range */}
 <div className="mb-4">
@@ -745,6 +1552,125 @@ if (response.data && Array.isArray(response.data.documents)) {
     onChange={e => setJudgementDateTo(e.target.value)}
     className="w-full border rounded px-2 py-1"
   />
+</div>
+
+
+<div className="mb-4">
+  <label className="block font-medium mb-1">Petitioner</label>
+ <Autocomplete
+  freeSolo
+  options={[
+    ...new Set(
+      documents
+        .map(doc => doc.Key_Entities?.Petitioner?.trim())
+        .filter(Boolean)
+    )
+  ]}
+  value={petitioner}
+  onInputChange={(event, newValue) => setPetitioner(newValue)}
+  size="small" // 👈 shrinks outer autocomplete
+  slotProps={{
+    popper: {
+      modifiers: [
+        {
+          name: 'offset',
+          options: {
+            offset: [0, 4],
+          },
+        },
+      ],
+    },
+    paper: {
+      sx: {
+        fontSize: '12px',     // 👈 smaller font for dropdown items
+        maxHeight: '150px',   // 👈 optional: smaller dropdown height
+        paddingY: '4px',
+      },
+    },
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      placeholder="Enter Petitioner"
+      variant="outlined"
+      className="w-full"
+      size="small"
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          fontSize: '12px',
+          padding: '2px',
+          '@media (min-width: 640px)': {
+            fontSize: '13px',
+            padding: '4px',
+          },
+        },
+        '& .MuiInputBase-input': {
+          padding: '6px 8px',
+        },
+      }}
+    />
+  )}
+/>
+
+</div>
+
+
+<div className="mb-4">
+  <label className="block font-medium mb-1">Respondent</label>
+   <Autocomplete
+  freeSolo
+  options={[
+    ...new Set(
+      documents
+        .map(doc => doc.Key_Entities?.Respondent?.trim())
+        .filter(Boolean)
+    )
+  ]}
+  value={respondent}
+  onInputChange={(event, newValue) => setRespondent(newValue)}
+  size="small" // 👈 shrinks outer autocomplete
+  slotProps={{
+    popper: {
+      modifiers: [
+        {
+          name: 'offset',
+          options: {
+            offset: [0, 4],
+          },
+        },
+      ],
+    },
+    paper: {
+      sx: {
+        fontSize: '12px',     // 👈 smaller font for dropdown items
+        maxHeight: '150px',   // 👈 optional: smaller dropdown height
+        paddingY: '4px',
+      },
+    },
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      placeholder="Respondent"
+      variant="outlined"
+      className="w-full"
+      size="small"
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          fontSize: '12px',
+          padding: '2px',
+          '@media (min-width: 640px)': {
+            fontSize: '13px',
+            padding: '4px',
+          },
+        },
+        '& .MuiInputBase-input': {
+          padding: '6px 8px',
+        },
+      }}
+    />
+  )}
+/>
 </div>
 
 <div className="mb-4">
@@ -805,10 +1731,6 @@ if (response.data && Array.isArray(response.data.documents)) {
 />
 
 </div>
-
-
-
-
 
 <div className="mb-4">
   <label className="block font-medium mb-1">{t("advOfRespondent")}</label>
@@ -957,21 +1879,19 @@ if (response.data && Array.isArray(response.data.documents)) {
   />
 </div>
 
-{/* Judgement Type */}
-{/* Judgement Type */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">{t("judgementType")}</label>
+  <label className="block font-medium mb-1">Previous Case Citation</label>
   <Autocomplete
     freeSolo
     options={[
       ...new Set(
         documents
-          .map(doc => doc.Metadata?.Judgement_type?.trim())
+          .map(doc => doc.Key_Entities?.Previous_case_citation?.trim())
           .filter(Boolean)
       )
     ]}
-    value={judgementType}
-    onInputChange={(event, newValue) => setJudgementType(newValue)}
+    value={prevcasecitation}
+    onInputChange={(event, newValue) => setPrevcasecitation(newValue)}
     size="small"
     slotProps={{
       popper: {
@@ -988,7 +1908,7 @@ if (response.data && Array.isArray(response.data.documents)) {
     renderInput={(params) => (
       <TextField
         {...params}
-        placeholder={t("enterJudgementType")}
+        placeholder="Enter Previous Case Citation"
         variant="outlined"
         className="w-full"
         size="small"
@@ -1010,20 +1930,19 @@ if (response.data && Array.isArray(response.data.documents)) {
   />
 </div>
 
-{/* Language of Judgement */}
 <div className="mb-4">
-  <label className="block font-medium mb-1">{t("languageOfJudgement")}</label>
+  <label className="block font-medium mb-1">Penalty Details</label>
   <Autocomplete
     freeSolo
     options={[
       ...new Set(
         documents
-          .map(doc => doc.Metadata?.Language_of_Judgement?.trim())
+          .map(doc => doc.Key_Entities?.Penalty_detail?.trim())
           .filter(Boolean)
       )
     ]}
-    value={languageOfJudgement}
-    onInputChange={(event, newValue) => setLanguageOfJudgement(newValue)}
+    value={penaltydetail}
+    onInputChange={(event, newValue) => setPenaltydetail(newValue)}
     size="small"
     slotProps={{
       popper: {
@@ -1040,7 +1959,7 @@ if (response.data && Array.isArray(response.data.documents)) {
     renderInput={(params) => (
       <TextField
         {...params}
-        placeholder={t("enterLanguage")}
+        placeholder="Enter Penality Details"
         variant="outlined"
         className="w-full"
         size="small"
@@ -1061,402 +1980,98 @@ if (response.data && Array.isArray(response.data.documents)) {
     )}
   />
 </div>
+
+<div className="mb-4">
+  <label className="block font-medium mb-1">Head Note</label>
+  <Autocomplete
+    freeSolo
+    options={[
+      ...new Set(
+        documents
+          .map(doc => doc.Key_Entities?.Head_note?.trim())
+          .filter(Boolean)
+      )
+    ]}
+    value={headnote}
+    onInputChange={(event, newValue) => setHeadnote(newValue)}
+    size="small"
+    slotProps={{
+      popper: {
+        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
+      },
+      paper: {
+        sx: {
+          fontSize: '12px',
+          maxHeight: '150px',
+          paddingY: '4px',
+        },
+      },
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder="Enter Head Note"
+        variant="outlined"
+        className="w-full"
+        size="small"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            fontSize: '12px',
+            padding: '2px',
+            '@media (min-width: 640px)': {
+              fontSize: '13px',
+              padding: '4px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+          },
+        }}
+      />
+    )}
+  />
+</div>
+{/* 🔹 Normal Filters Section */}
+<div className="mt-6 border-t pt-4">
+  <h4 className="text-md font-semibold mb-3">Normal Filters</h4>
+
+  <div className="mb-4">
+    <label className="block font-medium mb-1">{t("uploadDateFrom")}</label>
+    <input
+      type="date"
+      value={uploadDateFrom}
+      onChange={(e) => setUploadDateFrom(e.target.value)}
+      className="w-full border rounded px-2 py-1"
+    />
+  </div>
+
+  <div className="mb-4">
+    <label className="block font-medium mb-1">{t("uploadDateTo")}</label>
+    <input
+      type="date"
+      value={uploadDateTo}
+      onChange={(e) => setUploadDateTo(e.target.value)}
+      className="w-full border rounded px-2 py-1"
+    />
+  </div>
+
+  <div className="mb-4">
+    <label className="block font-medium mb-1">{t("sortBy")}</label>
+    <select
+      value={sortOrder}
+      onChange={(e) => setSortOrder(e.target.value)}
+      className="w-full border rounded px-2 py-1"
+    >
+      <option value="">{t("selectSortOrder")}</option>
+      <option value="A-Z">{t("sortAZ")}</option>
+      <option value="Z-A">{t("sortZA")}</option>
+    </select>
+  </div>
+</div>
+
 
   </aside>
 
-
-  <main className="flex-1 p-4 sm:p-6">
-  <h1 className="text-4xl font-bold text-center w-full text-gray-800">
-     {t("searchDocumentAdvanced")}
-</h1>
-
-  <div className="mb-4 flex items-center gap-2">
-  <div className="flex-1">
-    <Autocomplete
-  freeSolo
-  options={[
-    ...new Set(
-      documents
-        .map(doc => doc.MongoDB?.Doc_Title?.trim())
-        .filter(Boolean)
-    )
-  ]}
-  value={titleInput}
-  onInputChange={(event, newValue) => setTitleInput(newValue)}
-  size="small"
-  slotProps={{
-    popper: {
-      modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
-    },
-    paper: {
-      sx: {
-        fontSize: '12px',
-        maxHeight: '150px',
-        paddingY: '4px',
-      },
-    },
-  }}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      placeholder={t("enterDocumentTitle")}
-      variant="outlined"
-      className="w-full"
-      size="small"
-      sx={{
-        '& .MuiOutlinedInput-root': {
-          fontSize: '12px',
-          padding: '2px',
-          '@media (min-width: 640px)': {
-            fontSize: '13px',
-            padding: '4px',
-          },
-        },
-        '& .MuiInputBase-input': {
-          padding: '6px 8px',
-        },
-      }}
-    />
-  )}
-/>
-
-  </div>
-  <button
-    onClick={() => setTitle(titleInput)}
-    className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 text-sm"
-  >
-    🔍
-  </button>
-</div>
-
-    {filteredDocuments.length > 0 ? (
-      <div className="grid grid-cols-1 sm:grid-cols-1 gap-4 ">
-{filteredDocuments.map((doc) => {
-  const metadata = doc.Metadata || {};
-  const mongo = doc.MongoDB || {};
-  const docInfo = doc.Doc || {};
-  return (
-    <div
-  key={docInfo.doc_id}
-  className="relative bg-white shadow-lg rounded-xl p-4 w-full max-w-4xl mx-auto border dark:bg-gray-800 dark:border-gray-700 mb-4"
->
-  {/* Top-right action buttons */}
-  <div className="absolute top-2 right-2 flex gap-2 z-10">
-    <button
-      className="bg-gray-300 dark:bg-gray-800 text-gray-700 dark:text-white p-1 sm:p-2 rounded-md hover:bg-gray-400 dark:hover:bg-gray-700 transition flex items-center justify-center w-6 sm:w-8 h-6 sm:h-8"
-      onClick={() => {
-        setSelectedDocument(doc);
-        setShowEditDetailsModal(true);
-      }}
-    >
-      <Pencil className="w-3 sm:w-4 h-3 sm:h-4" />
-    </button>
-
-    <button
-      onClick={() => handleDelete(doc)}
-      className="bg-gray-300 dark:bg-gray-800 text-gray-700 dark:text-white p-1 sm:p-2 rounded-md hover:bg-gray-400 dark:hover:bg-gray-700 transition flex items-center justify-center w-6 sm:w-8 h-6 sm:h-8"
-    >
-      <Trash2 className="w-3 sm:w-4 h-3 sm:h-4" />
-    </button>
-
-    {/* Uploaded doc download */}
-    <div className="relative group">
-      <button
-        onClick={() => handleDownloadPDF(doc)}
-        className="bg-gray-300 dark:bg-gray-800 text-gray-700 dark:text-white p-2 rounded-md hover:bg-gray-400 dark:hover:bg-gray-700 transition flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8"
-      >
-        <Download className="w-3 sm:w-4 h-3 sm:h-4" />
-      </button>
-      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition">
-        Uploaded doc
-      </span>
-    </div>
-
-    {/* Original doc download */}
-    <div className="relative group">
-      <button
-        onClick={() => orignalPDF(doc)}
-        className="bg-gray-300 dark:bg-gray-800 text-gray-700 dark:text-white p-2 rounded-md hover:bg-gray-400 dark:hover:bg-gray-700 transition flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8"
-      >
-        <Download className="w-3 sm:w-4 h-3 sm:h-4" />
-      </button>
-      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition">
-        Original doc
-      </span>
-    </div>
-  </div>
-
-    <div className="mb-4">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-        {mongo.Doc_Title || metadata.title || "Untitled"}
-      </h3>
-      <p className="text-sm text-gray-600 dark:text-gray-300">
-        <strong>Upload date:</strong>{" "}
-        {new Date(docInfo.created_at).toLocaleDateString() || "No date"}
-      </p>
-      <p className="text-sm text-gray-600 dark:text-gray-300">
-        <strong>Class:</strong>{" "}
-        {mongo.Classification || metadata.Class || "Unclassified"}
-      </p>
-      <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-        <strong>Summary:</strong> {mongo.Summary || metadata.summary || "No summary"}
-      </p>
-      <p className="text-sm text-gray-600 dark:text-gray-300">
-        <strong>Case No:</strong> {doc.Key_Entities?.Case_no || "Not available"}
-      </p>
-    </div>
-    
-
-    <div className="flex justify-start">
-    <button
-      onClick={() => handleViewMore(doc)}
-      className="bg-blue-600 text-white text-sm px-3 py-1.5 rounded-md hover:bg-blue-700 transition"
-    >
-     {t("viewMore")}
-    </button>
-    
-  </div>
-  
-  </div>
-  );
-})}
-
-
-      </div>
-    ) : (
-      <div className="text-center text-gray-500 dark:text-white">
-        No document available
-      </div>
-    )}
-      </main>
-      <aside className="w-64 sticky top-20 h-fit bg-white p-4 rounded-lg shadow-md">
-    <h3 className="text-lg font-semibold mb-4">Advance Filters</h3>
-    
- 
-
-    
-
-
-  {/* Judgement Date Range */}
-<div className="mb-4">
-  <label className="block font-medium mb-1">{t("judgementDateFrom")}</label>
-  <input
-    type="date"
-    value={judgementDateFrom}
-    onChange={e => setJudgementDateFrom(e.target.value)}
-    className="w-full border rounded px-2 py-1"
-  />
-</div>
-
-{/* Filing Date To */}
-<div className="mb-4">
-  <label className="block font-medium mb-1">{t("judgementDateTo")}</label>
-  <input
-    type="date"
-    value={judgementDateTo}
-    onChange={e => setJudgementDateTo(e.target.value)}
-    className="w-full border rounded px-2 py-1"
-  />
-</div>
-
-
-
-
-
-
-
-<div className="mb-4">
-  <label className="block font-medium mb-1">{t("caseNo")}</label>
-   <Autocomplete
-  freeSolo
-  options={[
-    ...new Set(
-      documents
-        .map(doc => doc.Key_Entities?.Case_no?.trim())
-        .filter(Boolean)
-    )
-  ]}
-  value={caseno}
-  onInputChange={(event, newValue) => setCaseno(newValue)}
-  size="small" // 👈 shrinks outer autocomplete
-  slotProps={{
-    popper: {
-      modifiers: [
-        {
-          name: 'offset',
-          options: {
-            offset: [0, 4],
-          },
-        },
-      ],
-    },
-    paper: {
-      sx: {
-        fontSize: '12px',     // 👈 smaller font for dropdown items
-        maxHeight: '150px',   // 👈 optional: smaller dropdown height
-        paddingY: '4px',
-      },
-    },
-  }}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      placeholder={t("enterCaseNo")}
-      variant="outlined"
-      className="w-full"
-      size="small"
-      sx={{
-        '& .MuiOutlinedInput-root': {
-          fontSize: '12px',
-          padding: '2px',
-          '@media (min-width: 640px)': {
-            fontSize: '13px',
-            padding: '4px',
-          },
-        },
-        '& .MuiInputBase-input': {
-          padding: '6px 8px',
-        },
-      }}
-    />
-  )}
-/>
-</div>
-
-{/* Bench */}
-<div className="mb-4">
-  <label className="block font-medium mb-1">{t("courtNo")}</label>
-  <Autocomplete
-    freeSolo
-    options={[
-      ...new Set(
-        documents
-          .map(doc => doc.Key_Entities?.Court_no?.trim())
-          .filter(Boolean)
-      )
-    ]}
-    value={courtno}
-    onInputChange={(event, newValue) => setCourtno(newValue)}
-    size="small"
-    slotProps={{
-      popper: {
-        modifiers: [{ name: 'offset', options: { offset: [0, 4] } }],
-      },
-      paper: {
-        sx: {
-          fontSize: '12px',
-          maxHeight: '150px',
-          paddingY: '4px',
-        },
-      },
-    }}
-    renderInput={(params) => (
-      <TextField
-        {...params}
-        placeholder={t("enterCourtNo")}
-        variant="outlined"
-        className="w-full"
-        size="small"
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            fontSize: '12px',
-            padding: '2px',
-            '@media (min-width: 640px)': {
-              fontSize: '13px',
-              padding: '4px',
-            },
-          },
-          '& .MuiInputBase-input': {
-            padding: '6px 8px',
-          },
-        }}
-      />
-    )}
-  />
-</div>
-
-{/* Case Status */}
-
-
-
-<div className="mb-4">
-  <label className="block font-medium mb-1">{t("orderPronounceFrom")}</label>
-  <input
-    type="date"
-    value={orderDateFrom}
-    onChange={e => setOrderDateFrom(e.target.value)}
-    className="w-full border rounded px-2 py-1"
-  />
-</div>
-
-
-<div className="mb-4">
-  <label className="block font-medium mb-1">{t("orderPronounceTo")}</label>
-   <input
-    type="date"
-    value={orderDateTo}
-    onChange={e => setOrderDateTo(e.target.value)}
-    className="w-full border rounded px-2 py-1"
-  />
-</div>
-
-<div className="mb-4">
-  <label className="block font-medium mb-1">{t("uploadDateFrom")}</label>
-   <input
-    type="date"
-    value={uploadDateFrom}
-    onChange={e => setUploadDateFrom(e.target.value)}
-    className="w-full border rounded px-2 py-1"
-  />
-</div>
-
-<div className="mb-4">
-  <label className="block font-medium mb-1">{t("uploadDateTo")}</label>
-  <input
-    type="date"
-    value={uploadDateTo}
-    onChange={e => setUploadDateTo(e.target.value)}
-    className="w-full border rounded px-2 py-1"
-  />
-</div>
-
-<div className="mb-4">
-  <label className="block font-medium mb-1">{t("hearingDateFrom")}</label>
-   <input
-    type="date"
-    value={hearingDateFrom}
-    onChange={e => setHearingDateFrom(e.target.value)}
-    className="w-full border rounded px-2 py-1"
-  />
-</div>
-
-<div className="mb-4">
-  <label className="block font-medium mb-1">{t("hearingDateTo")}</label>
-  <input
-    type="date"
-    value={hearingDateTo}
-    onChange={e => setHearingDateTo(e.target.value)}
-    className="w-full border rounded px-2 py-1"
-  />
-</div>
-{/* Sort By */}
-<div className="mb-4">
-  <label className="block font-medium mb-1">{t("sortBy")}</label>
-  <select
-    value={sortOrder}
-    onChange={(e) => setSortOrder(e.target.value)}
-    className="w-full border rounded px-2 py-1"
-  >
-    <option value="">{t("selectSortOrder")}r</option>
-    <option value="A-Z">{t("sortAZ")}</option>
-    <option value="Z-A">{t("sortZA")}</option>
-  </select>
-</div>
-
-
-
-
-  </aside>
   </div>
 
   {showEditDetailsModal && renderEditDetailsModal()}

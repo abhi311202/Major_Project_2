@@ -460,8 +460,10 @@ const pdfu= PdfUrl;
   
 
   const onSubmit = async (data) => {
-    console.log("IN ON SUBMIT");
+    console.log("IN ON SUBMIT", data);
     // console.log(data,"abhi");
+    console.log("✅ Full form data:", data);
+
 
     const success = await uploadToS3(file);
     console.log(success);
@@ -505,7 +507,7 @@ const pdfu= PdfUrl;
       MongoDB:{
       Doc_Title: data.title,
       Serial_No: data.serialnum,
-      Document_Content: data.content,
+      Document_Content: data.pageContents,
       Summary: data.summary,
       Classification: oth ? "Other" : c,
       Classification_reason: data.classificationReason,
@@ -652,26 +654,7 @@ console.log("hllllooo new "+PdfUrl)
       // }, 1000);
     }
   };
-  const handleClear_Keyentity = () => {
-    setCaseno("");
-    setCasetype("");
-    setCasestatus("");
-    setFilingdate("");
-    setJudgmentdate("");
-    setCourtno("");
-    setCourtname("");
-    setBench("");
-    setPetitioner("");
-    setRespondent("");
-    setAdvofpetitioner("");
-    setAdvofrespondent("");
-    setPrevcasecitation("");
-    setPenaltydetail("");
-    setHeadnote("");
-  
-    // Optional: if you're using useForm() from react-hook-form
-    // reset();
-  };
+
   const handleClear_Metadata = () => {
     // Reset state values
     setJudgementauthor("");
@@ -892,18 +875,18 @@ console.log("hllllooo new "+PdfUrl)
   
       // ✅ Map entity fields
       const entityFields = {
-        "CASE_NO.": ["caseno", setCaseno],
+        "CASE_NO": ["caseno", setCaseno],
         "CASE_TYPE": ["casetype", setCasetype],
         "CASE_STATUS": ["casestatus", setCasestatus],
-        "FILING _DATE": ["filingdate", setFilingdate],
-        "JUDGEMENT _DATE": ["judgmentdate", setJudgmentdate],
-        "COURT_NO.": ["courtno", setCourtno],
+        "FILING_DATE": ["filingdate", setFilingdate],
+        "JUDGEMENT_DATE": ["judgmentdate", setJudgmentdate],
+        "COURT_NO": ["courtno", setCourtno],
         "COURT_NAME": ["courtname", setCourtname],
         "BENCH": ["bench", setBench],
-        "PETITIONER:": ["petitioner", setPetitioner],
+        "PETITIONER": ["petitioner", setPetitioner],
         "RESPONDENT": ["respondent", setRespondent],
-        "ADV._OF_PETITIONER": ["advofpetitioner", setAdvofpetitioner],
-        "ADV._OF_RESPONDENT": ["advofrespondent", setAdvofrespondent],
+        "ADV_OF_PETITIONER": ["advofpetitioner", setAdvofpetitioner],
+        "ADV_OF_RESPONDENT": ["advofrespondent", setAdvofrespondent],
         "PREVIOUS_CASE_CITATION": ["prevcasecitation", setPrevcasecitation],
         "PENALTY_DETAIL": ["penaltydetail", setPenaltydetail],
         "HEAD_NOTE": ["headnote", setHeadnote],
@@ -923,17 +906,18 @@ console.log("hllllooo new "+PdfUrl)
         "JUDGEMENT_TYPE": ["judgementtype", setJudgementtype],
         "LANGUAGE_OF_JUDGEMENT": ["langofjudgement", setLangofjudgement],
         "DATE_OF_HEARING": ["dateofhearing", setDateofhearing],
-        "DATE_OF_ORDER PRONOUNCEMENT": ["dateoforderpro", setDateoforderpro],
+        "DATE_OF_ORDER_PRONOUNCEMENT": ["dateoforderpro", setDateoforderpro],
         "BENCH_COMPOSITION": ["benchcomposition", setBenchcomposition],
-        "REFERRED ACTS": ["referredacts", setReferredacts],
+        "REFERRED_ACTS": ["referredacts", setReferredacts],
       };
   
       for (const key in metadataFields) {
         const [fieldName, setter] = metadataFields[key];
-        const value = metadata[key] || "";
+        const value = metadata.hasOwnProperty(key) ? metadata[key] : "";
         console.log(`📦 Setting metadata [${fieldName}] from key "${key}" → "${value}"`);
         setter(value);
-        setValue(fieldName, value);
+        setValue("judgementauthor", metadata[key] || "");  // inside the metadata loop
+
       }
   
       console.log("✅ All fields populated.");
@@ -941,7 +925,6 @@ console.log("hllllooo new "+PdfUrl)
       console.error("❌ Error fetching data:", error);
     }
   };
-  
 
   const handleSummarizaton = async () => {
     if (!extractedJson) {
@@ -983,17 +966,18 @@ console.log("hllllooo new "+PdfUrl)
   
       console.log("📥 Classification API Response:", res.data);
   
-      const categoryText = res.data?.threshold?.classification?.category?.[0] || "";
-      const reasonText = res.data?.threshold?.classification?.reason || "";
-      
+      // ✅ Correct path to classification data
+      const categoryText = res.data?.data?.classification?.category?.[0] || "";
+      const reasonText = res.data?.data?.classification?.reason || "";
+  
       console.log("📝 Classification Category:", categoryText);
       console.log("📝 Classification Reason:", reasonText);
-      
+  
       setClassification(categoryText);
       setClassificationReason(reasonText);
+  
       setValue("Class", categoryText);
       setValue("ClassificationReason", reasonText);
-      
   
     } catch (error) {
       console.error("❌ Error fetching classification:", error);
@@ -1001,29 +985,11 @@ console.log("hllllooo new "+PdfUrl)
   };
   
   
+  
 return (
 <div className="flex min-h-screen max-h-max overflow-hidden ">
   <div className="flex flex-col items-center justify-start w-full p-4">
-  {extractedJson && (
-  <div className="flex justify-center mt-4">
-    <button
-      onClick={() => {
-        const blob = new Blob([JSON.stringify(extractedJson, null, 2)], {
-          type: "application/json",
-        });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${extractedJson.doc_name.replace(/\.[^/.]+$/, "")}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-      }}
-      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-    >
-      ⬇️ Download JSON
-    </button>
-  </div>
-)}
+
     {/* File Chooser Always on Top */}
     <div className="w-full ml-[950px]">
   <label
@@ -1111,8 +1077,9 @@ return (
                 file ? "hover:bg-gray-700" : "opacity-50 cursor-not-allowed"
               }`}
               onClick={() => {
-                handleSummarize();
+                handleSummarizaton();
                 handleClassify();
+                handleEntityMetadataExtraction();
               }}
               disabled={!file}
             >
@@ -1365,28 +1332,7 @@ return (
     />
   </div>
 </div>
-<div className="mt-6 flex flex-wrap gap-4">
-<button
-  onClick={handleEntityMetadataExtraction}
-  className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
->
-  Show Result 1
-</button>
-
-  <button
-    onClick={handleClear_Keyentity}
-    className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
-  >
-    Clear
-  </button>
-</div>
-
-</div>
-
-{/* Meta Data */}
-
-<div className="border rounded-lg p-6 shadow-md bg-white dark:bg-gray-900">
-          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Meta Data</h2>
+<h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Meta Data</h2>
 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
   <div>
@@ -1394,14 +1340,14 @@ return (
       Judgement Author:
     </label>
     <textarea
-    value={judgementauthor}
-      rows="2"
-      className="w-full border p-4 rounded-md resize-none border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-      onChange={(e) => {
-        setJudgementauthor(e.target.value);
-        setValue("judgementauthor", e.target.value);
-      }}
-    />
+  {...register("judgementauthor")}
+  value={judgementauthor}
+  onChange={(e) => {
+    setJudgementauthor(e.target.value);
+    setValue("judgementauthor", e.target.value);
+  }}
+/>
+
   </div>
 
 
@@ -1503,21 +1449,26 @@ return (
  
 </div>
 <div className="mt-6 flex flex-wrap gap-4">
-  <button
-    onClick={handleShowResult}
-    className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
-  >
-    Show Result
-  </button>
+<button
+  onClick={handleEntityMetadataExtraction}
+  className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
+>
+  Show Result 
+</button>
 
   <button
-    onClick={handleClear_Metadata}
+    // onClick={handleClear_Keyentity}
     className="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
   >
     Clear
   </button>
 </div>
+
 </div>
+
+{/* Meta Data */}
+
+
 {/* class */}
 <div className="border rounded-lg p-6 shadow-md bg-white dark:bg-gray-900">
 <label className="block text-gray-600 font-medium dark:text-white">
@@ -1525,21 +1476,17 @@ return (
             <div className="relative w-full">
               {/* Textarea Input */}
               <textarea
-                rows="3"
-                defaultValue={classification}
-                onChange={(e) => {
-                  setClassification(e.target.value);
-                  setValue("Class", e.target.value);
-                }}
-                {...(loading1
-                  ? {}
-                  : register("classification", { required: true }))}
-                className={`w-full p-4 border rounded-lg resize-none text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white ${
-                  classError || classificationError
-                    ? "border-red-500"
-                    : "border-gray-300"
-                }`}
-              />
+  rows="3"
+  value={classification}  // controlled input
+  onChange={(e) => {
+    setClassification(e.target.value);
+    setValue("Class", e.target.value);
+  }}
+  {...(loading1 ? {} : register("classification", { required: true }))}
+  className={`w-full p-4 border rounded-lg resize-none text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white ${
+    classError || classificationError ? "border-red-500" : "border-gray-300"
+  }`}
+/>
 
               {loading1 && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-black/80">
@@ -1573,18 +1520,19 @@ return (
               Classification Reason:
             </label>
             <div className="relative">
-              <textarea
-                rows="8"
-                defaultValue={classificationReason}
-                onChange={(e) => {
-                  setClassificationReason(e.target.value);
-                  setValue("ClassificationReason", e.target.value);
-                }}
-                {...(loading1 ? {} : register("classificationReason", { required: true }))}
-                className={`w-full p-3 border rounded-md resize-none dark:bg-black dark:border-gray-600 dark:text-white dark:bg-gray-800 dark:border-gray-700 dark:text-white ${
-                  classificationError ? "border-red-500" : ""
-                }`}
-              />
+            <textarea
+  rows="8"
+  value={classificationReason}
+  onChange={(e) => {
+    setClassificationReason(e.target.value);
+    setValue("ClassificationReason", e.target.value);
+  }}
+  {...(loading1 ? {} : register("classificationReason", { required: true }))}
+  className={`w-full p-3 border rounded-md resize-none dark:bg-black dark:border-gray-600 dark:text-white ${
+    classificationError ? "border-red-500" : ""
+  }`}
+/>
+
               {loading1 && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-black/80">
                   <span className="text-2xl font-bold text-gray-600 dark:text-gray-300 animate-pulse">

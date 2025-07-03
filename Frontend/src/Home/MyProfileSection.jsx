@@ -12,7 +12,7 @@ const MyProfileSection = () => {
 
   const [profileData, setProfileData] = useState({});
   const [superAdminStatus, setSuperAdminStatus] = useState("not_requested");
-
+  const [uploadedDocuments, setDocuments] = useState([]);
   const storedObjectString = localStorage.getItem("Admin");
   const myObject = JSON.parse(storedObjectString);
   console.log(myObject)
@@ -68,7 +68,7 @@ const MyProfileSection = () => {
 
   const getSuperAdminButtonText = () => {
     if (superAdminStatus === "loading") return "Checking...";
-    if (superAdminStatus === "requested") return "Already Requested For SuperAdmin";
+    if (superAdminStatus === "requested") return "Requested For SuperAdmin";
     return "Request Super Admin Access";
   };
 
@@ -121,7 +121,27 @@ const MyProfileSection = () => {
     }
   };
   
-
+  React.useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/Document/get-documents`);
+  
+        console.log("📦 Full API Response:", response.data); // ✅ Log full response
+        console.log("📦 Documents length", response.data.documents.length); // ✅ Log documents array
+  
+        if (response.data && Array.isArray(response.data.documents)) {
+          setDocuments(response.data.documents);
+          setFilteredDocuments(response.data.documents);
+        } else {
+          console.warn("⚠️ Unexpected response format:", response.data);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching documents:", error);
+      }
+    };
+  
+    fetchDocuments();
+  }, []);
 
 
   const gradientHover =
@@ -153,7 +173,7 @@ const MyProfileSection = () => {
           <div className="text-sm text-black mt-1 dark:text-white">{t("Registration Date")}</div>
         </div>
         <div className={`bg-white p-4 rounded-xl shadow text-center dark:bg-black dark:text-white ${gradientHover}`}>
-          <div className="text-xl font-bold text-black dark:text-white">15</div>
+          <div className="text-xl font-bold text-black dark:text-white">{uploadedDocuments.length}</div>
           <div className="text-sm text-black mt-1 dark:text-white">{t("Doc Uploaded")}</div>
         </div>
         

@@ -50,10 +50,7 @@ const ManageSuperAdmin = () => {
   
       toast.success(res.data.message);
   
-      await axios.post(`${baseURL}/Services/send-welcome-email`, {
-        email: admin.email,
-        username: admin.username
-      });
+
   
       toast.success("Welcome email sent!");
   
@@ -105,12 +102,8 @@ const ManageSuperAdmin = () => {
       );
       toast.success(res.data.message);
 
-      // ✅ Send rejection email with correct info
-      await axios.post(`${baseURL}/Services/send-welcome-email`, {
-        email: rejectedAdmin.email,
-        username: rejectedAdmin.username,
-        type: "SuperAdminRequestRejected",
-      });
+
+
 
       toast.success("Rejection email sent!");
 
