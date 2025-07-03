@@ -1,7 +1,8 @@
 import client from "../../../config/sqlDB.js";
 
 export const checkAdminExistsByEmail = async (email) => {
-  const query = `SELECT source_table
+  try {
+    const query = `SELECT source_table
       FROM (
           SELECT 'admin' AS source_table
           FROM admin
@@ -15,6 +16,10 @@ export const checkAdminExistsByEmail = async (email) => {
       ) AS combined
       LIMIT 1;`;
 
-  const result = await client.query(query, [email]);
-  return result.rows.length > 0 ? result.rows[0].source_table : false;
+    const result = await client.query(query, [email]);
+    return result.rows.length > 0 ? result.rows[0].source_table : false;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
