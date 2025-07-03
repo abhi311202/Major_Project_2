@@ -1,5 +1,7 @@
 import axios from "axios";
+// import dotenv from "dotenv";
 
+// dotenv.config();
 export const docSummarization = async (req, res) => {
   const { doc_id, doc_name, metadata, entities, pages } = req.body;
   if (!doc_id && !doc_name && !metadata && !entities && !pages) {
@@ -9,8 +11,9 @@ export const docSummarization = async (req, res) => {
     });
   }
   try {
+    console.log(`http://${process.env.SUMMARY}/summarize`);
     const response = await axios.post(
-      "http://13.200.48.15:4000/summarize",
+      `http://${process.env.SUMMARY}/summarize`,
       req.body
     );
     // console.log(response.data);

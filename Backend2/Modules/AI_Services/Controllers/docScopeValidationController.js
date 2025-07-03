@@ -10,7 +10,7 @@ export const docScopeValidation = async (req, res) => {
   }
   try {
     const response = await axios.post(
-      "http://13.200.48.15:6000/doc-validation",
+      `http://${process.env.SCOPE_VALIDATION}/validation`,
       req.body
     );
     // console.log(response.data.validation_score * 100);

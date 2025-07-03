@@ -1,20 +1,19 @@
-
 import client from "../../../config/sqlDB.js";
 
 export const createMetadata = async (Meta_data) => {
-    //   console.log(Meta_data);
-    const {
-      id,
-      Judgement_author,
-      Judgement_type,
-      Language_of_Judgement,
-      Date_of_hearing,
-      Date_of_order_pronouncement,
-      Bench_Composition,
-      Referred_acts,
-    } = Meta_data;
-  
-    const query = `INSERT INTO document_metadata (
+  //   console.log(Meta_data);
+  const {
+    id,
+    JUDGEMENT_AUTHOR,
+    JUDGEMENT_TYPE,
+    LANGUAGE_OF_JUDGEMENT,
+    DATE_OF_HEARING,
+    DATE_OF_ORDER_PRONOUNCEMENT,
+    BENCH_COMPOSITION,
+    REFERRED_ACTS,
+  } = Meta_data;
+
+  const query = `INSERT INTO document_metadata (
       doc_id,
       judgement_author,
       judgement_type,
@@ -34,19 +33,19 @@ export const createMetadata = async (Meta_data) => {
       $8
   )
   RETURNING doc_id;`;
-  
-    const values = [
-      id,
-      Judgement_author,
-      Judgement_type,
-      Language_of_Judgement,
-      Date_of_hearing,
-      Date_of_order_pronouncement,
-      Bench_Composition,
-      Referred_acts,
-    ];
-  
-    const result = await client.query(query, values);
-    //   console.log(result);
-    return result.rows[0].doc_id;
-  };
+
+  const values = [
+    id,
+    JUDGEMENT_AUTHOR,
+    JUDGEMENT_TYPE,
+    LANGUAGE_OF_JUDGEMENT,
+    DATE_OF_HEARING,
+    DATE_OF_ORDER_PRONOUNCEMENT,
+    BENCH_COMPOSITION,
+    REFERRED_ACTS,
+  ];
+
+  const result = await client.query(query, values);
+  //   console.log(result);
+  return result.rows[0].doc_id;
+};

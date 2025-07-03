@@ -6,7 +6,7 @@ const documentSchema = new mongoose.Schema({
   Classification: { type: String, required: true },
   Classification_reason: { type: String, required: true },
   Summary: { type: String, required: true },
-  Document_Content: { type: String, required: true },
+  Document_Content: { type: [mongoose.Schema.Types.Mixed], required: true },
 });
 
 const Document = mongoose.model("Document", documentSchema);

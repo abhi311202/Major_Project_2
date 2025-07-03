@@ -1,5 +1,5 @@
 import Document from "../Mongo_Models/DocUploadModel.js";
-
+import axios from "axios";
 import client from "../../../config/sqlDB.js";
 
 import { createDocument } from "../Models/createDocumentModel.js";
@@ -86,6 +86,27 @@ export const DocUpload = async (req, res) => {
             owner_type
           );
           if (doc_owner_map_id) {
+            // send document to PYTHON API TO INGEST
+            const json_py = {
+              doc_id: doc_id,
+              doc_name: MongoDB.Doc_Title,
+              metadata: Metadata,
+              entities: Key_Entities,
+              pages: MongoDB.Document_Content,
+            };
+            // console.log(json_py);
+            // http://13.127.253.239:5004/ingest
+            // console.log(`http://${process.env.RAG}/ingest`);
+
+            const response = await axios.post(
+              `http://${process.env.RAG}/ingest`,
+              json_py
+            );
+            // console.log(response.data);
+
+            if (response.data.vector_upload_count === 0) {
+              throw new Error("Could not make entry in vector table");
+            }
             await client.query("COMMIT");
             return res.status(200).json({
               message: "Document Uploaded Successfully",
@@ -97,7 +118,7 @@ export const DocUpload = async (req, res) => {
             throw new Error("Could not make entry in document_owner_map table");
           }
         } catch (error) {
-          console.log("Error in DocUploadController: "+error);
+          console.log("Error in DocUploadController: " + error);
           throw error;
         }
       } else {

@@ -9,11 +9,15 @@ export const docSearch = async (req, res) => {
     });
   }
   try {
-    // const response = await axios.post("https://api.example.com/endpoint",req.body);
+    // console.log(`http://13.127.253.239:5003/search`);
+    const response = await axios.post(
+      `http://${process.env.SEARCH}/search`,
+      req.body
+    );
     // console.log(response.data);
     return res.status(200).json({
       message: "Document Searching Successful!",
-      data: doc_Search_Output,
+      data: response.data,
     });
   } catch (error) {
     console.log(error);
@@ -21,11 +25,4 @@ export const docSearch = async (req, res) => {
       error: "Something went wrong!",
     });
   }
-};
-
-const doc_Search_Output = {
-    "search_query": "give the important points.",
-    "metadata": {},
-    "entities": {},
-    "search_result": [1, 2, 3]
 };

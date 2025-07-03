@@ -9,8 +9,9 @@ export const docClassification = async (req, res) => {
     });
   }
   try {
+    console.log(`http://${process.env.CLASSIFICATION}/classify`);
     const response = await axios.post(
-      "http://13.200.48.15:5000/classify",
+      `http://${process.env.CLASSIFICATION}/classify`,
       req.body
     );
     // console.log(response.data);
