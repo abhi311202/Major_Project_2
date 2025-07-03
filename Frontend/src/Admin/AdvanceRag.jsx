@@ -66,6 +66,7 @@ const [advOfRespondent, setAdvOfRespondent] = useState('');
 const [advOfPetitioner, setAdvOfPetitioner] = useState('');
 
 
+
 const [caseStatus, setCaseStatus] = useState('');
 const [filingDateFrom, setFilingDateFrom] = useState('');
 const [filingDateTo, setFilingDateTo] = useState('');
@@ -226,6 +227,55 @@ const [sortOrder, setSortOrder] = React.useState('asc'); // or 'desc'
     };
 
   };
+  const handleSendQuery = async () => {
+    if (!query.trim()) {
+      toast.error("Please enter a query.");
+      return;
+    }
+  
+    const payload = {
+      query: query.trim(),
+      metadata: {},
+      entities: {},
+    };
+  
+    setMessages((prev) => [...prev, { type: "user", text: query }]);
+    setWaitingForResponse(true);
+  
+    try {
+      const res = await axios.post("http://localhost:4001/AI-Services/rag-query-input", payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      const response = res.data?.data; // ✅ accessing inside `.data.data`
+  
+      if (!response) {
+        throw new Error("Invalid API response structure");
+      }
+  
+      // ✅ Correct logging
+      console.log("🟢 Full API Response:", response);
+      console.log("📝 Query:", response.query);
+      console.log("📌 Answer:", response.result);
+      console.log("📚 References:", response.references);
+      console.log("🔍 Metadata:", response.metadata);
+      console.log("🧩 Entities:", response.entities);
+  
+      setMessages((prev) => [...prev, { type: "ai", text: response.result || "No result found." }]);
+    } catch (err) {
+      console.error("❌ API error:", err);
+      setMessages((prev) => [...prev, { type: "ai", text: "Error: Unable to get response." }]);
+    } finally {
+      setWaitingForResponse(false);
+      setQuery("");
+    }
+  };
+  
+  
+  
+  
 
   const handleEndChat = async () => {
   if (!ingestOutput || !ingestOutput.index_name) {
@@ -319,49 +369,7 @@ const Clearchat = () =>{
         .replace(/\n{2,}/g, '\n\n'); // Ensure spacing is preserved
 }
 
-  const handleSendQuery = async () => {
-    if (query.trim() === "") return;
-
-  setMessages([...messages, { type: "user", text: query }]);
-  setQuery(""); // Clear the input field immediately after adding the message
-    setWaitingForResponse(true);
-    
-
-    try {
-      const jsonData = { query };
-      const res = await axios.post("http://52.66.174.249:9000/query", jsonData);
-      if (res.data) {
-        console.log(res.data);
-        if (res.data.response === "Sorry! No relevant information found!") {
-          // text1 = res.data.response;
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { type: "bot", text: res.data.response },
-          ]);
-        }
-        else {
-          // text1 = res.data.response + "\n\nReferences: \n" + res.data.references;
-          setMessages((prevMessages) => [
-          ...prevMessages,
-          { type: "bot", text: res.data.response },
-          ]);
-          
-          setMessages((prevMessages) => [
-          ...prevMessages,
-          { type: "bot", text: "Page References: " + res.data.references.join(", ") }
-
-          ]);
-        }
-      }
-    } catch (err) {
-      console.error("Error processing query:", err);
-    } finally {
-      setWaitingForResponse(false);
-      
-    }
-
-    
-  };
+ 
   return (
 <>
 <div className="flex min-h-screen dark:bg-[#222]">
@@ -739,12 +747,7 @@ const Clearchat = () =>{
       >
         ➤
       </button>
-      <button
-        onClick={handleEndChat}
-        className="bg-red-500 text-white px-3 py-2 rounded"
-      >
-        End
-      </button>
+    
       <button
         onClick={Clearchat}
         className="bg-yellow-500 text-white px-3 py-2 rounded"

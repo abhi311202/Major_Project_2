@@ -179,56 +179,8 @@ function UploadNewDocument() {
     reader.readAsArrayBuffer(file);
 
     reader.onload = async function () {
-      // try {
-      //   const pdfData = new Uint8Array(reader.result);
-      //   const pdf = await getDocument({
-      //     data: pdfData,
-      //     standardFontDataUrl: "node_modules/pdfjs-dist/standard_fonts/",
-      //   }).promise;
-
-      //   for (let i = 1; i <= pdf.numPages; i++) {
-      //     const page = await pdf.getPage(i);
-      //     const textContent = await page.getTextContent();
-      //     const text = textContent.items.map((item) => item.str).join(" ");
-
-      //     pages.push({
-      //       page_number: i,
-      //       page_char_count: text.length,
-      //       page_token_count: text.length / 4,
-      //       page_word_count: text.split(" ").length,
-      //       page_sentence_count_raw: text.split(".").length,
-      //       text: cleanString(text),
-      //     });
-      //   }
-
-      //   const jsonData = {
-      //     doc_id: 12345,
-      //     doc_name: file.name,
-      //     metadata: {},
-      //     pages: pages,
-      //   };
-
-      //   await axios
-      //     .post("http://52.66.174.249:7000/summarize", jsonData)
-      //     .then((res) => {
-      //       console.log(JSON.stringify(res.data));
-      //       reset({ summary: res.data.summarization });
-      //       setSummary(markdownToPlainText(res.data.summarization));
-      //     })
-      //     .catch((err) => {
-      //       console.error(err);
-      //       setSummarizationError("Failed to fetch summary."); // Show error message in UI
-      //     })
-      //     .finally(() => {
-      //       setLoading(false); // Stop loading after request completes
-      //     });
-      // } catch (error) {
-      //   console.error("Error processing file:", error);
-      //   setSummarizationError(
-      //     "An error occurred while processing the document."
-      //   );
-      //   setLoading(false);
-      // }
+ 
+   
     };
 
     reader.onerror = () => {
@@ -237,169 +189,6 @@ function UploadNewDocument() {
       setLoading(false);
     };
   };
-
-
-
-  // Stimulate classification process
-  // const handleClassify = async () => {
-  //   console.log("Quick Classify");
-  //   setLoading1(true); // Set loading to true when request starts
-  //   setClassification(null); // Clear previous classification
-  //   setClassificationReason(null); // Clear previous reason
-  //   setClassificationError(null); // Clear previous error
-
-  //   let pages = [];
-
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.readAsArrayBuffer(file);
-
-  //     reader.onload = async function () {
-  //       const pdfData = new Uint8Array(reader.result);
-
-  //       // try {
-  //       //   const pdf = await getDocument({
-  //       //     data: pdfData,
-  //       //     standardFontDataUrl: "node_modules/pdfjs-dist/standard_fonts/",
-  //       //   }).promise;
-
-  //       //   for (let i = 1; i <= pdf.numPages; i++) {
-  //       //     const page = await pdf.getPage(i);
-  //       //     const textContent = await page.getTextContent();
-  //       //     const text = textContent.items.map((item) => item.str).join(" ");
-
-  //       //     pages.push({
-  //       //       page_number: i,
-  //       //       page_char_count: text.length,
-  //       //       page_token_count: text.length / 4,
-  //       //       page_word_count: text.split(" ").length,
-  //       //       page_sentence_count_raw: text.split(".").length,
-  //       //       text: cleanString(text),
-  //       //     });
-  //       //   }
-
-  //       //   const jsonData1 = {
-  //       //     doc_id: 12345, // You might want to generate a unique ID
-  //       //     doc_name: file.name,
-  //       //     metadata: {},
-  //       //     pages: pages,
-  //       //   };
-
-  //       //   // Send data to the classification API
-  //       //   // const response = await axios.post(
-  //       //   //   "http://52.66.174.249:8000/classify",
-  //       //   //   jsonData1
-  //       //   // );
-
-  //       //   // console.log(JSON.stringify(response.data.classification));
-
-  //       //   // const classificationvalue = "• " + response.data.classification.category.join("<br/>• ");
-  //       //   // console.log(classificationvalue);
-
-  //       //   // Update state with classification results
-
-  //       //   setClassification(
-  //       //     // markdownToPlainText(JSON.stringify(response.data.classification.category))
-  //       //     // classificationvalue
-  //       //     response.data.classification.category.join("\n")
-  //       //   );
-  //       //   setClassificationReason(
-  //       //     markdownToPlainText(
-  //       //       JSON.stringify(response.data.classification.reason)
-  //       //     )
-  //       //   );
-  //       // } catch (err) {
-  //       //   console.error("Error during classification:", err);
-  //       //   setClassificationError(
-  //       //     "Failed to classify the document. Please try again."
-  //       //   );
-  //       // } finally {
-  //       //   setLoading1(false); // Unset loading state
-  //       // }
-  //     };
-  //   } else {
-  //     setClassificationError("Please upload a file before classification.");
-  //     setLoading1(false);
-  //   }
-  // };
-
-  // const handleEntitymeta = async () => {
-  //   console.log("Meta and Entity extraction");
-  //   setLoading2(true);
-  //   setEntitymetaError(null); // Reset error state before starting
-  //   setEntitymeta(""); // Clear previous summary
-
-  //   let pages = [];
-  //   if (!file) {
-  //     setEntitymetaError("No file selected.");
-  //     setLoading2(false);
-  //     return;
-  //   }
-
-  //   const reader = new FileReader();
-  //   reader.readAsArrayBuffer(file);
-
-  //   reader.onload = async function () {
-  //     try {
-  //       const pdfData = new Uint8Array(reader.result);
-  //       const pdf = await getDocument({
-  //         data: pdfData,
-  //         standardFontDataUrl: "node_modules/pdfjs-dist/standard_fonts/",
-  //       }).promise;
-
-  //       for (let i = 1; i <= pdf.numPages; i++) {
-  //         const page = await pdf.getPage(i);
-  //         const textContent = await page.getTextContent();
-  //         const text = textContent.items.map((item) => item.str).join(" ");
-
-  //         pages.push({
-  //           page_number: i,
-  //           page_char_count: text.length,
-  //           page_token_count: text.length / 4,
-  //           page_word_count: text.split(" ").length,
-  //           page_sentence_count_raw: text.split(".").length,
-  //           text: cleanString(text),
-  //         });
-  //       }
-
-  //       const jsonData = {
-  //         doc_id: 12345,
-  //         doc_name: file.name,
-  //         metadata: {},
-  //         pages: pages,
-  //       };
-
-  //       await axios
-  //         .post("http://52.66.174.249:7000/apirequired", jsonData)
-  //         .then((res) => {
-  //           console.log(JSON.stringify(res.data));
-  //           reset({ entitymeta: res.data.entitymetapipeline });
-  //           setSummary(markdownToPlainText(res.data.entitymetapipeline));
-  //         })
-  //         .catch((err) => {
-  //           console.error(err);
-  //           setEntitymetaError("Failed to fetch summary."); // Show error message in UI
-  //         })
-  //         .finally(() => {
-  //           setLoading(false); // Stop loading after request completes
-  //         });
-  //     } catch (error) {
-  //       console.error("Error processing file:", error);
-  //       setEntitymetaError(
-  //         "An error occurred while processing the document."
-  //       );
-  //       setLoading2(false);
-  //     }
-  //   };
-
-  //   reader.onerror = () => {
-  //     console.error("Error reading the file.");
-  //     setEntitymetaError("Failed to read the file.");
-  //     setLoading2(false);
-  //   };
-  // };
-
-
 
 
 
@@ -911,14 +700,14 @@ console.log("hllllooo new "+PdfUrl)
         "REFERRED_ACTS": ["referredacts", setReferredacts],
       };
   
-      for (const key in metadataFields) {
-        const [fieldName, setter] = metadataFields[key];
-        const value = metadata.hasOwnProperty(key) ? metadata[key] : "";
-        console.log(`📦 Setting metadata [${fieldName}] from key "${key}" → "${value}"`);
-        setter(value);
-        setValue("judgementauthor", metadata[key] || "");  // inside the metadata loop
+for (const key in metadataFields) {
+  const [fieldName, setter] = metadataFields[key];
+  const value = metadata[key] || "";
+  setter(value);
+  setValue(fieldName, value);  // ✅ Correct
+}
 
-      }
+      
   
       console.log("✅ All fields populated.");
     } catch (error) {
