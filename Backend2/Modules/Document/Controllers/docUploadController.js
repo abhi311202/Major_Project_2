@@ -87,6 +87,7 @@ export const DocUpload = async (req, res) => {
           );
           if (doc_owner_map_id) {
             // send document to PYTHON API TO INGEST
+            // console.log(MongoDB.Document_Content);
             const json_py = {
               doc_id: doc_id,
               doc_name: MongoDB.Doc_Title,
@@ -96,8 +97,8 @@ export const DocUpload = async (req, res) => {
             };
             // console.log(json_py);
             // http://13.127.253.239:5004/ingest
-            // console.log(`http://${process.env.RAG}/ingest`);
-
+            console.log(`http://${process.env.RAG}/ingest`);
+            console.log(json_py);
             const response = await axios.post(
               `http://${process.env.RAG}/ingest`,
               json_py

@@ -229,7 +229,7 @@ const [sortOrder, setSortOrder] = React.useState('asc'); // or 'desc'
   };
   const handleSendQuery = async () => {
     if (!query.trim()) {
-      toast.error("Please enter a query.");
+      toast.error("Please enter a question.");
       return;
     }
   
@@ -249,33 +249,42 @@ const [sortOrder, setSortOrder] = React.useState('asc'); // or 'desc'
         },
       });
   
-      const response = res.data?.data; // ✅ accessing inside `.data.data`
+      const responseData = res.data?.data;
   
-      if (!response) {
-        throw new Error("Invalid API response structure");
+      if (!responseData) {
+        throw new Error("Invalid API response format");
       }
   
-      // ✅ Correct logging
-      console.log("🟢 Full API Response:", response);
-      console.log("📝 Query:", response.query);
-      console.log("📌 Answer:", response.result);
-      console.log("📚 References:", response.references);
-      console.log("🔍 Metadata:", response.metadata);
-      console.log("🧩 Entities:", response.entities);
+      // ✅ Log all key parts
+      console.log("📝 Query:", responseData.query);
+      console.log("📌 Answer/Response:", responseData.response);
+      console.log("📚 References:", responseData.references);
+      console.log("🔍 Metadata:", responseData.metadata);
+      console.log("🧩 Entities:", responseData.entities);
   
-      setMessages((prev) => [...prev, { type: "ai", text: response.result || "No result found." }]);
-    } catch (err) {
-      console.error("❌ API error:", err);
-      setMessages((prev) => [...prev, { type: "ai", text: "Error: Unable to get response." }]);
+      // ✅ Append response to chat messages
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "ai",
+          text: responseData.response || "No response found.",
+        },
+      ]);
+    } catch (error) {
+      console.error("❌ API error:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "ai",
+          text: "⚠️ Error: Could not retrieve response.",
+        },
+      ]);
     } finally {
       setWaitingForResponse(false);
       setQuery("");
     }
   };
-  
-  
-  
-  
+
 
   const handleEndChat = async () => {
   if (!ingestOutput || !ingestOutput.index_name) {

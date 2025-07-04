@@ -10,6 +10,9 @@ import servicesRoutes from "./Services/Routes/servicesRoutes.js";
 import aiServicesRoutes from "./Modules/AI_Services/Routes/aiServicesRoutes.js";
 import cookieParser from "cookie-parser";
 import connectMongo from "./config/mongoClient.js";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 const app = express();
 app.use(cors());
@@ -20,11 +23,24 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 dotenv.config();
 const port = process.env.PORT || 4000;
 
+// Simulate __dirname in ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Serve static files (e.g., for React frontend)
+// ✅ Serve static files from React build folder
+app.use(express.static(path.join(__dirname, "../Frontend/dist")));
+
+// // // ✅ Catch-all for SPA client-side routing
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../Frontend/dist/index.html"));
+});
+
 connectMongo();
 
-app.get("/", (req, res) => {
-  res.send("Hello Abiiii!");
-});
+// app.get("/", (req, res) => {
+//   res.send("Hello Abiiii!");
+// });
 
 app.use("/User", userRoutes);
 app.use("/Admin", adminRoutes);
